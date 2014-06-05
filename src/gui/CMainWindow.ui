@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CMainWindow</class>
+ <widget class="QMainWindow" name="CMainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>820</width>
+    <height>730</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Test-suite Analysis and Manipulation</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="metrics">
+       <attribute name="title">
+        <string>Metrics</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>Tab 2</string>
+       </attribute>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTextBrowser" name="textBrowserOutput"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>820</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>false</bool>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpenConfiguration"/>
+    <addaction name="actionSaveConfiguration"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuData">
+    <property name="title">
+     <string>Data</string>
+    </property>
+    <widget class="QMenu" name="menuRead">
+     <property name="title">
+      <string>Read</string>
+     </property>
+     <addaction name="actionReadCoverage"/>
+     <addaction name="actionReadResults"/>
+     <addaction name="actionReadChangeset"/>
+    </widget>
+    <widget class="QMenu" name="menuDump">
+     <property name="title">
+      <string>Dump</string>
+     </property>
+     <addaction name="actionDumpCoverage"/>
+     <addaction name="actionDumpResults"/>
+     <addaction name="actionDumpChangeset"/>
+    </widget>
+    <addaction name="actionLoadTestSuite"/>
+    <addaction name="separator"/>
+    <addaction name="menuRead"/>
+    <addaction name="menuDump"/>
+   </widget>
+   <widget class="QMenu" name="menuMetrics">
+    <property name="title">
+     <string>Metrics</string>
+    </property>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuData"/>
+   <addaction name="menuMetrics"/>
+  </widget>
+  <action name="actionOpenConfiguration">
+   <property name="text">
+    <string>Open configuration</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionLoadTestSuite">
+   <property name="text">
+    <string>Load test-suite</string>
+   </property>
+  </action>
+  <action name="actionSaveConfiguration">
+   <property name="text">
+    <string>Save configuration</string>
+   </property>
+  </action>
+  <action name="actionReadCoverage">
+   <property name="text">
+    <string>Coverage</string>
+   </property>
+  </action>
+  <action name="actionReadResults">
+   <property name="text">
+    <string>Results</string>
+   </property>
+  </action>
+  <action name="actionReadChangeset">
+   <property name="text">
+    <string>Changeset</string>
+   </property>
+  </action>
+  <action name="actionDumpCoverage">
+   <property name="text">
+    <string>Coverage</string>
+   </property>
+  </action>
+  <action name="actionDumpResults">
+   <property name="text">
+    <string>Results</string>
+   </property>
+  </action>
+  <action name="actionDumpChangeset">
+   <property name="text">
+    <string>Changeset</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
