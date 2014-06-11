@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>820</width>
+    <width>621</width>
     <height>730</height>
    </rect>
   </property>
@@ -20,8 +20,8 @@
    <string>Test-suite Analysis and Manipulation</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="enabled">
        <bool>true</bool>
@@ -41,7 +41,7 @@
       </widget>
      </widget>
     </item>
-    <item>
+    <item row="1" column="0">
      <widget class="QTextBrowser" name="textBrowserOutput"/>
     </item>
    </layout>
@@ -51,7 +51,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>820</width>
+     <width>621</width>
      <height>25</height>
     </rect>
    </property>
@@ -62,23 +62,19 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionOpenConfiguration"/>
-    <addaction name="actionSaveConfiguration"/>
+    <addaction name="actionNewWorkspace"/>
+    <addaction name="actionRenameWorkspace"/>
+    <addaction name="actionSaveWorkspace"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuData">
-    <property name="title">
-     <string>Data</string>
+   <widget class="QMenu" name="menuTestSuite">
+    <property name="enabled">
+     <bool>true</bool>
     </property>
-    <widget class="QMenu" name="menuRead">
-     <property name="title">
-      <string>Read</string>
-     </property>
-     <addaction name="actionReadCoverage"/>
-     <addaction name="actionReadResults"/>
-     <addaction name="actionReadChangeset"/>
-    </widget>
+    <property name="title">
+     <string>Test-Suite</string>
+    </property>
     <widget class="QMenu" name="menuDump">
      <property name="title">
       <string>Dump</string>
@@ -89,21 +85,23 @@
     </widget>
     <addaction name="actionLoadTestSuite"/>
     <addaction name="separator"/>
-    <addaction name="menuRead"/>
     <addaction name="menuDump"/>
    </widget>
    <widget class="QMenu" name="menuMetrics">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="title">
      <string>Metrics</string>
     </property>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuData"/>
+   <addaction name="menuTestSuite"/>
    <addaction name="menuMetrics"/>
   </widget>
-  <action name="actionOpenConfiguration">
+  <action name="actionNewWorkspace">
    <property name="text">
-    <string>Open configuration</string>
+    <string>New workspace</string>
    </property>
   </action>
   <action name="actionExit">
@@ -112,13 +110,16 @@
    </property>
   </action>
   <action name="actionLoadTestSuite">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Load test-suite</string>
    </property>
   </action>
-  <action name="actionSaveConfiguration">
+  <action name="actionSaveWorkspace">
    <property name="text">
-    <string>Save configuration</string>
+    <string>Save workspace</string>
    </property>
   </action>
   <action name="actionReadCoverage">
@@ -149,6 +150,11 @@
   <action name="actionDumpChangeset">
    <property name="text">
     <string>Changeset</string>
+   </property>
+  </action>
+  <action name="actionRenameWorkspace">
+   <property name="text">
+    <string>Rename workspace</string>
    </property>
   </action>
  </widget>

@@ -15,6 +15,9 @@ public:
     explicit CLoadTestSuiteDialog(QWidget *parent = 0);
     ~CLoadTestSuiteDialog();
 
+protected:
+    bool eventFilter(QObject *object, QEvent *event);
+
 private slots:
     void on_pushButtonCoverage_clicked();
 

@@ -1,13 +1,16 @@
 #include "CLoadTestSuiteDialog.h"
 #include "CMainWindow.h"
 #include "ui_CLoadTestSuiteDialog.h"
+#include "lib/CWorkspace.h"
 #include <QFileDialog>
+#include <QMessageBox>
 
 CLoadTestSuiteDialog::CLoadTestSuiteDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::CLoadTestSuiteDialog)
 {
     ui->setupUi(this);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->installEventFilter(this);
 }
 
 CLoadTestSuiteDialog::~CLoadTestSuiteDialog()
@@ -30,7 +33,18 @@ void CLoadTestSuiteDialog::on_pushButtonChangeset_clicked()
     ui->textEditResults->setText(QFileDialog::getOpenFileName(this));
 }
 
+bool CLoadTestSuiteDialog::eventFilter(QObject *object, QEvent *event)
+ {
+     if (object == ui->buttonBox->button(QDialogButtonBox::Ok) && event->type() == QEvent::MouseButtonRelease) {
+            if (ui->textEditCoverage->toPlainText().isEmpty() || ui->textEditResults->toPlainText().isEmpty()) {
+                 QMessageBox::critical(this, "Error", "Mising results or coverage file");
+                 return true;
+             }
+     }
+     return false;
+ }
+
 void CLoadTestSuiteDialog::on_buttonBox_accepted()
 {
-    qobject_cast<CMainWindow*>(parent())->loadSelectionData(ui->textEditCoverage->toPlainText(), ui->textEditResults->toPlainText(), ui->textEditChangeset->toPlainText());
+    qobject_cast<CMainWindow*>(parent())->getWorkspace()->loadTestSuite(ui->textEditCoverage->toPlainText(), ui->textEditResults->toPlainText(), ui->textEditChangeset->toPlainText());
 }

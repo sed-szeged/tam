@@ -2,9 +2,8 @@
 #define CMAINWINDOW_H
 
 #include <QMainWindow>
-#include "data/CSelectionData.h"
 
-using namespace soda;
+class CWorkspace;
 
 namespace Ui {
 class CMainWindow;
@@ -18,18 +17,21 @@ public:
     explicit CMainWindow(QWidget *parent = 0);
     ~CMainWindow();
 
-    void loadSelectionData(QString coverage, QString results, QString changes);
+    CWorkspace* getWorkspace() { return m_workspace; }
+    Ui::CMainWindow* getUi() { return ui; }
 
 private slots:
     void on_actionExit_triggered();
 
     void on_actionLoadTestSuite_triggered();
 
+    void on_actionNewWorkspace_triggered();
+
     void on_actionDumpCoverage_triggered();
 
 private:
     Ui::CMainWindow *ui;
-    CSelectionData *selectionData;
+    CWorkspace* m_workspace;
 };
 
 #endif // CMAINWINDOW_H
