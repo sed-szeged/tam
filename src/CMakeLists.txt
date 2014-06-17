@@ -8,6 +8,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(Qt5Widgets REQUIRED)
+find_package(Qt5WebKitWidgets REQUIRED)
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
@@ -25,6 +26,16 @@ include(ExternalProject)
 # Set default ExternalProject root directory
 set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/ThirdParty)
 
+# Compile Unqlite
+ExternalProject_Add(
+    Unqlite
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/../ext/unqlite
+    INSTALL_COMMAND ""
+)
+
+include_directories(${CMAKE_SOURCE_DIR}/../ext)
+
+# rapidjson
 ExternalProject_Add(
     rapidjson
     SVN_REPOSITORY "http://rapidjson.googlecode.com/svn/trunk"
@@ -34,7 +45,6 @@ ExternalProject_Add(
     INSTALL_COMMAND "" # skip install
     )
 
-# set(RAPIDJSON_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/ThirdParty/src/rapidjson/include)
 include_directories(${CMAKE_BINARY_DIR}/ThirdParty/src/rapidjson/include)
 
 # Add SoDA
@@ -70,8 +80,8 @@ file(GLOB tam_FORMS ${tam_SOURCE_DIR}/gui/*.ui)
 
 QT5_WRAP_UI(tam_FORMS_HEADERS ${tam_FORMS})
 
-# aux_source_directory(${tam_SOURCE_DIR}/lib tam_lib)
+aux_source_directory(${tam_SOURCE_DIR}/lib tam_lib)
 
-add_executable(test-suite-analysis-and-manipulation ${tam_SOURCES} ${tam_FORMS_HEADERS} ${tam_SOURCE_DIR}/lib/CWorkspace.cpp ${tam_SOURCE_DIR}/lib/CWorkspace.h)
-target_link_libraries(test-suite-analysis-and-manipulation ${binary_dir}/lib/SoDA/${CMAKE_FIND_LIBRARY_PREFIXES}SoDA.so ${Boost_LIBRARIES})
-qt5_use_modules(test-suite-analysis-and-manipulation Widgets)
+add_executable(test-suite-analysis-and-manipulation ${tam_SOURCES} ${tam_FORMS_HEADERS} ${tam_lib})
+target_link_libraries(test-suite-analysis-and-manipulation ${binary_dir}/lib/SoDA/${CMAKE_FIND_LIBRARY_PREFIXES}SoDA.so ${Boost_LIBRARIES} ${CMAKE_BINARY_DIR}/ThirdParty/src/Unqlite-build/${CMAKE_FIND_LIBRARY_PREFIXES}Unqlite.so)
+qt5_use_modules(test-suite-analysis-and-manipulation WebKitWidgets Widgets)

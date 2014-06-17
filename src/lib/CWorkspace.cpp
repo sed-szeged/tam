@@ -1,13 +1,20 @@
 #include "CWorkspace.h"
+#include "CUnqliteWrapper.h"
+
 #include "util/CSelectionStatistics.h"
 #include "ui_CMainWindow.h"
+#include <iostream>
 #include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
 
-CWorkspace::CWorkspace(const char *name, CMainWindow *mainWindow) :
-    m_isChangesAvailable(false), m_name(name),
+CWorkspace::CWorkspace(CMainWindow *mainWindow) :
+    m_isChangesAvailable(false), m_isSaved(false), m_fileName(QString()),
     m_testSuite(new CSelectionData()), m_mainWindow(mainWindow)
 {
+    m_mainWindow->getUi()->textBrowserOutput->append("New empty workspace created...");
+    for (int i = 0; i < NUM_OF_COLS; ++i) {
+        m_results[collections[i]] = new rapidjson::Document();
+        m_results[collections[i]]->SetObject();
+    }
 }
 
 CWorkspace::~CWorkspace()
@@ -18,18 +25,75 @@ CWorkspace::~CWorkspace()
     }
 }
 
-void CWorkspace::loadTestSuite(QString coverage, QString results, QString changes)
+bool CWorkspace::save()
 {
-    m_mainWindow->getUi()->textBrowserOutput->append("Loading coverage data from path: " + coverage + " ...");
-    m_testSuite->loadCoverage(coverage.toStdString());
+    CUnqliteWrapper *wrapper = new CUnqliteWrapper(m_fileName.toStdString());
+    for (int i = 0; i < NUM_OF_COLS; ++i) {
+        if (!wrapper->storeDocument(collections[i], *m_results[collections[i]]))
+            return false;
+    }
+    delete wrapper;
+    m_isSaved = true;
+    return true;
+}
 
-    m_mainWindow->getUi()->textBrowserOutput->append("Loading results data from path: " + results + " ...");
-    m_testSuite->loadResults(results.toStdString());
+void CWorkspace::load()
+{
+    CUnqliteWrapper *wrapper = new CUnqliteWrapper(m_fileName.toStdString());
+    for (int i = 0; i < NUM_OF_COLS; ++i) {
+        wrapper->fetchById(collections[i], 0, *m_results[collections[i]]);
+    }
+    delete wrapper;
+}
 
-    if (!changes.isEmpty()) {
-        m_mainWindow->getUi()->textBrowserOutput->append("Loading changeset data from path: " + changes + " ...");
-        m_testSuite->loadChangeset(changes.toStdString());
+QString CWorkspace::getCoveragePath()
+{
+    if ((*m_results[WS])["coverage_binary"].IsNull())
+        return "";
+    return (*m_results[WS])["coverage_binary"].GetString();
+}
+
+QString CWorkspace::getResultsPath()
+{
+    if ((*m_results[WS])["results_binary"].IsNull())
+        return "";
+    return (*m_results[WS])["results_binary"].GetString();
+}
+
+QString CWorkspace::getChangesetPath()
+{
+    if ((*m_results[WS])["changeset_binary"].IsNull())
+        return "";
+    return (*m_results[WS])["changeset_binary"].GetString();
+}
+
+void CWorkspace::setBinaryPaths(QString coverage, QString results, QString changes)
+{
+    rapidjson::Value s;
+    s.SetString(coverage.toStdString().c_str(), coverage.length(), m_results[WS]->GetAllocator());
+    m_results[WS]->AddMember("coverage_binary", s, m_results[WS]->GetAllocator());
+
+    s.SetString(results.toStdString().c_str(), results.length(), m_results[WS]->GetAllocator());
+    m_results[WS]->AddMember("results_binary", s, m_results[WS]->GetAllocator());
+
+    s.SetString(changes.toStdString().c_str(), changes.length(), m_results[WS]->GetAllocator());
+    m_results[WS]->AddMember("changeset_binary", s, m_results[WS]->GetAllocator());
+
+    if (!changes.isEmpty())
         m_isChangesAvailable = true;
+}
+
+void CWorkspace::loadTestSuite()
+{
+    m_mainWindow->getUi()->textBrowserOutput->append("Loading coverage data from path: " + QString((*m_results[WS])["coverage_binary"].GetString()) + " ...");
+    m_testSuite->loadCoverage((*m_results[WS])["coverage_binary"].GetString());
+
+    m_mainWindow->getUi()->textBrowserOutput->append("Loading results data from path: " + QString((*m_results[WS])["results_binary"].GetString()) + " ...");
+    m_testSuite->loadResults((*m_results[WS])["results_binary"].GetString());
+
+    if (m_isChangesAvailable) {
+        m_mainWindow->getUi()->textBrowserOutput->append("Loading changeset data from path: " + QString((*m_results[WS])["changes_binary"].GetString()) + " ...");
+        m_testSuite->loadChangeset((*m_results[WS])["changes_binary"].GetString());
     }
 
     m_testSuite->globalize();
@@ -42,18 +106,16 @@ void CWorkspace::calcStatistics()
     m_mainWindow->getUi()->textBrowserOutput->append("Calculating statistics...");
     CSelectionStatistics stat(m_testSuite);
 
-    m_results["coverage-statistics"] = new rapidjson::Document();
-    m_results["coverage-statistics"]->SetObject();
-    stat.calcCoverageRelatedStatistics(*m_results["coverage-statistics"]);
-    m_results["results-statistics"] = new rapidjson::Document();
-    m_results["results-statistics"]->SetObject();
-    stat.calcCovResultsSummary(*m_results["results-statistics"]);
-    stat.calcFailStatistics(*m_results["results-statistics"]);
+    stat.calcCoverageRelatedStatistics(*m_results[COV_STATS]);
+
+    stat.calcCovResultsSummary(*m_results[RES_STATS]);
+    stat.calcFailStatistics(*m_results[RES_STATS]);
+
     m_mainWindow->getUi()->textBrowserOutput->append("done.");
-    m_mainWindow->getUi()->textBrowserOutput->clear();
 
     rapidjson::StringBuffer s;
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+
     m_results["results-statistics"]->Accept(writer);
     m_mainWindow->getUi()->textBrowserOutput->append(s.GetString());
 }

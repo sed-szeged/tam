@@ -29,7 +29,17 @@ private slots:
 
     void on_actionDumpCoverage_triggered();
 
+    void on_actionShowStatistics_triggered();
+
+    void on_actionLoadWorkspace_triggered();
+
+    void on_actionSaveWorkspace_triggered();
+
 private:
+
+    bool saveWorkspace();
+    bool saveWorkspaceAs();
+
     Ui::CMainWindow *ui;
     CWorkspace* m_workspace;
 };

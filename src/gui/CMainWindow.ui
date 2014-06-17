@@ -63,7 +63,7 @@
      <string>File</string>
     </property>
     <addaction name="actionNewWorkspace"/>
-    <addaction name="actionRenameWorkspace"/>
+    <addaction name="actionLoadWorkspace"/>
     <addaction name="actionSaveWorkspace"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
@@ -86,6 +86,7 @@
     <addaction name="actionLoadTestSuite"/>
     <addaction name="separator"/>
     <addaction name="menuDump"/>
+    <addaction name="actionShowStatistics"/>
    </widget>
    <widget class="QMenu" name="menuMetrics">
     <property name="enabled">
@@ -155,6 +156,16 @@
   <action name="actionRenameWorkspace">
    <property name="text">
     <string>Rename workspace</string>
+   </property>
+  </action>
+  <action name="actionShowStatistics">
+   <property name="text">
+    <string>Show statistics</string>
+   </property>
+  </action>
+  <action name="actionLoadWorkspace">
+   <property name="text">
+    <string>Load workspace</string>
    </property>
   </action>
  </widget>

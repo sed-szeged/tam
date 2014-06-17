@@ -1,8 +1,6 @@
 #include <stdexcept>
 #include "CUnqliteWrapper.h"
 
-namespace tam {
-
 CUnqliteWrapper::CUnqliteWrapper(std::string db_path) :
     m_Path(db_path), m_Rc(0), m_isOpened(false),
     m_Db(NULL), m_Vm(NULL), m_Scalar(NULL)
@@ -21,7 +19,7 @@ bool CUnqliteWrapper::storeDocument(std::string collection, rapidjson::Document 
     std::string jx9 = JX9_PROG_STORE_DOCUMENT;
     {
         rapidjson::StringBuffer sb;
-        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+        rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
         doc.Accept(writer);
         jx9.replace(jx9.find("%s"), 2, sb.GetString());
     }
@@ -59,7 +57,7 @@ bool CUnqliteWrapper::removeDocumentById(std::string collection, int id)
     return res;
 }
 
-rapidjson::Document CUnqliteWrapper::fetchAll(std::string collection)
+void CUnqliteWrapper::fetchAll(std::string collection, rapidjson::Document &doc)
 {
     std::string jx9 = JX9_PROG_GET_ALL_DOC_FROM_COLLECTION;
 
@@ -69,7 +67,6 @@ rapidjson::Document CUnqliteWrapper::fetchAll(std::string collection)
     executeVm();
 
     unqlite_value *resVal = unqlite_vm_extract_variable(m_Vm, "data");
-    rapidjson::Document doc;
     {
         std::string res = unqlite_value_to_string(resVal, NULL);
         doc.Parse<0>(res.c_str());
@@ -78,10 +75,9 @@ rapidjson::Document CUnqliteWrapper::fetchAll(std::string collection)
     unqlite_vm_release_value(m_Vm, resVal);
     unqlite_vm_release(m_Vm);
     close();
-    return doc;
 }
 
-rapidjson::Document CUnqliteWrapper::fetchById(std::string collection, int id)
+void CUnqliteWrapper::fetchById(std::string collection, int id, rapidjson::Document &doc)
 {
     std::string jx9 = JX9_PROG_GET_DOC_BY_ID;
 
@@ -92,7 +88,6 @@ rapidjson::Document CUnqliteWrapper::fetchById(std::string collection, int id)
     executeVm();
 
     unqlite_value *resVal = unqlite_vm_extract_variable(m_Vm, "data");
-    rapidjson::Document doc;
     {
         std::string res = unqlite_value_to_string(resVal, NULL);
         doc.Parse<0>(res.c_str());
@@ -101,7 +96,6 @@ rapidjson::Document CUnqliteWrapper::fetchById(std::string collection, int id)
     unqlite_vm_release_value(m_Vm, resVal);
     unqlite_vm_release(m_Vm);
     close();
-    return doc;
 }
 
 void CUnqliteWrapper::open()
@@ -203,5 +197,3 @@ void CUnqliteWrapper::executeVm()
         throw std::runtime_error(std::string(zErr));
     }
 }
-
-} // namespace tam

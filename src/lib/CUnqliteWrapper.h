@@ -2,12 +2,12 @@
 #define CUNQLITEWRAPPER_H
 
 extern "C" {
-    #include "unqlite.h"
+    #include "unqlite/unqlite.h"
 }
 
-#include "document.h"
-#include "stringbuffer.h"
-#include "prettywriter.h"
+#include "rapidjson/document.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 
 #include <iostream>
 
@@ -22,6 +22,7 @@ extern "C" {
  "}"\
  "/* Record to store the string is replaced with the proper json structure */ "\
  "$zRec = %s;"\
+ "$zRec = json_encode($zRec);"\
  "$rc = db_store($coll, $zRec);"
 
 #define JX9_PROG_GET_ALL_DOC_FROM_COLLECTION "/* Retrieve collection records */"\
@@ -41,8 +42,6 @@ extern "C" {
  "  return;"\
  "}"\
  "$rc = db_drop_record($coll, $id);"
-
-namespace tam {
 
 /**
  * @brief The CUnqliteWrapper class provides a higher level methods for getting and storing data from a unqlite database.
@@ -77,17 +76,17 @@ public:
     /**
      * @brief Returns all json objects from the specified collection.
      * @param collection Collection name.
-     * @return Returns the requested json objects.
+     * @param Returns the requested json objects.
      */
-    rapidjson::Document fetchAll(std::string collection);
+    void fetchAll(std::string collection, rapidjson::Document &doc);
 
     /**
      * @brief Returns the specified json object from the database.
      * @param collection Collection name.
      * @param id Identifier of the json object.
-     * @return Returns the specified json object.
+     * @param doc Returns the specified json object.
      */
-    rapidjson::Document fetchById(std::string collection, int id);
+    void fetchById(std::string collection, int id, rapidjson::Document &doc);
 
 private:
 
@@ -163,5 +162,4 @@ private:
 
 };
 
-} // namespace tam
 #endif // CUNQLITEWRAPPER_H
