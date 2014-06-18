@@ -16,36 +16,81 @@
   <property name="windowTitle">
    <string>Test-Suite statistics</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tabStat">
+     <widget class="QWidget" name="tabGeneral">
       <attribute name="title">
        <string>General</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QWebView" name="webView" native="true"/>
+        <widget class="QWebView" name="webViewGen" native="true"/>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2">
+     <widget class="QWidget" name="tabCodeCov">
       <attribute name="title">
-       <string>Tab 2</string>
+       <string>Code coverage</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QWebView" name="webViewCodeCov" native="true"/>
+       </item>
+      </layout>
      </widget>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="tabTestCov">
       <attribute name="title">
-       <string>Page</string>
+       <string>Test coverage</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QWebView" name="webViewTestCov" native="true"/>
+       </item>
+      </layout>
      </widget>
-     <widget class="QWidget" name="tab_3">
+     <widget class="QWidget" name="tabResultsFail">
       <attribute name="title">
-       <string>Page</string>
+       <string>Results fail</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <widget class="QWebView" name="webViewResultsFail" native="true"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabRevisionFail">
+      <attribute name="title">
+       <string>Revision fail</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QWebView" name="webViewRevisionFail" native="true"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabExecutedHist">
+      <attribute name="title">
+       <string>Executed hist</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <item>
+        <widget class="QWebView" name="webViewExecutedHist" native="true"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabTcInfo">
+      <attribute name="title">
+       <string>Test case info</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QWebView" name="webViewTcInfo" native="true"/>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>

@@ -3,6 +3,7 @@
 
 #include "rapidjson/document.h"
 #include <QDialog>
+#include <QWebView>
 
 namespace Ui {
 class CShowStatisticsDialog;
@@ -17,7 +18,8 @@ public:
     ~CShowStatisticsDialog();
 
 private:
-    void createHtml();
+    void fillGeneralTab();
+    void generateChartForTab(QWebView *view, int tabindex);
     void convertJsonToStringArray(rapidjson::Document *data, QString element, QString &str);
     Ui::CShowStatisticsDialog *ui;
 };
