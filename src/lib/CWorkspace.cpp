@@ -10,7 +10,7 @@ CWorkspace::CWorkspace(CMainWindow *mainWindow) :
     m_isChangesAvailable(false), m_isSaved(false), m_fileName(QString()),
     m_testSuite(new CSelectionData()), m_mainWindow(mainWindow)
 {
-    m_mainWindow->getUi()->textBrowserOutput->append("New empty workspace created...");
+    m_mainWindow->getUi()->textBrowserOutput->append("New workspace created...");
     for (int i = 0; i < NUM_OF_COLS; ++i) {
         m_results[collections[i]] = new rapidjson::Document();
         m_results[collections[i]]->SetObject();
@@ -48,21 +48,21 @@ void CWorkspace::load()
 
 QString CWorkspace::getCoveragePath()
 {
-    if ((*m_results[WS])["coverage_binary"].IsNull())
+    if (m_results[WS]->FindMember("coverage_binary") == NULL || (*m_results[WS])["coverage_binary"].IsNull())
         return "";
     return (*m_results[WS])["coverage_binary"].GetString();
 }
 
 QString CWorkspace::getResultsPath()
 {
-    if ((*m_results[WS])["results_binary"].IsNull())
+    if (m_results[WS]->FindMember("results_binary") == NULL || (*m_results[WS])["results_binary"].IsNull())
         return "";
     return (*m_results[WS])["results_binary"].GetString();
 }
 
 QString CWorkspace::getChangesetPath()
 {
-    if ((*m_results[WS])["changeset_binary"].IsNull())
+    if (m_results[WS]->FindMember("changeset_binary") == NULL || (*m_results[WS])["changeset_binary"].IsNull())
         return "";
     return (*m_results[WS])["changeset_binary"].GetString();
 }
@@ -112,10 +112,4 @@ void CWorkspace::calcStatistics()
     stat.calcFailStatistics(*m_results[RES_STATS]);
 
     m_mainWindow->getUi()->textBrowserOutput->append("done.");
-
-    rapidjson::StringBuffer s;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
-
-    m_results["results-statistics"]->Accept(writer);
-    m_mainWindow->getUi()->textBrowserOutput->append(s.GetString());
 }

@@ -112,7 +112,7 @@ void CShowStatisticsDialog::generateChartForTab(QWebView *view, int tabindex)
                       "'containerId': 'chart',"
                       "'options': {"
                         "title: '%3',"
-                        "width: 1000,"
+                        "width: 800,"
                         "legend: { position: 'none' },"
                         "hAxis: {title: '%4'},"
                         "vAxis: {title: '%5'}"
@@ -128,8 +128,8 @@ void CShowStatisticsDialog::generateChartForTab(QWebView *view, int tabindex)
               "google.setOnLoadCallback(drawChart);"
             "</script></head><body>"
             "<div id=\"dashboard\">"
-            "<div id=\"chart\" style=\"height:400px; width:1000px;\"></div>"
-            "<div id=\"control\" style=\"height:50px; width:1000px;\"></div>"
+            "<div id=\"chart\" style=\"height:400px; width:800px;text-align:left;\"></div>"
+            "<div id=\"control\" style=\"height:50px; width:800px;text-align:left;\"></div>"
               "</div></body></html>";
 
     rapidjson::Document *data = qobject_cast<CMainWindow*>(parent())->getWorkspace()->getResultsByName(chartData[tabindex].dataSource.toStdString());

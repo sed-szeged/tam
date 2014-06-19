@@ -8,7 +8,7 @@
 
 using namespace soda;
 
-// names of the collections which results will be stored
+// names of the collections where results will be stored
 #define NUM_OF_COLS 3
 #define WS collections[0]
 #define COV_STATS collections[1]
