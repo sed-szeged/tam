@@ -92,35 +92,52 @@ void CShowStatisticsDialog::generateChartForTab(QWebView *view, int tabindex)
             "<title> Google Visualization API Sample </title>"
             "<!-- One script tag loads all the required libraries! Do not specify any chart types in the autoload statement. -->"
             "<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>"
+            "<script type=\"text/javascript\">google.load('visualization', '1.1', {packages: ['controls']});</script>"
             "<script type=\"text/javascript\">"
-              "google.load(\"visualization\", \"1\", {packages:[\"corechart\"]});"
-              "google.setOnLoadCallback(drawChart);"
-
               "function drawChart() {"
                 "var data = google.visualization.arrayToDataTable(["
                       "[%1],"
                 "%2]);"
 
-                "var options = {"
-                  "title: '%3',"
-                  "width: 1000,"
-                  "legend: { position: 'none' },"
-                  "hAxis: {title: '%4'},"
-                  "vAxis: {title: '%5'}"
-                "};"
-                "var chart = new google.visualization.ColumnChart(document.getElementById('chart'));"
-                "chart.draw(data, options);"
+                "var slider = new google.visualization.ControlWrapper({"
+                    "'controlType': 'ChartRangeFilter',"
+                    "'containerId': 'control',"
+                    "'options': {"
+                        "'filterColumnIndex': 0,"
+                    "},"
+                    "'state': {'range': {'start': 0, 'end': data.getNumberOfRows() < 100 ? data.getNumberOfRows() : 100}}"
+                "});"
+                "var wrapper = new google.visualization.ChartWrapper({"
+                      "'chartType': 'ColumnChart',"
+                      "'containerId': 'chart',"
+                      "'options': {"
+                        "title: '%3',"
+                        "width: 1000,"
+                        "legend: { position: 'none' },"
+                        "hAxis: {title: '%4'},"
+                        "vAxis: {title: '%5'}"
+                      "}"
+                    "});"
+                // Create the dashboard.
+                "var dashboard = new google.visualization.Dashboard(document.getElementById('dashboard'))."
+                // Configure the slider to affect the bar chart
+                "bind(slider, wrapper)."
+                // Draw the dashboard
+                "draw(data);"
               "}"
+              "google.setOnLoadCallback(drawChart);"
             "</script></head><body>"
-            "<div id=\"chart\" style=\"height:800px; width:1000px;\"></div>"
-              "</body></html>";
+            "<div id=\"dashboard\">"
+            "<div id=\"chart\" style=\"height:400px; width:1000px;\"></div>"
+            "<div id=\"control\" style=\"height:50px; width:1000px;\"></div>"
+              "</div></body></html>";
 
     rapidjson::Document *data = qobject_cast<CMainWindow*>(parent())->getWorkspace()->getResultsByName(chartData[tabindex].dataSource.toStdString());
     QString dataStr;
     if (chartData[tabindex].dataColumn == "test_case_info") {
         const rapidjson::Value& val = (*data)["test_case_info"];
         for (rapidjson::Value::ConstMemberIterator itr = val.MemberBegin(); itr != val.MemberEnd(); ++itr) {
-            dataStr.append("['" + QString(itr->name.GetString()) + "'," + QString::number(itr->value["executed"].GetInt()) + "," +  QString::number(itr->value["fail"].GetInt()) + "],");
+            dataStr.append("[" + QString(itr->name.GetString()) + "," + QString::number(itr->value["executed"].GetInt()) + "," +  QString::number(itr->value["fail"].GetInt()) + "],");
         }
         dataStr.chop(1);
     } else
@@ -139,7 +156,7 @@ void CShowStatisticsDialog::convertJsonToStringArray(rapidjson::Document *data, 
         if (QString(itr->name.GetString()).compare("0") == 0)
             continue;
 
-        str.append("['" + QString(itr->name.GetString()) + "'," + QString::number(itr->value.GetInt()) + "],");
+        str.append("[" + QString(itr->name.GetString()) + "," + QString::number(itr->value.GetInt()) + "],");
     }
     str.chop(1);
 }
