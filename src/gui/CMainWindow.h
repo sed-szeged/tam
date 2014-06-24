@@ -1,7 +1,12 @@
 #ifndef CMAINWINDOW_H
 #define CMAINWINDOW_H
 
+#include "engine/CKernel.h"
+
 #include <QMainWindow>
+#include <QStandardItemModel>
+
+using namespace soda;
 
 class CWorkspace;
 
@@ -18,6 +23,7 @@ public:
     ~CMainWindow();
 
     CWorkspace* getWorkspace() { return m_workspace; }
+    CKernel* getKernel() { return m_kernel; }
     Ui::CMainWindow* getUi() { return ui; }
 
 private slots:
@@ -35,13 +41,24 @@ private slots:
 
     void on_actionSaveWorkspace_triggered();
 
+    void on_buttonClusterTestList_clicked();
+
+    void on_checkBoxSelectAll_stateChanged(int state);
+
+    void on_buttonClusterCEList_clicked();
+
 private:
 
     bool saveWorkspace();
     bool saveWorkspaceAs();
 
     Ui::CMainWindow *ui;
-    CWorkspace* m_workspace;
+    CWorkspace *m_workspace;
+    CKernel *m_kernel;
+
+    QStandardItemModel* m_model;
+
+    QStringList m_clusterAlgorithms;
 };
 
 #endif // CMAINWINDOW_H
