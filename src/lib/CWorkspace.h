@@ -9,12 +9,13 @@
 using namespace soda;
 
 // names of the collections where results will be stored
-#define NUM_OF_COLS 3
+#define NUM_OF_COLS 4
 #define WS collections[0]
 #define COV_STATS collections[1]
 #define RES_STATS collections[2]
+#define METRICS collections[3]
 
-static const char* collections[] = { "workspace", "coverage-statistics", "results-statistics" };
+static const char* collections[NUM_OF_COLS] = { "workspace", "coverage-statistics", "results-statistics", "metrics" };
 
 class CWorkspace
 {

@@ -98,7 +98,6 @@ void CWorkspace::loadTestSuite()
 
     m_testSuite->globalize();
     m_mainWindow->getUi()->textBrowserOutput->append("Test-Suite loading finished.");
-    calcStatistics();
 }
 
 void CWorkspace::calcStatistics()
