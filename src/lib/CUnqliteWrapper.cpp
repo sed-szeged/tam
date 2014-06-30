@@ -90,6 +90,12 @@ void CUnqliteWrapper::fetchById(std::string collection, int id, rapidjson::Docum
     unqlite_value *resVal = unqlite_vm_extract_variable(m_Vm, "data");
     {
         std::string res = unqlite_value_to_string(resVal, NULL);
+        if (res.empty()) {
+            unqlite_vm_release_value(m_Vm, resVal);
+            unqlite_vm_release(m_Vm);
+            close();
+            return;
+        }
         doc.Parse<0>(res.c_str());
     }
 

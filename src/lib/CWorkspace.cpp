@@ -32,6 +32,12 @@ bool CWorkspace::save()
         if (!wrapper->storeDocument(collections[i], *m_results[collections[i]]))
             return false;
     }
+    rapidjson::Document clusters;
+    clusters.SetObject();
+    m_mainWindow->getClusterList()->toJson(clusters);
+    if (!wrapper->storeDocument(CLUSTERS, clusters))
+        return false;
+
     delete wrapper;
     m_isSaved = true;
     return true;
@@ -43,6 +49,10 @@ void CWorkspace::load()
     for (int i = 0; i < NUM_OF_COLS; ++i) {
         wrapper->fetchById(collections[i], 0, *m_results[collections[i]]);
     }
+    rapidjson::Document clusters;
+    clusters.SetObject();
+    wrapper->fetchById(CLUSTERS, 0, clusters);
+    m_mainWindow->getClusterList()->fromJson(clusters);
     delete wrapper;
 }
 

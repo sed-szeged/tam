@@ -1,16 +1,16 @@
-#include "CShowClustersDialog.h"
+#include "CShowClusters.h"
 #include "CMainWindow.h"
 #include "lib/CTestSuiteMetrics.h"
 
-CShowClustersDialog::CShowClustersDialog()
+CShowClusters::CShowClusters()
 {
 }
 
-CShowClustersDialog::~CShowClustersDialog()
+CShowClusters::~CShowClusters()
 {
 }
 
-void CShowClustersDialog::generateCharts(std::map<std::string, CClusterDefinition> &clusterList, QWebView *webView)
+void CShowClusters::generateCharts(std::map<std::string, CClusterDefinition> &clusterList, QWebView *webView)
 {
     QString html = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
         "<html xmlns=\"http://www.w3.org/1999/xhtml\">"
@@ -62,21 +62,15 @@ void CShowClustersDialog::generateCharts(std::map<std::string, CClusterDefinitio
               "</body></html>";
 
     QString clusterTable;
-    for (std::map<std::string, CClusterDefinition>::iterator it = clusterList.begin(); it != clusterList.end(); ++it) {
-        QStringList parts = QString(it->first.c_str()).split(" - ");
-        if (parts.size() == 2 && parts[0] != parts[1])
-            continue;
-        clusterTable.append("['" + QString(parts[0]) + "'," + QString::number(it->second.getTestCases().size()) + "," + QString::number(it->second.getCodeElements().size()) + "],");
-    }
-    clusterTable.chop(1);
-
     QString clusterChart;
     for (std::map<std::string, CClusterDefinition>::iterator it = clusterList.begin(); it != clusterList.end(); ++it) {
         QStringList parts = QString(it->first.c_str()).split(" - ");
         if (parts.size() == 2 && parts[0] != parts[1])
             continue;
+        clusterTable.append("['" + QString(parts[0]) + "'," + QString::number(it->second.getTestCases().size()) + "," + QString::number(it->second.getCodeElements().size()) + "],");
         clusterChart.append("['" + QString(parts[0]) + "'," + QString::number(it->second.getTestCases().size()) + "],");
     }
+    clusterTable.chop(1);
     clusterChart.chop(1);
     html = html.arg(clusterTable, clusterChart);
 

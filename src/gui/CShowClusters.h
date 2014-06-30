@@ -6,11 +6,11 @@
 
 using namespace soda;
 
-class CShowClustersDialog
+class CShowClusters
 {
 public:
-    CShowClustersDialog();
-    ~CShowClustersDialog();
+    CShowClusters();
+    ~CShowClusters();
     void generateCharts(std::map<std::string, CClusterDefinition> &clusterList, QWebView *webView);
 };
 

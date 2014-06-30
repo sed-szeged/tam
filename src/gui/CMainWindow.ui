@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>640</width>
-    <height>612</height>
+    <height>647</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -29,7 +29,7 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="2,0">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="2,1">
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="enabled">
@@ -85,67 +85,77 @@
            <attribute name="title">
             <string>General</string>
            </attribute>
-           <widget class="QLabel" name="label_3">
+           <widget class="QGroupBox" name="groupBox_2">
             <property name="geometry">
              <rect>
               <x>10</x>
               <y>10</y>
-              <width>67</width>
-              <height>17</height>
+              <width>551</width>
+              <height>121</height>
              </rect>
             </property>
-            <property name="text">
-             <string>TextLabel</string>
+            <property name="title">
+             <string>Test-suite</string>
             </property>
-           </widget>
-           <widget class="QLabel" name="label_6">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>40</y>
-              <width>67</width>
-              <height>17</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-           <widget class="QLabel" name="label_7">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>80</y>
-              <width>67</width>
-              <height>17</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-           <widget class="QLabel" name="label_8">
-            <property name="geometry">
-             <rect>
-              <x>30</x>
-              <y>130</y>
-              <width>67</width>
-              <height>17</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
+            <widget class="QLabel" name="label_7">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>90</y>
+               <width>131</width>
+               <height>17</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Changeset matrix:</string>
+             </property>
+            </widget>
+            <widget class="QLabel" name="label_6">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>60</y>
+               <width>121</width>
+               <height>17</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Results file path:</string>
+             </property>
+            </widget>
+            <widget class="QLabel" name="label_3">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>30</y>
+               <width>131</width>
+               <height>17</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Coverage file path:</string>
+             </property>
+            </widget>
            </widget>
           </widget>
-          <widget class="QWidget" name="tab_2">
+          <widget class="QWidget" name="tests">
            <attribute name="title">
-            <string>Tab 2</string>
+            <string>Tests</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="codeElements">
+           <attribute name="title">
+            <string>Code Elements</string>
            </attribute>
           </widget>
          </widget>
         </item>
        </layout>
+      </widget>
+      <widget class="QWidget" name="statistics">
+       <attribute name="title">
+        <string>Statistics</string>
+       </attribute>
       </widget>
       <widget class="QWidget" name="cluster">
        <attribute name="title">
@@ -157,37 +167,7 @@
           <property name="currentIndex">
            <number>0</number>
           </property>
-          <widget class="QWidget" name="data">
-           <attribute name="title">
-            <string>Data</string>
-           </attribute>
-           <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <item>
-             <widget class="QWebView" name="clusterWebView" native="true"/>
-            </item>
-           </layout>
-          </widget>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="metrics">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <attribute name="title">
-        <string>Metrics</string>
-       </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QTabWidget" name="tabWidget_3">
-          <property name="currentIndex">
-           <number>1</number>
-          </property>
-          <widget class="QWidget" name="options">
+          <widget class="QWidget" name="clusterOptionstab">
            <attribute name="title">
             <string>Options</string>
            </attribute>
@@ -195,7 +175,7 @@
             <property name="geometry">
              <rect>
               <x>150</x>
-              <y>10</y>
+              <y>15</y>
               <width>111</width>
               <height>27</height>
              </rect>
@@ -236,14 +216,14 @@
             </property>
             <property name="geometry">
              <rect>
-              <x>150</x>
-              <y>50</y>
-              <width>101</width>
+              <x>470</x>
+              <y>55</y>
+              <width>81</width>
               <height>27</height>
              </rect>
             </property>
             <property name="text">
-             <string>Load test list</string>
+             <string>Browse...</string>
             </property>
            </widget>
            <widget class="QLabel" name="label_5">
@@ -262,34 +242,108 @@
            <widget class="QPushButton" name="buttonClusterCEList">
             <property name="geometry">
              <rect>
-              <x>190</x>
-              <y>90</y>
-              <width>151</width>
+              <x>470</x>
+              <y>95</y>
+              <width>81</width>
               <height>27</height>
              </rect>
             </property>
             <property name="text">
-             <string>Load CE list</string>
+             <string>Browse...</string>
             </property>
            </widget>
-           <widget class="QLabel" name="label_4">
+           <widget class="QLabel" name="labelClusterTestList">
             <property name="geometry">
              <rect>
-              <x>10</x>
-              <y>140</y>
-              <width>67</width>
+              <x>130</x>
+              <y>60</y>
+              <width>311</width>
               <height>17</height>
              </rect>
             </property>
             <property name="text">
-             <string>Revision:</string>
+             <string>No cluster test list selected</string>
+            </property>
+           </widget>
+           <widget class="QLabel" name="labelClusterCodeeElementList">
+            <property name="geometry">
+             <rect>
+              <x>190</x>
+              <y>100</y>
+              <width>251</width>
+              <height>17</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>No cluster code element list selected</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="buttonCalcCluster">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>130</y>
+              <width>111</width>
+              <height>27</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Create clusters</string>
+            </property>
+           </widget>
+          </widget>
+          <widget class="QWidget" name="data">
+           <attribute name="title">
+            <string>Data</string>
+           </attribute>
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <item>
+             <widget class="QWebView" name="clusterWebView" native="true"/>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="metrics">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>Metrics</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QTabWidget" name="tabWidget_3">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="options">
+           <attribute name="title">
+            <string>Options</string>
+           </attribute>
+           <widget class="QLabel" name="label_4">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>20</y>
+              <width>121</width>
+              <height>17</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Revision number:</string>
             </property>
            </widget>
            <widget class="QLineEdit" name="lineEditRevisionMetrics">
             <property name="geometry">
              <rect>
-              <x>80</x>
-              <y>130</y>
+              <x>140</x>
+              <y>15</y>
               <width>113</width>
               <height>27</height>
              </rect>
@@ -299,7 +353,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>170</y>
+              <y>60</y>
               <width>221</width>
               <height>141</height>
              </rect>
@@ -340,8 +394,8 @@
            <widget class="QPushButton" name="buttonCalculateMetrics">
             <property name="geometry">
              <rect>
-              <x>430</x>
-              <y>330</y>
+              <x>10</x>
+              <y>190</y>
               <width>99</width>
               <height>27</height>
              </rect>
@@ -355,19 +409,29 @@
            <attribute name="title">
             <string>Results</string>
            </attribute>
+          </widget>
+          <widget class="QWidget" name="charts">
+           <attribute name="title">
+            <string>Charts</string>
+           </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_4">
             <item>
              <widget class="QWebView" name="webViewResults" native="true"/>
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="heatMap">
+           <attribute name="title">
+            <string>Heat map</string>
+           </attribute>
+          </widget>
          </widget>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="statistics">
+      <widget class="QWidget" name="score">
        <attribute name="title">
-        <string>Statistics</string>
+        <string>Score</string>
        </attribute>
       </widget>
      </widget>
@@ -509,6 +573,11 @@
   <action name="actionShowMetrics">
    <property name="text">
     <string>Show metrics</string>
+   </property>
+  </action>
+  <action name="actionLog">
+   <property name="text">
+    <string>Log</string>
    </property>
   </action>
  </widget>

@@ -27,12 +27,14 @@ extern "C" {
 
 #define JX9_PROG_GET_ALL_DOC_FROM_COLLECTION "/* Retrieve collection records */"\
  "if (!db_exists($coll)) {"\
+ "  $data = \"\";"\
  "  return;"\
  "}"\
  "$data = db_fetch_all($coll);"
 
 #define JX9_PROG_GET_DOC_BY_ID "/* Retrieve collection records */"\
  "if (!db_exists($coll)) {"\
+ "  $data = \"\";"\
  "  return;"\
  "}"\
  "$data = db_fetch_by_id($coll, $id);"

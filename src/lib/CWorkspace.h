@@ -14,6 +14,7 @@ using namespace soda;
 #define COV_STATS collections[1]
 #define RES_STATS collections[2]
 #define METRICS collections[3]
+#define CLUSTERS "clusters"
 
 static const char* collections[NUM_OF_COLS] = { "workspace", "coverage-statistics", "results-statistics", "metrics" };
 

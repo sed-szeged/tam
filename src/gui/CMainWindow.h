@@ -3,6 +3,7 @@
 
 #include "engine/CKernel.h"
 #include "lib/CTestSuiteMetrics.h"
+#include "lib/CClusterList.h"
 
 #include <QMainWindow>
 #include <QProgressBar>
@@ -27,6 +28,8 @@ public:
     CWorkspace* getWorkspace() { return m_workspace; }
     CTestSuiteMetrics* getMetrics() { return m_metrics; }
     CKernel* getKernel() { return m_kernel; }
+    CClusterList* getClusterList() { return m_clusterList; }
+
     Ui::CMainWindow* getUi() { return ui; }
 
 private slots:
@@ -56,11 +59,13 @@ private slots:
 
     void on_actionShowMetrics_triggered();
 
+    void on_buttonCalcCluster_clicked();
+
 private:
 
     void createStatusBar();
     void fillWidgets();
-
+    void updateLabels();
     bool saveWorkspace();
     bool saveWorkspaceAs();
 
@@ -71,6 +76,8 @@ private:
     CWorkspace *m_workspace;
     CKernel *m_kernel;
     CTestSuiteMetrics *m_metrics;
+    CClusterList *m_clusterList;
+
     QStringList m_clusterAlgorithms;
 };
 

@@ -1,7 +1,7 @@
 #include "CMainWindow.h"
 #include "CLoadTestSuiteDialog.h"
 #include "CShowStatisticsDialog.h"
-#include "CShowClustersDialog.h"
+#include "CShowClusters.h"
 #include "ui_CMainWindow.h"
 #include "lib/CWorkspace.h"
 
@@ -18,13 +18,13 @@
 CMainWindow::CMainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::CMainWindow),
-    m_workspace(NULL), m_kernel(new CKernel()),
-    m_metrics(NULL)
+    m_kernel(new CKernel())
 {
     ui->setupUi(this);
     setFixedSize(size());
 
     m_workspace = new CWorkspace(this);
+    m_clusterList = new CClusterList(this);
     m_metrics = new CTestSuiteMetrics(this);
 
     ui->textBrowserOutput->hide();
@@ -38,6 +38,8 @@ CMainWindow::~CMainWindow()
     delete m_progressBar;
     delete m_workspace;
     delete m_kernel;
+    delete m_clusterList;
+    delete m_metrics;
     delete m_model;
 }
 
@@ -72,6 +74,18 @@ void CMainWindow::createStatusBar()
     m_progressBar->setMaximumSize(180, 19);
     m_progressBar->setValue(0);
     ui->statusBar->addPermanentWidget(m_progressBar);
+}
+
+void CMainWindow::updateLabels()
+{
+    rapidjson::Document &res = *m_workspace->getResultsByName(WS);
+    QFileInfo fileInfo;
+    fileInfo.setFile(res.HasMember("cluster-code-elements-list") ? res["cluster-code-elements-list"].GetString() : "");
+    if (fileInfo.exists())
+        ui->labelClusterCodeeElementList->setText(fileInfo.fileName());
+    fileInfo.setFile(res.HasMember("cluster-test-list") ? res["cluster-test-list"].GetString() : "");
+    if (fileInfo.exists())
+        ui->labelClusterTestList->setText(fileInfo.fileName());
 }
 
 void CMainWindow::on_actionExit_triggered()
@@ -118,6 +132,7 @@ void CMainWindow::on_actionLoadWorkspace_triggered()
         m_workspace->setFileName(fileName);
         m_workspace->load();
         ui->textBrowserOutput->append("Workspace loaded from file: " + m_workspace->getFileName());
+        updateLabels();
     }
 }
 
@@ -161,6 +176,7 @@ void CMainWindow::on_buttonClusterTestList_clicked()
     rapidjson::Value s;
     s.SetString(fileName.toStdString().c_str(), fileName.length(), workspace->GetAllocator());
     workspace->AddMember("cluster-test-list", s, workspace->GetAllocator());
+    ui->labelClusterTestList->setText(fileName);
 }
 
 void CMainWindow::on_buttonClusterCEList_clicked()
@@ -175,6 +191,7 @@ void CMainWindow::on_buttonClusterCEList_clicked()
     rapidjson::Value s;
     s.SetString(fileName.toStdString().c_str(), fileName.length(), workspace->GetAllocator());
     workspace->AddMember("cluster-code-elements-list", s, workspace->GetAllocator());
+    ui->labelClusterCodeeElementList->setText(fileName);
 }
 
 void CMainWindow::on_checkBoxMetricsSelectAll_stateChanged(int state)
@@ -186,9 +203,8 @@ void CMainWindow::on_checkBoxMetricsSelectAll_stateChanged(int state)
 
 void CMainWindow::on_actionComputeClusters_triggered()
 {
-    m_metrics->createClusters();
-    CShowClustersDialog cluster;
-    cluster.generateCharts(m_metrics->getClusterList(), ui->clusterWebView);
+    CShowClusters cluster;
+    cluster.generateCharts(m_clusterList->getClusters(), ui->clusterWebView);
     ui->textBrowserOutput->append("Clusters done.");
 }
 
@@ -227,7 +243,7 @@ void CMainWindow::on_actionShowMetrics_triggered()
                     "data.addColumn('number', 'cov');"
                     "data.addColumn('number', 'tpce');"
                     "data.addColumn('number', 'effcov');"
-                    //"data.addColumn('number', 'effpart');"
+                    "data.addColumn('number', 'effpart');"
                     "data.addRows(["
                       "%1"
                     "]);"
@@ -267,8 +283,8 @@ void CMainWindow::on_actionShowMetrics_triggered()
                       "wrapper.draw();"
                   "}"
             "</script></head><body>"
-            "<div id=\"covval_chart\" style=\"height:500px;\"></div>"
-            "<div id=\"spec_chart\" style=\"height:500px;\"></div>"
+            "<div id=\"covval_chart\" style=\"height:400px;\"></div>"
+            "<div id=\"spec_chart\" style=\"height:400px;\"></div>"
               "</body></html>";
 
     rapidjson::Document& metrics = *m_workspace->getResultsByName(METRICS);
@@ -281,9 +297,9 @@ void CMainWindow::on_actionShowMetrics_triggered()
             continue;
 
         rapidjson::Value& val = itr->value;
-        covVal.append("['" + QString(parts[0]) + "'," + QString::number(val["fault-detection"].GetDouble()) + "," + QString::number(val["tpce"].GetDouble()) + "," + QString::number(val["coverage-efficiency"].GetDouble()) + /*"," + QString::number(val["partition-efficiency"].GetDouble()) +*/ "],");
+        covVal.append("['" + QString(parts[0]) + "'," + QString::number(val["fault-detection"].GetDouble()) + "," + QString::number(val["tpce"].GetDouble()) + "," + QString::number(val["coverage-efficiency"].GetDouble()) + "," + QString::number(val["partition-efficiency"].GetDouble()) + "],");
 
-        IndexType nrOfTests = m_metrics->getClusterList().at(itr->name.GetString()).getTestCases().size();
+        IndexType nrOfTests = m_clusterList->getClusters().at(itr->name.GetString()).getTestCases().size();
         IndexType specTests = nrOfTests * val["specialization"].GetDouble();
         if (specTests == nrOfTests)
             continue;
@@ -296,8 +312,11 @@ void CMainWindow::on_actionShowMetrics_triggered()
 
     html = html.arg(covVal, special);
 
-std::cout << html.toStdString() << std::endl;
-
     ui->webViewResults->settings()->clearMemoryCaches();
     ui->webViewResults->setHtml(html);
+}
+
+void CMainWindow::on_buttonCalcCluster_clicked()
+{
+    m_clusterList->createClusters();
 }
