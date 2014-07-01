@@ -1,7 +1,7 @@
 #include "CMainWindow.h"
-#include "CLoadTestSuiteDialog.h"
 #include "CShowStatisticsDialog.h"
 #include "CShowClusters.h"
+#include "CShowMetrics.h"
 #include "ui_CMainWindow.h"
 #include "lib/CWorkspace.h"
 
@@ -86,6 +86,16 @@ void CMainWindow::updateLabels()
     fileInfo.setFile(res.HasMember("cluster-test-list") ? res["cluster-test-list"].GetString() : "");
     if (fileInfo.exists())
         ui->labelClusterTestList->setText(fileInfo.fileName());
+
+    fileInfo.setFile(m_workspace->getCoveragePath());
+    if (fileInfo.exists())
+        ui->labelCov->setText(fileInfo.fileName());
+    fileInfo.setFile(m_workspace->getResultsPath());
+    if (fileInfo.exists())
+        ui->labelRes->setText(fileInfo.fileName());
+    fileInfo.setFile(m_workspace->getChangesetPath());
+    if (fileInfo.exists())
+        ui->labelChan->setText(fileInfo.fileName());
 }
 
 void CMainWindow::on_actionExit_triggered()
@@ -93,21 +103,13 @@ void CMainWindow::on_actionExit_triggered()
     qApp->exit();
 }
 
-void CMainWindow::on_actionLoadTestSuite_triggered()
-{
-    CLoadTestSuiteDialog dia(this);
-    dia.exec();
-}
-
 void CMainWindow::on_actionDumpCoverage_triggered()
 {
     rapidjson::StringBuffer s;
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
-    for (int i = 0; i < NUM_OF_COLS; ++i) {
         s.Clear();
-        m_workspace->getResultsByName(collections[i])->Accept(writer);
-        ui->textBrowserOutput->append(s.GetString());
-    }
+        m_workspace->getResultsByName(WS)->Accept(writer);
+        std::cout << s.GetString() << std::endl;
 }
 
 void CMainWindow::on_actionNewWorkspace_triggered()
@@ -142,6 +144,11 @@ void CMainWindow::on_actionSaveWorkspace_triggered()
         ui->textBrowserOutput->append("Workspace saved successfully to " + m_workspace->getFileName());
     else
         ui->textBrowserOutput->append("Unable to save workspace to " + m_workspace->getFileName());
+}
+
+void CMainWindow::on_actionSaveWorkspaceAs_triggered()
+{
+    saveWorkspaceAs();
 }
 
 bool CMainWindow::saveWorkspace()
@@ -227,96 +234,50 @@ void CMainWindow::on_buttonCalculateMetrics_clicked()
 
 void CMainWindow::on_actionShowMetrics_triggered()
 {
-    QString html = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
-        "<html xmlns=\"http://www.w3.org/1999/xhtml\">"
-          "<head>"
-            "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>"
-            "<!-- One script tag loads all the required libraries! Do not specify any chart types in the autoload statement. -->"
-            "<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>"
-            "<script type=\"text/javascript\">google.load('visualization', '1.1', {packages: ['controls']});</script>"
-            "<script type=\"text/javascript\">"
-                  "google.setOnLoadCallback(drawCovChart);"
-                  "google.setOnLoadCallback(drawSpecChart);"
-                  "function drawCovChart() {"
-                    "var data = new google.visualization.DataTable();"
-                    "data.addColumn('string', 'Group');"
-                    "data.addColumn('number', 'cov');"
-                    "data.addColumn('number', 'tpce');"
-                    "data.addColumn('number', 'effcov');"
-                    "data.addColumn('number', 'effpart');"
-                    "data.addRows(["
-                      "%1"
-                    "]);"
-
-                    "var wrapper = new google.visualization.ChartWrapper({"
-                      "'chartType': 'ColumnChart',"
-                      "'containerId': 'covval_chart',"
-                      "'dataTable': data,"
-                      "'options': {"
-                        "title: 'Coverage values and test efficiency',"
-                        "legend: {position: 'bottom'},"
-                      "}"
-                    "});"
-                    // Draw chart
-                    "wrapper.draw();"
-                  "}"
-                  "function drawSpecChart() {"
-                      "var data = new google.visualization.DataTable();"
-                      "data.addColumn('string', 'Group');"
-                      "data.addColumn('number', 'Special tests');"
-                      "data.addColumn('number', 'Not special tests');"
-                      "data.addRows(["
-                        "%2"
-                      "]);"
-
-                      "var wrapper = new google.visualization.ChartWrapper({"
-                        "'chartType': 'ColumnChart',"
-                        "'containerId': 'spec_chart',"
-                        "'dataTable': data,"
-                        "'options': {"
-                          "title: 'Special and not special part of all tests in each group',"
-                          "legend: {position: 'bottom'},"
-                          "isStacked: true,"
-                        "}"
-                      "});"
-                      // Draw chart
-                      "wrapper.draw();"
-                  "}"
-            "</script></head><body>"
-            "<div id=\"covval_chart\" style=\"height:400px;\"></div>"
-            "<div id=\"spec_chart\" style=\"height:400px;\"></div>"
-              "</body></html>";
-
-    rapidjson::Document& metrics = *m_workspace->getResultsByName(METRICS);
-
-    QString covVal;
-    QString special;
-    for (rapidjson::Value::MemberIterator itr = metrics.MemberBegin(); itr != metrics.MemberEnd(); ++itr) {
-        QStringList parts = QString(itr->name.GetString()).split(" - ");
-        if (parts.size() == 2 && parts[0] != parts[1])
-            continue;
-
-        rapidjson::Value& val = itr->value;
-        covVal.append("['" + QString(parts[0]) + "'," + QString::number(val["fault-detection"].GetDouble()) + "," + QString::number(val["tpce"].GetDouble()) + "," + QString::number(val["coverage-efficiency"].GetDouble()) + "," + QString::number(val["partition-efficiency"].GetDouble()) + "],");
-
-        IndexType nrOfTests = m_clusterList->getClusters().at(itr->name.GetString()).getTestCases().size();
-        IndexType specTests = nrOfTests * val["specialization"].GetDouble();
-        if (specTests == nrOfTests)
-            continue;
-
-        special.append("['" + QString(parts[0]) + "'," + QString::number(specTests) + "," + QString::number(nrOfTests - specTests) + "],");
-    }
-
-    covVal.chop(1);
-    special.chop(1);
-
-    html = html.arg(covVal, special);
-
-    ui->webViewResults->settings()->clearMemoryCaches();
-    ui->webViewResults->setHtml(html);
+    CShowMetrics metrics(*m_workspace->getResultsByName(METRICS), m_clusterList->getClusters());
+    metrics.generateResults(ui->webViewResults);
+    metrics.generateCharts(ui->webViewCharts);
 }
 
 void CMainWindow::on_buttonCalcCluster_clicked()
 {
     m_clusterList->createClusters();
+}
+
+void CMainWindow::on_buttonBrowseCov_clicked()
+{
+    QFileInfo fileInfo;
+    fileInfo.setFile(QFileDialog::getOpenFileName(this, tr("Open coverage file")));
+    if (!fileInfo.exists())
+        return;
+
+    ui->labelCov->setText(fileInfo.fileName());
+    m_workspace->setCoveragePath(fileInfo.filePath());
+}
+
+void CMainWindow::on_buttonBrowseRes_clicked()
+{
+    QFileInfo fileInfo;
+    fileInfo.setFile(QFileDialog::getOpenFileName(this, tr("Open results file")));
+    if (!fileInfo.exists())
+        return;
+
+    ui->labelRes->setText(fileInfo.fileName());
+    m_workspace->setResultsPath(fileInfo.filePath());
+}
+
+void CMainWindow::on_buttonBrowseCha_clicked()
+{
+    QFileInfo fileInfo;
+    fileInfo.setFile(QFileDialog::getOpenFileName(this, tr("Open changeset file")));
+    if (!fileInfo.exists())
+        return;
+
+    ui->labelChan->setText(fileInfo.fileName());
+    m_workspace->setChangesetPath(fileInfo.filePath());
+}
+
+void CMainWindow::on_buttonLoad_clicked()
+{
+    m_workspace->loadTestSuite();
 }

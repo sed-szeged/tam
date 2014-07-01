@@ -56,54 +56,62 @@ void CWorkspace::load()
     delete wrapper;
 }
 
+void CWorkspace::setCoveragePath(QString path)
+{
+    rapidjson::Value s;
+    s.SetString(path.toStdString().c_str(), path.length(), m_results[WS]->GetAllocator());
+    m_results[WS]->AddMember("coverage-binary", s, m_results[WS]->GetAllocator());
+}
+
 QString CWorkspace::getCoveragePath()
 {
-    if (m_results[WS]->FindMember("coverage_binary") == NULL || (*m_results[WS])["coverage_binary"].IsNull())
+    if (m_results[WS]->FindMember("coverage-binary") == NULL || (*m_results[WS])["coverage-binary"].IsNull())
         return "";
-    return (*m_results[WS])["coverage_binary"].GetString();
+    return (*m_results[WS])["coverage-binary"].GetString();
+}
+
+void CWorkspace::setResultsPath(QString path)
+{
+    rapidjson::Value s;
+    s.SetString(path.toStdString().c_str(), path.length(), m_results[WS]->GetAllocator());
+    m_results[WS]->AddMember("results-binary", s, m_results[WS]->GetAllocator());
 }
 
 QString CWorkspace::getResultsPath()
 {
-    if (m_results[WS]->FindMember("results_binary") == NULL || (*m_results[WS])["results_binary"].IsNull())
+    if (m_results[WS]->FindMember("results-binary") == NULL || (*m_results[WS])["results-binary"].IsNull())
         return "";
-    return (*m_results[WS])["results_binary"].GetString();
+    return (*m_results[WS])["results-binary"].GetString();
+}
+
+void CWorkspace::setChangesetPath(QString path)
+{
+    rapidjson::Value s;
+    s.SetString(path.toStdString().c_str(), path.length(), m_results[WS]->GetAllocator());
+    m_results[WS]->AddMember("changeset-binary", s, m_results[WS]->GetAllocator());
+
+    if (!path.isEmpty())
+        m_isChangesAvailable = true;
 }
 
 QString CWorkspace::getChangesetPath()
 {
-    if (m_results[WS]->FindMember("changeset_binary") == NULL || (*m_results[WS])["changeset_binary"].IsNull())
+    if (m_results[WS]->FindMember("changeset-binary") == NULL || (*m_results[WS])["changeset-binary"].IsNull())
         return "";
-    return (*m_results[WS])["changeset_binary"].GetString();
-}
-
-void CWorkspace::setBinaryPaths(QString coverage, QString results, QString changes)
-{
-    rapidjson::Value s;
-    s.SetString(coverage.toStdString().c_str(), coverage.length(), m_results[WS]->GetAllocator());
-    m_results[WS]->AddMember("coverage_binary", s, m_results[WS]->GetAllocator());
-
-    s.SetString(results.toStdString().c_str(), results.length(), m_results[WS]->GetAllocator());
-    m_results[WS]->AddMember("results_binary", s, m_results[WS]->GetAllocator());
-
-    s.SetString(changes.toStdString().c_str(), changes.length(), m_results[WS]->GetAllocator());
-    m_results[WS]->AddMember("changeset_binary", s, m_results[WS]->GetAllocator());
-
-    if (!changes.isEmpty())
-        m_isChangesAvailable = true;
+    return (*m_results[WS])["changeset-binary"].GetString();
 }
 
 void CWorkspace::loadTestSuite()
 {
-    m_mainWindow->getUi()->textBrowserOutput->append("Loading coverage data from path: " + QString((*m_results[WS])["coverage_binary"].GetString()) + " ...");
-    m_testSuite->loadCoverage((*m_results[WS])["coverage_binary"].GetString());
+    m_mainWindow->getUi()->textBrowserOutput->append("Loading coverage data from path: " + QString((*m_results[WS])["coverage-binary"].GetString()) + " ...");
+    m_testSuite->loadCoverage((*m_results[WS])["coverage-binary"].GetString());
 
-    m_mainWindow->getUi()->textBrowserOutput->append("Loading results data from path: " + QString((*m_results[WS])["results_binary"].GetString()) + " ...");
-    m_testSuite->loadResults((*m_results[WS])["results_binary"].GetString());
+    m_mainWindow->getUi()->textBrowserOutput->append("Loading results data from path: " + QString((*m_results[WS])["results-binary"].GetString()) + " ...");
+    m_testSuite->loadResults((*m_results[WS])["results-binary"].GetString());
 
     if (m_isChangesAvailable) {
-        m_mainWindow->getUi()->textBrowserOutput->append("Loading changeset data from path: " + QString((*m_results[WS])["changes_binary"].GetString()) + " ...");
-        m_testSuite->loadChangeset((*m_results[WS])["changes_binary"].GetString());
+        m_mainWindow->getUi()->textBrowserOutput->append("Loading changeset data from path: " + QString((*m_results[WS])["changes-binary"].GetString()) + " ...");
+        m_testSuite->loadChangeset((*m_results[WS])["changes-binary"].GetString());
     }
 
     m_testSuite->globalize();

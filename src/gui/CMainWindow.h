@@ -35,8 +35,6 @@ public:
 private slots:
     void on_actionExit_triggered();
 
-    void on_actionLoadTestSuite_triggered();
-
     void on_actionNewWorkspace_triggered();
 
     void on_actionDumpCoverage_triggered();
@@ -60,6 +58,16 @@ private slots:
     void on_actionShowMetrics_triggered();
 
     void on_buttonCalcCluster_clicked();
+
+    void on_buttonBrowseCov_clicked();
+
+    void on_buttonBrowseRes_clicked();
+
+    void on_buttonBrowseCha_clicked();
+
+    void on_buttonLoad_clicked();
+
+    void on_actionSaveWorkspaceAs_triggered();
 
 private:
 

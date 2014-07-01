@@ -57,7 +57,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -85,58 +85,145 @@
            <attribute name="title">
             <string>General</string>
            </attribute>
-           <widget class="QGroupBox" name="groupBox_2">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>10</y>
-              <width>551</width>
-              <height>121</height>
-             </rect>
-            </property>
-            <property name="title">
-             <string>Test-suite</string>
-            </property>
-            <widget class="QLabel" name="label_7">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>90</y>
-               <width>131</width>
-               <height>17</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Changeset matrix:</string>
-             </property>
-            </widget>
-            <widget class="QLabel" name="label_6">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>60</y>
-               <width>121</width>
-               <height>17</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Results file path:</string>
-             </property>
-            </widget>
-            <widget class="QLabel" name="label_3">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>30</y>
-               <width>131</width>
-               <height>17</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Coverage file path:</string>
-             </property>
-            </widget>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <item>
+             <widget class="QGroupBox" name="groupBox_2">
+              <property name="title">
+               <string>Test-suite</string>
+              </property>
+              <widget class="QLabel" name="label_7">
+               <property name="geometry">
+                <rect>
+                 <x>17</x>
+                 <y>110</y>
+                 <width>124</width>
+                 <height>17</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Changeset matrix:</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="label_6">
+               <property name="geometry">
+                <rect>
+                 <x>17</x>
+                 <y>70</y>
+                 <width>114</width>
+                 <height>17</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Results file path:</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="label_3">
+               <property name="geometry">
+                <rect>
+                 <x>17</x>
+                 <y>30</y>
+                 <width>128</width>
+                 <height>17</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Coverage file path:</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="labelChan">
+               <property name="geometry">
+                <rect>
+                 <x>151</x>
+                 <y>110</y>
+                 <width>291</width>
+                 <height>17</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>No file selected</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="labelCov">
+               <property name="geometry">
+                <rect>
+                 <x>151</x>
+                 <y>30</y>
+                 <width>291</width>
+                 <height>17</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>No file selected</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="labelRes">
+               <property name="geometry">
+                <rect>
+                 <x>151</x>
+                 <y>70</y>
+                 <width>291</width>
+                 <height>17</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>No file selected</string>
+               </property>
+              </widget>
+              <widget class="QPushButton" name="buttonBrowseCov">
+               <property name="geometry">
+                <rect>
+                 <x>450</x>
+                 <y>25</y>
+                 <width>85</width>
+                 <height>27</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Browse...</string>
+               </property>
+              </widget>
+              <widget class="QPushButton" name="buttonBrowseRes">
+               <property name="geometry">
+                <rect>
+                 <x>450</x>
+                 <y>65</y>
+                 <width>85</width>
+                 <height>27</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Browse...</string>
+               </property>
+              </widget>
+              <widget class="QPushButton" name="buttonBrowseCha">
+               <property name="geometry">
+                <rect>
+                 <x>450</x>
+                 <y>105</y>
+                 <width>85</width>
+                 <height>27</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Browse...</string>
+               </property>
+              </widget>
+              <widget class="QPushButton" name="buttonLoad">
+               <property name="geometry">
+                <rect>
+                 <x>450</x>
+                 <y>145</y>
+                 <width>85</width>
+                 <height>27</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Load</string>
+               </property>
+              </widget>
+             </widget>
+            </item>
+           </layout>
           </widget>
           <widget class="QWidget" name="tests">
            <attribute name="title">
@@ -409,6 +496,11 @@
            <attribute name="title">
             <string>Results</string>
            </attribute>
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <item>
+             <widget class="QWebView" name="webViewResults" native="true"/>
+            </item>
+           </layout>
           </widget>
           <widget class="QWidget" name="charts">
            <attribute name="title">
@@ -416,7 +508,7 @@
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_4">
             <item>
-             <widget class="QWebView" name="webViewResults" native="true"/>
+             <widget class="QWebView" name="webViewCharts" native="true"/>
             </item>
            </layout>
           </widget>
@@ -467,6 +559,7 @@
     <addaction name="actionNewWorkspace"/>
     <addaction name="actionLoadWorkspace"/>
     <addaction name="actionSaveWorkspace"/>
+    <addaction name="actionSaveWorkspaceAs"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -485,8 +578,6 @@
      <addaction name="actionDumpResults"/>
      <addaction name="actionDumpChangeset"/>
     </widget>
-    <addaction name="actionLoadTestSuite"/>
-    <addaction name="separator"/>
     <addaction name="menuDump"/>
     <addaction name="actionCalculateStatistics"/>
     <addaction name="actionComputeClusters"/>
@@ -512,32 +603,9 @@
     <string>Exit</string>
    </property>
   </action>
-  <action name="actionLoadTestSuite">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Load test-suite</string>
-   </property>
-  </action>
   <action name="actionSaveWorkspace">
    <property name="text">
     <string>Save workspace</string>
-   </property>
-  </action>
-  <action name="actionReadCoverage">
-   <property name="text">
-    <string>Coverage</string>
-   </property>
-  </action>
-  <action name="actionReadResults">
-   <property name="text">
-    <string>Results</string>
-   </property>
-  </action>
-  <action name="actionReadChangeset">
-   <property name="text">
-    <string>Changeset</string>
    </property>
   </action>
   <action name="actionDumpCoverage">
@@ -575,9 +643,9 @@
     <string>Show metrics</string>
    </property>
   </action>
-  <action name="actionLog">
+  <action name="actionSaveWorkspaceAs">
    <property name="text">
-    <string>Log</string>
+    <string>Save workspace as...</string>
    </property>
   </action>
  </widget>

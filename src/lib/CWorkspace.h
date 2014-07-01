@@ -31,8 +31,11 @@ public:
     bool isSaved() { return m_isSaved; }
     void setSaved(bool saved) { m_isSaved = saved; }
 
+    void setCoveragePath(QString path);
     QString getCoveragePath();
+    void setResultsPath(QString path);
     QString getResultsPath();
+    void setChangesetPath(QString path);
     QString getChangesetPath();
 
     QString getFileName() { return m_fileName; }
@@ -40,8 +43,6 @@ public:
 
     CSelectionData* getTestSuite() { return m_testSuite; }
     rapidjson::Document* getResultsByName(String name) { return m_results[name]; }
-
-    void setBinaryPaths(QString coverage, QString results, QString changes);
 
 private:
 

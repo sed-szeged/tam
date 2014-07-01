@@ -1,6 +1,4 @@
 #include "CShowClusters.h"
-#include "CMainWindow.h"
-#include "lib/CTestSuiteMetrics.h"
 
 CShowClusters::CShowClusters()
 {
