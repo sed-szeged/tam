@@ -2,6 +2,7 @@
 #include "CShowStatisticsDialog.h"
 #include "CShowClusters.h"
 #include "CShowMetrics.h"
+#include "CIDManagerTableModel.h"
 #include "ui_CMainWindow.h"
 #include "lib/CWorkspace.h"
 
@@ -16,9 +17,8 @@
 #include "rapidjson/stringbuffer.h"
 
 CMainWindow::CMainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::CMainWindow),
-    m_kernel(new CKernel())
+    QMainWindow(parent), ui(new Ui::CMainWindow),
+    m_revCompleter(NULL), m_kernel(new CKernel())
 {
     ui->setupUi(this);
     setFixedSize(size());
@@ -35,7 +35,9 @@ CMainWindow::CMainWindow(QWidget *parent) :
 CMainWindow::~CMainWindow()
 {
     delete ui;
-    delete m_progressBar;
+    delete m_statusProgressBar;
+    delete m_testSuiteAvailableLabel;
+    delete m_statusLabel;
     delete m_workspace;
     delete m_kernel;
     delete m_clusterList;
@@ -68,12 +70,24 @@ void CMainWindow::fillWidgets()
 
 void CMainWindow::createStatusBar()
 {
+    m_statusProgressBar = new QProgressBar(ui->statusBar);
+    m_statusProgressBar->setAlignment(Qt::AlignRight);
+    m_statusProgressBar->setMaximumSize(180, 19);
+    m_statusProgressBar->setTextVisible(false);
+
+    m_statusLabel = new QLabel(ui->statusBar);
+    m_statusLabel->setAlignment(Qt::AlignRight);
+
+    m_testSuiteAvailableLabel = new QLabel(ui->statusBar);
+    m_testSuiteAvailableLabel->setAlignment(Qt::AlignCenter);
+    m_testSuiteAvailableLabel->setText("TS");
+    m_testSuiteAvailableLabel->setToolTip("Test-suite loaded.");
+    m_testSuiteAvailableLabel->setVisible(false);
+
     ui->statusBar->setSizeGripEnabled(false);
-    m_progressBar = new QProgressBar(ui->statusBar);
-    m_progressBar->setAlignment(Qt::AlignRight);
-    m_progressBar->setMaximumSize(180, 19);
-    m_progressBar->setValue(0);
-    ui->statusBar->addPermanentWidget(m_progressBar);
+    ui->statusBar->addPermanentWidget(m_testSuiteAvailableLabel);
+    ui->statusBar->addPermanentWidget(m_statusLabel);
+    ui->statusBar->addPermanentWidget(m_statusProgressBar);
 }
 
 void CMainWindow::updateLabels()
@@ -277,7 +291,42 @@ void CMainWindow::on_buttonBrowseCha_clicked()
     m_workspace->setChangesetPath(fileInfo.filePath());
 }
 
+void CMainWindow::statusUpdate(QString label)
+{
+    m_statusLabel->setText(label);
+}
+
+void CMainWindow::loadFinished(QString msg)
+{
+    ui->statusBar->showMessage(msg, 5000);
+    m_statusProgressBar->setRange(0, 1);
+    m_statusLabel->clear();
+    delete m_loadThread;
+    m_testSuiteAvailableLabel->setVisible(true);
+
+    ui->tableViewTests->setModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getTestcases()));
+    ui->tableViewCE->setModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getCodeElements()));
+
+    if (m_revCompleter) {
+        delete m_revCompleter;
+        m_revCompleter = NULL;
+    }
+
+    QStandardItemModel *revs = new QStandardItemModel(this);
+    IntVector revsVec = m_workspace->getTestSuite()->getResults()->getRevisionNumbers();
+    for (IntVector::const_iterator it = revsVec.begin(); it != revsVec.end(); ++it) {
+        revs->appendRow(new QStandardItem(QString::number(*it)));
+    }
+    m_revCompleter = new QCompleter(revs, this);
+    m_revCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    ui->lineEditRevisionMetrics->setCompleter(m_revCompleter);
+}
+
 void CMainWindow::on_buttonLoad_clicked()
 {
-    m_workspace->loadTestSuite();
+    m_loadThread = new CTestSuiteLoader(this);
+    connect(m_loadThread, SIGNAL(updateStatusLabel(QString)), this, SLOT(statusUpdate(QString)));
+    connect(m_loadThread, SIGNAL(processFinished(QString)), this, SLOT(loadFinished(QString)));
+    m_statusProgressBar->setRange(0, 0);
+    m_loadThread->load(m_workspace);
 }

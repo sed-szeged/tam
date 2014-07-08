@@ -24,7 +24,6 @@ public:
     CWorkspace(CMainWindow *mainWindow);
     ~CWorkspace();
 
-    void loadTestSuite();
     void calcStatistics();
     bool save();
     void load();

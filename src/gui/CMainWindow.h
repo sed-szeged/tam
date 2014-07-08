@@ -4,9 +4,12 @@
 #include "engine/CKernel.h"
 #include "lib/CTestSuiteMetrics.h"
 #include "lib/CClusterList.h"
+#include "lib/CTestSuiteLoader.h"
 
+#include <QCompleter>
 #include <QMainWindow>
 #include <QProgressBar>
+#include <QLabel>
 #include <QStandardItemModel>
 
 using namespace soda;
@@ -33,6 +36,9 @@ public:
     Ui::CMainWindow* getUi() { return ui; }
 
 private slots:
+    void statusUpdate(QString label);
+    void loadFinished(QString msg);
+
     void on_actionExit_triggered();
 
     void on_actionNewWorkspace_triggered();
@@ -78,9 +84,13 @@ private:
     bool saveWorkspaceAs();
 
     Ui::CMainWindow *ui;
+    QCompleter *m_revCompleter;
     QStandardItemModel *m_model;
-    QProgressBar *m_progressBar;
+    QLabel *m_statusLabel;
+    QLabel *m_testSuiteAvailableLabel;
+    QProgressBar *m_statusProgressBar;
 
+    CTestSuiteLoader *m_loadThread;
     CWorkspace *m_workspace;
     CKernel *m_kernel;
     CTestSuiteMetrics *m_metrics;

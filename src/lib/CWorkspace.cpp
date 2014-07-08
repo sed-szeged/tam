@@ -101,23 +101,6 @@ QString CWorkspace::getChangesetPath()
     return (*m_results[WS])["changeset-binary"].GetString();
 }
 
-void CWorkspace::loadTestSuite()
-{
-    m_mainWindow->getUi()->textBrowserOutput->append("Loading coverage data from path: " + QString((*m_results[WS])["coverage-binary"].GetString()) + " ...");
-    m_testSuite->loadCoverage((*m_results[WS])["coverage-binary"].GetString());
-
-    m_mainWindow->getUi()->textBrowserOutput->append("Loading results data from path: " + QString((*m_results[WS])["results-binary"].GetString()) + " ...");
-    m_testSuite->loadResults((*m_results[WS])["results-binary"].GetString());
-
-    if (m_isChangesAvailable) {
-        m_mainWindow->getUi()->textBrowserOutput->append("Loading changeset data from path: " + QString((*m_results[WS])["changes-binary"].GetString()) + " ...");
-        m_testSuite->loadChangeset((*m_results[WS])["changes-binary"].GetString());
-    }
-
-    m_testSuite->globalize();
-    m_mainWindow->getUi()->textBrowserOutput->append("Test-Suite loading finished.");
-}
-
 void CWorkspace::calcStatistics()
 {
     m_mainWindow->getUi()->textBrowserOutput->append("Calculating statistics...");
