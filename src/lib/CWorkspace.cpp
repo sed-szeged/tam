@@ -101,15 +101,10 @@ QString CWorkspace::getChangesetPath()
     return (*m_results[WS])["changeset-binary"].GetString();
 }
 
-void CWorkspace::calcStatistics()
+bool CWorkspace::isStatisticsCalculated()
 {
-    m_mainWindow->getUi()->textBrowserOutput->append("Calculating statistics...");
-    CSelectionStatistics stat(m_testSuite);
+    if (m_results[WS]->FindMember("statistics-calculated") == NULL)
+        return false;
 
-    stat.calcCoverageRelatedStatistics(*m_results[COV_STATS]);
-
-    stat.calcCovResultsSummary(*m_results[RES_STATS]);
-    stat.calcFailStatistics(*m_results[RES_STATS]);
-
-    m_mainWindow->getUi()->textBrowserOutput->append("done.");
+    return (*m_results[WS])["statistics-calculated"].GetBool();
 }

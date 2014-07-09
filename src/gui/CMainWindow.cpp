@@ -1,5 +1,5 @@
 #include "CMainWindow.h"
-#include "CShowStatisticsDialog.h"
+#include "CShowStatistics.h"
 #include "CShowClusters.h"
 #include "CShowMetrics.h"
 #include "CIDManagerTableModel.h"
@@ -10,6 +10,7 @@
 #include <QLayout>
 #include <QStatusBar>
 #include <QCheckBox>
+#include <QWebFrame>
 
 #include <iostream>
 
@@ -96,7 +97,7 @@ void CMainWindow::updateLabels()
     QFileInfo fileInfo;
     fileInfo.setFile(res.HasMember("cluster-code-elements-list") ? res["cluster-code-elements-list"].GetString() : "");
     if (fileInfo.exists())
-        ui->labelClusterCodeeElementList->setText(fileInfo.fileName());
+        ui->labelClusterCodeElementList->setText(fileInfo.fileName());
     fileInfo.setFile(res.HasMember("cluster-test-list") ? res["cluster-test-list"].GetString() : "");
     if (fileInfo.exists())
         ui->labelClusterTestList->setText(fileInfo.fileName());
@@ -165,6 +166,13 @@ void CMainWindow::on_actionSaveWorkspaceAs_triggered()
     saveWorkspaceAs();
 }
 
+void CMainWindow::on_actionShowMetrics_triggered()
+{
+    CShowMetrics metrics(*m_workspace->getResultsByName(METRICS), m_clusterList->getClusters());
+    metrics.generateResults(ui->webViewResults);
+    metrics.generateCharts(ui->webViewCharts);
+}
+
 bool CMainWindow::saveWorkspace()
 {
     if (m_workspace->getFileName().isEmpty())
@@ -212,7 +220,12 @@ void CMainWindow::on_buttonClusterCEList_clicked()
     rapidjson::Value s;
     s.SetString(fileName.toStdString().c_str(), fileName.length(), workspace->GetAllocator());
     workspace->AddMember("cluster-code-elements-list", s, workspace->GetAllocator());
-    ui->labelClusterCodeeElementList->setText(fileName);
+    ui->labelClusterCodeElementList->setText(fileName);
+}
+
+void CMainWindow::on_buttonCalcCluster_clicked()
+{
+    m_clusterList->createClusters();
 }
 
 void CMainWindow::on_checkBoxMetricsSelectAll_stateChanged(int state)
@@ -220,18 +233,6 @@ void CMainWindow::on_checkBoxMetricsSelectAll_stateChanged(int state)
     for (int i = 0; i < m_model->rowCount(); ++i) {
         m_model->item(i)->setCheckState(Qt::CheckState(state));
     }
-}
-
-void CMainWindow::on_actionComputeClusters_triggered()
-{
-    CShowClusters cluster;
-    cluster.generateCharts(m_clusterList->getClusters(), ui->clusterWebView);
-    ui->textBrowserOutput->append("Clusters done.");
-}
-
-void CMainWindow::on_actionCalculateStatistics_triggered()
-{
-    m_workspace->calcStatistics();
 }
 
 void CMainWindow::on_buttonCalculateMetrics_clicked()
@@ -244,18 +245,6 @@ void CMainWindow::on_buttonCalculateMetrics_clicked()
 
     m_metrics->calculateMetrics(metrics, (IndexType)ui->lineEditRevisionMetrics->text().toLongLong());
     ui->textBrowserOutput->append("metrics done");
-}
-
-void CMainWindow::on_actionShowMetrics_triggered()
-{
-    CShowMetrics metrics(*m_workspace->getResultsByName(METRICS), m_clusterList->getClusters());
-    metrics.generateResults(ui->webViewResults);
-    metrics.generateCharts(ui->webViewCharts);
-}
-
-void CMainWindow::on_buttonCalcCluster_clicked()
-{
-    m_clusterList->createClusters();
 }
 
 void CMainWindow::on_buttonBrowseCov_clicked()
@@ -291,6 +280,15 @@ void CMainWindow::on_buttonBrowseCha_clicked()
     m_workspace->setChangesetPath(fileInfo.filePath());
 }
 
+void CMainWindow::on_buttonLoad_clicked()
+{
+    m_loadThread = new CTestSuiteLoader(this);
+    connect(m_loadThread, SIGNAL(updateStatusLabel(QString)), this, SLOT(statusUpdate(QString)));
+    connect(m_loadThread, SIGNAL(processFinished(QString)), this, SLOT(loadFinished(QString)));
+    m_statusProgressBar->setMaximum(0);
+    m_loadThread->load(m_workspace);
+}
+
 void CMainWindow::statusUpdate(QString label)
 {
     m_statusLabel->setText(label);
@@ -299,14 +297,40 @@ void CMainWindow::statusUpdate(QString label)
 void CMainWindow::loadFinished(QString msg)
 {
     ui->statusBar->showMessage(msg, 5000);
-    m_statusProgressBar->setRange(0, 1);
+    m_statusProgressBar->setMaximum(1);
     m_statusLabel->clear();
     delete m_loadThread;
     m_testSuiteAvailableLabel->setVisible(true);
 
     ui->tableViewTests->setModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getTestcases()));
     ui->tableViewCE->setModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getCodeElements()));
+    createCompleterForMetrics();
+    calculateStatistics();
+}
 
+void CMainWindow::calculateStatistics()
+{
+    if (m_workspace->isStatisticsCalculated())
+        return;
+
+    m_statsThread = new CStatisticsThread(this);
+    connect(m_statsThread, SIGNAL(updateStatusLabel(QString)), this, SLOT(statusUpdate(QString)));
+    connect(m_statsThread, SIGNAL(processFinished(QString)), this, SLOT(calcStatsFinished(QString)));
+    m_statusProgressBar->setMaximum(0);
+    m_statsThread->calcStatistics(m_workspace);
+}
+
+void CMainWindow::calcStatsFinished(QString msg)
+{
+    ui->statusBar->showMessage(msg, 5000);
+    m_statusProgressBar->setMaximum(1);
+    m_statusLabel->clear();
+    delete m_statsThread;
+    m_workspace->getResultsByName(WS)->AddMember("statistics-calculated", true, m_workspace->getResultsByName(WS)->GetAllocator());
+}
+
+void CMainWindow::createCompleterForMetrics()
+{
     if (m_revCompleter) {
         delete m_revCompleter;
         m_revCompleter = NULL;
@@ -322,11 +346,32 @@ void CMainWindow::loadFinished(QString msg)
     ui->lineEditRevisionMetrics->setCompleter(m_revCompleter);
 }
 
-void CMainWindow::on_buttonLoad_clicked()
+void CMainWindow::on_tabWidgetStatistics_currentChanged(int index)
 {
-    m_loadThread = new CTestSuiteLoader(this);
-    connect(m_loadThread, SIGNAL(updateStatusLabel(QString)), this, SLOT(statusUpdate(QString)));
-    connect(m_loadThread, SIGNAL(processFinished(QString)), this, SLOT(loadFinished(QString)));
-    m_statusProgressBar->setRange(0, 0);
-    m_loadThread->load(m_workspace);
+    if (!index || !m_workspace->isStatisticsCalculated())
+        return;
+
+    QWidget* widget = ui->tabWidgetStatistics->widget(index);
+    QList<QWebView*> webView = widget->findChildren<QWebView*>();
+    if (webView.count() == 1 && webView[0]->title().isEmpty()) {
+        CShowStatistics stats(m_workspace);
+        stats.generateChartForTab(webView[0], index - 1);
+    }
+}
+
+void CMainWindow::on_tabWidgetMain_currentChanged(int index)
+{
+    if (ui->tabWidgetMain->tabBar()->tabText(index) == "Statistics" && ui->webViewGen->title().isEmpty()
+            && m_workspace->isStatisticsCalculated()) {
+        CShowStatistics stats(m_workspace);
+        stats.fillGeneralTab(ui->webViewGen);
+    }
+}
+
+void CMainWindow::on_tabWidgetCluster_currentChanged(int index)
+{
+    if (ui->tabWidgetCluster->tabBar()->tabText(index) == "Data") {
+        CShowClusters clusters;
+        clusters.generateCharts(m_clusterList->getClusters(), ui->webViewCluster);
+    }
 }

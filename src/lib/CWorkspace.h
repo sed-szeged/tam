@@ -24,9 +24,9 @@ public:
     CWorkspace(CMainWindow *mainWindow);
     ~CWorkspace();
 
-    void calcStatistics();
     bool save();
     void load();
+    bool isStatisticsCalculated();
     bool isSaved() { return m_isSaved; }
     void setSaved(bool saved) { m_isSaved = saved; }
 

@@ -5,6 +5,7 @@
 #include "lib/CTestSuiteMetrics.h"
 #include "lib/CClusterList.h"
 #include "lib/CTestSuiteLoader.h"
+#include "lib/CStatisticsThread.h"
 
 #include <QCompleter>
 #include <QMainWindow>
@@ -38,6 +39,7 @@ public:
 private slots:
     void statusUpdate(QString label);
     void loadFinished(QString msg);
+    void calcStatsFinished(QString msg);
 
     void on_actionExit_triggered();
 
@@ -52,10 +54,6 @@ private slots:
     void on_buttonClusterTestList_clicked();
 
     void on_buttonClusterCEList_clicked();
-
-    void on_actionComputeClusters_triggered();
-
-    void on_actionCalculateStatistics_triggered();
 
     void on_buttonCalculateMetrics_clicked();
 
@@ -75,27 +73,38 @@ private slots:
 
     void on_actionSaveWorkspaceAs_triggered();
 
+    void on_tabWidgetStatistics_currentChanged(int index);
+
+    void on_tabWidgetMain_currentChanged(int index);
+
+    void on_tabWidgetCluster_currentChanged(int index);
+
 private:
 
     void createStatusBar();
+    void createCompleterForMetrics();
+    void calculateStatistics();
     void fillWidgets();
     void updateLabels();
     bool saveWorkspace();
     bool saveWorkspaceAs();
 
     Ui::CMainWindow *ui;
-    QCompleter *m_revCompleter;
-    QStandardItemModel *m_model;
+
     QLabel *m_statusLabel;
     QLabel *m_testSuiteAvailableLabel;
     QProgressBar *m_statusProgressBar;
 
+    CStatisticsThread *m_statsThread;
     CTestSuiteLoader *m_loadThread;
     CWorkspace *m_workspace;
     CKernel *m_kernel;
-    CTestSuiteMetrics *m_metrics;
-    CClusterList *m_clusterList;
 
+    CTestSuiteMetrics *m_metrics;
+    QCompleter *m_revCompleter;
+    QStandardItemModel *m_model;
+
+    CClusterList *m_clusterList;
     QStringList m_clusterAlgorithms;
 };
 

@@ -1,5 +1,5 @@
-#ifndef CSHOWCLUSTERSDIALOG_H
-#define CSHOWCLUSTERSDIALOG_H
+#ifndef CSHOWCLUSTERS_H
+#define CSHOWCLUSTERS_H
 
 #include <QWebView>
 #include "data/CClusterDefinition.h"
@@ -14,4 +14,4 @@ public:
     void generateCharts(std::map<std::string, CClusterDefinition> &clusterList, QWebView *webView);
 };
 
-#endif // CSHOWCLUSTERSDIALOG_H
+#endif // CSHOWCLUSTERS_H

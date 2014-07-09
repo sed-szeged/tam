@@ -31,7 +31,7 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout1" stretch="2,1">
     <item>
-     <widget class="QTabWidget" name="tabWidget">
+     <widget class="QTabWidget" name="tabWidgetMain">
       <property name="enabled">
        <bool>true</bool>
       </property>
@@ -77,7 +77,7 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QTabWidget" name="tabWidget_2">
+         <widget class="QTabWidget" name="tabWidgetProject">
           <property name="currentIndex">
            <number>0</number>
           </property>
@@ -278,9 +278,9 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_8">
         <item>
-         <widget class="QTabWidget" name="tabWidget_5">
+         <widget class="QTabWidget" name="tabWidgetStatistics">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tabGeneral">
            <attribute name="title">
@@ -362,7 +362,7 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <widget class="QTabWidget" name="tabWidget_4">
+         <widget class="QTabWidget" name="tabWidgetCluster">
           <property name="currentIndex">
            <number>0</number>
           </property>
@@ -383,7 +383,7 @@
              <enum>QComboBox::AdjustToContents</enum>
             </property>
            </widget>
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="labelClusterAlgorithm">
             <property name="geometry">
              <rect>
               <x>10</x>
@@ -396,7 +396,7 @@
              <string>Cluster algorithm:</string>
             </property>
            </widget>
-           <widget class="QLabel" name="label_2">
+           <widget class="QLabel" name="labelClusterTestListTitle">
             <property name="geometry">
              <rect>
               <x>10</x>
@@ -425,7 +425,7 @@
              <string>Browse...</string>
             </property>
            </widget>
-           <widget class="QLabel" name="label_5">
+           <widget class="QLabel" name="labelClusterCodeElementListTitle">
             <property name="geometry">
              <rect>
               <x>10</x>
@@ -464,7 +464,7 @@
              <string>No cluster test list selected</string>
             </property>
            </widget>
-           <widget class="QLabel" name="labelClusterCodeeElementList">
+           <widget class="QLabel" name="labelClusterCodeElementList">
             <property name="geometry">
              <rect>
               <x>190</x>
@@ -497,7 +497,7 @@
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <item>
-             <widget class="QWebView" name="clusterWebView" native="true"/>
+             <widget class="QWebView" name="webViewCluster" native="true"/>
             </item>
            </layout>
           </widget>
@@ -517,7 +517,7 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QTabWidget" name="tabWidget_3">
+         <widget class="QTabWidget" name="tabWidgetMetrics">
           <property name="currentIndex">
            <number>0</number>
           </property>
@@ -525,7 +525,7 @@
            <attribute name="title">
             <string>Options</string>
            </attribute>
-           <widget class="QLabel" name="label_4">
+           <widget class="QLabel" name="labelRevisionNumber">
             <property name="geometry">
              <rect>
               <x>10</x>
@@ -691,10 +691,6 @@
      <addaction name="actionDumpChangeset"/>
     </widget>
     <addaction name="menuDump"/>
-    <addaction name="actionCalculateStatistics"/>
-    <addaction name="actionComputeClusters"/>
-    <addaction name="actionShowMetrics"/>
-    <addaction name="actionShowStats"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -736,34 +732,14 @@
     <string>Changeset</string>
    </property>
   </action>
-  <action name="actionCalculateStatistics">
-   <property name="text">
-    <string>Calculate statistics</string>
-   </property>
-  </action>
   <action name="actionLoadWorkspace">
    <property name="text">
     <string>Load workspace</string>
    </property>
   </action>
-  <action name="actionComputeClusters">
-   <property name="text">
-    <string>Compute clusters</string>
-   </property>
-  </action>
-  <action name="actionShowMetrics">
-   <property name="text">
-    <string>Show metrics</string>
-   </property>
-  </action>
   <action name="actionSaveWorkspaceAs">
    <property name="text">
     <string>Save workspace as...</string>
-   </property>
-  </action>
-  <action name="actionShowStats">
-   <property name="text">
-    <string>Show stats</string>
    </property>
   </action>
  </widget>
