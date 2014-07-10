@@ -186,3 +186,8 @@ void CShowMetrics::generateCharts(QWebView *webView)
     webView->settings()->clearMemoryCaches();
     webView->setHtml(html);
 }
+
+void CShowMetrics::generateHeatMap(QWebView *webView)
+{
+
+}

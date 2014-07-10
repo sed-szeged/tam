@@ -3,14 +3,11 @@
 
 #include "util/CSelectionStatistics.h"
 #include "ui_CMainWindow.h"
-#include <iostream>
-#include "rapidjson/prettywriter.h"
 
 CWorkspace::CWorkspace(CMainWindow *mainWindow) :
     m_isChangesAvailable(false), m_isSaved(false), m_fileName(QString()),
     m_testSuite(new CSelectionData()), m_mainWindow(mainWindow)
 {
-    m_mainWindow->getUi()->textBrowserOutput->append("New workspace created...");
     for (int i = 0; i < NUM_OF_COLS; ++i) {
         m_results[collections[i]] = new rapidjson::Document();
         m_results[collections[i]]->SetObject();

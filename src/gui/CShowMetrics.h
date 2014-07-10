@@ -16,7 +16,7 @@ public:
 
     void generateResults(QWebView *webView);
     void generateCharts(QWebView *webView);
-    void generateHeatMap();
+    void generateHeatMap(QWebView *webView);
 
 private:
 

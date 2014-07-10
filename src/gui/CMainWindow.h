@@ -59,8 +59,6 @@ private slots:
 
     void on_checkBoxMetricsSelectAll_stateChanged(int arg1);
 
-    void on_actionShowMetrics_triggered();
-
     void on_buttonCalcCluster_clicked();
 
     void on_buttonBrowseCov_clicked();
@@ -78,6 +76,8 @@ private slots:
     void on_tabWidgetMain_currentChanged(int index);
 
     void on_tabWidgetCluster_currentChanged(int index);
+
+    void on_tabWidgetMetrics_currentChanged(int index);
 
 private:
 

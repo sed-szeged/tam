@@ -28,7 +28,6 @@ CMainWindow::CMainWindow(QWidget *parent) :
     m_clusterList = new CClusterList(this);
     m_metrics = new CTestSuiteMetrics(this);
 
-    ui->textBrowserOutput->hide();
     createStatusBar();
     fillWidgets();
 }
@@ -148,7 +147,7 @@ void CMainWindow::on_actionLoadWorkspace_triggered()
         m_workspace = new CWorkspace(this);
         m_workspace->setFileName(fileName);
         m_workspace->load();
-        ui->textBrowserOutput->append("Workspace loaded from file: " + m_workspace->getFileName());
+        ui->statusBar->showMessage("Workspace loaded from file: " + m_workspace->getFileName(), 5000);
         updateLabels();
     }
 }
@@ -156,21 +155,14 @@ void CMainWindow::on_actionLoadWorkspace_triggered()
 void CMainWindow::on_actionSaveWorkspace_triggered()
 {
     if (saveWorkspace())
-        ui->textBrowserOutput->append("Workspace saved successfully to " + m_workspace->getFileName());
+        ui->statusBar->showMessage("Workspace saved successfully to " + m_workspace->getFileName());
     else
-        ui->textBrowserOutput->append("Unable to save workspace to " + m_workspace->getFileName());
+        ui->statusBar->showMessage("Unable to save workspace to " + m_workspace->getFileName());
 }
 
 void CMainWindow::on_actionSaveWorkspaceAs_triggered()
 {
     saveWorkspaceAs();
-}
-
-void CMainWindow::on_actionShowMetrics_triggered()
-{
-    CShowMetrics metrics(*m_workspace->getResultsByName(METRICS), m_clusterList->getClusters());
-    metrics.generateResults(ui->webViewResults);
-    metrics.generateCharts(ui->webViewCharts);
 }
 
 bool CMainWindow::saveWorkspace()
@@ -244,7 +236,6 @@ void CMainWindow::on_buttonCalculateMetrics_clicked()
     }
 
     m_metrics->calculateMetrics(metrics, (IndexType)ui->lineEditRevisionMetrics->text().toLongLong());
-    ui->textBrowserOutput->append("metrics done");
 }
 
 void CMainWindow::on_buttonBrowseCov_clicked()
@@ -374,4 +365,17 @@ void CMainWindow::on_tabWidgetCluster_currentChanged(int index)
         CShowClusters clusters;
         clusters.generateCharts(m_clusterList->getClusters(), ui->webViewCluster);
     }
+}
+
+void CMainWindow::on_tabWidgetMetrics_currentChanged(int index)
+{
+    QString tabText = ui->tabWidgetMetrics->tabBar()->tabText(index);
+    CShowMetrics metrics(*m_workspace->getResultsByName(METRICS), m_clusterList->getClusters());
+    if (tabText == "Results")
+        metrics.generateResults(ui->webViewResults);
+    else if (tabText == "Charts")
+        metrics.generateCharts(ui->webViewCharts);
+    else if (tabText == "Heat map")
+        metrics.generateHeatMap(ui->webViewHeatmap);
+
 }
