@@ -42,7 +42,8 @@ CMainWindow::~CMainWindow()
     delete m_kernel;
     delete m_clusterList;
     delete m_metrics;
-    delete m_model;
+    delete m_scorePluginModel;
+    delete m_metricsPluginModel;
 }
 
 void CMainWindow::fillWidgets()
@@ -54,18 +55,31 @@ void CMainWindow::fillWidgets()
     }
     ui->comboBoxClusterPlugins->addItems(m_clusterAlgorithms);
 
-    // fill combobox with metric algorithm names
-    m_model = new QStandardItemModel();
+    // fill listview with metric algorithm names
+    m_metricsPluginModel = new QStandardItemModel();
 
     StringVector metricPlugins = m_kernel->getTestSuiteMetricPluginManager().getPluginNames();
     for (int i = 0; i < metricPlugins.size(); ++i) {
         QStandardItem *item = new QStandardItem(tr(metricPlugins[i].c_str()));
         item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
         item->setData(Qt::Unchecked, Qt::CheckStateRole);
-        m_model->appendRow(item);
+        m_metricsPluginModel->appendRow(item);
     }
 
-    ui->listViewMetrics->setModel(m_model);
+    ui->listViewMetrics->setModel(m_metricsPluginModel);
+
+    // fill listview with falt localization technique names
+    m_scorePluginModel = new QStandardItemModel();
+
+    StringVector scorePlugins = m_kernel->getFaultLocalizationTechniquePluginManager().getPluginNames();
+    for (int i = 0; i < scorePlugins.size(); ++i) {
+        QStandardItem *item = new QStandardItem(tr(scorePlugins[i].c_str()));
+        item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        item->setData(Qt::Unchecked, Qt::CheckStateRole);
+        m_scorePluginModel->appendRow(item);
+    }
+
+    ui->listViewFaultlocalization->setModel(m_scorePluginModel);
 }
 
 void CMainWindow::createStatusBar()
@@ -222,17 +236,17 @@ void CMainWindow::on_buttonCalcCluster_clicked()
 
 void CMainWindow::on_checkBoxMetricsSelectAll_stateChanged(int state)
 {
-    for (int i = 0; i < m_model->rowCount(); ++i) {
-        m_model->item(i)->setCheckState(Qt::CheckState(state));
+    for (int i = 0; i < m_metricsPluginModel->rowCount(); ++i) {
+        m_metricsPluginModel->item(i)->setCheckState(Qt::CheckState(state));
     }
 }
 
 void CMainWindow::on_buttonCalculateMetrics_clicked()
 {
     StringVector metrics;
-    for (int i = 0; i < m_model->rowCount(); ++i) {
-        if (m_model->item(i)->checkState() == Qt::Checked)
-            metrics.push_back(m_model->item(i)->text().toStdString());
+    for (int i = 0; i < m_metricsPluginModel->rowCount(); ++i) {
+        if (m_metricsPluginModel->item(i)->checkState() == Qt::Checked)
+            metrics.push_back(m_metricsPluginModel->item(i)->text().toStdString());
     }
 
     m_metrics->calculateMetrics(metrics, (IndexType)ui->lineEditRevisionMetrics->text().toLongLong());

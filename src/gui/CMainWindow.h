@@ -102,7 +102,8 @@ private:
 
     CTestSuiteMetrics *m_metrics;
     QCompleter *m_revCompleter;
-    QStandardItemModel *m_model;
+    QStandardItemModel *m_metricsPluginModel;
+    QStandardItemModel *m_scorePluginModel;
 
     CClusterList *m_clusterList;
     QStringList m_clusterAlgorithms;

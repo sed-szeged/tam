@@ -31,11 +31,9 @@ void CTestSuiteMetrics::calculateMetric(const std::string &name, IndexType revis
         }
     }
 
-    (std::cerr << "[INFO] Calculating metrics: " << metric->getName() << " ...").flush();
     metric->init(m_mainWindow->getWorkspace()->getTestSuite(), &m_mainWindow->getClusterList()->getClusters(), revision);
 
     metric->calculate(*m_mainWindow->getWorkspace()->getResultsByName(METRICS));
     m_metricsCalculated.insert(name);
-    (std::cerr << " done." << std::endl).flush();
 }
 
