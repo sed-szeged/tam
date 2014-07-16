@@ -1,9 +1,9 @@
 #ifndef CFLSCORE_H
 #define CFLSCORE_H
 
-#include "engine/CKernel.h"
 #include "data/CSelectionData.h"
 #include "rapidjson/document.h"
+#include "engine/CKernel.h"
 
 using namespace soda;
 

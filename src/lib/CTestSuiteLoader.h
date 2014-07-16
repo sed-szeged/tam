@@ -29,7 +29,6 @@ private:
     String m_covPath;
     String m_resPath;
     String m_changesPath;
-    bool m_isStatisticsCalculated;
     CSelectionData *m_testSuite;
 };
 

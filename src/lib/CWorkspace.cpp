@@ -62,9 +62,10 @@ void CWorkspace::setCoveragePath(QString path)
 
 QString CWorkspace::getCoveragePath()
 {
-    if (m_results[WS]->FindMember("coverage-binary") == NULL || (*m_results[WS])["coverage-binary"].IsNull())
+    rapidjson::Document::MemberIterator member = m_results[WS]->FindMember("coverage-binary");
+    if (member == m_results[WS]->MemberEnd() || member->value.IsNull())
         return "";
-    return (*m_results[WS])["coverage-binary"].GetString();
+    return member->value.GetString();
 }
 
 void CWorkspace::setResultsPath(QString path)
@@ -76,9 +77,10 @@ void CWorkspace::setResultsPath(QString path)
 
 QString CWorkspace::getResultsPath()
 {
-    if (m_results[WS]->FindMember("results-binary") == NULL || (*m_results[WS])["results-binary"].IsNull())
+    rapidjson::Document::MemberIterator member = m_results[WS]->FindMember("results-binary");
+    if (member == m_results[WS]->MemberEnd() || member->value.IsNull())
         return "";
-    return (*m_results[WS])["results-binary"].GetString();
+    return member->value.GetString();
 }
 
 void CWorkspace::setChangesetPath(QString path)
@@ -93,15 +95,17 @@ void CWorkspace::setChangesetPath(QString path)
 
 QString CWorkspace::getChangesetPath()
 {
-    if (m_results[WS]->FindMember("changeset-binary") == NULL || (*m_results[WS])["changeset-binary"].IsNull())
+    rapidjson::Document::MemberIterator member = m_results[WS]->FindMember("changeset-binary");
+    if (member == m_results[WS]->MemberEnd() || member->value.IsNull())
         return "";
-    return (*m_results[WS])["changeset-binary"].GetString();
+    return member->value.GetString();
 }
 
 bool CWorkspace::isStatisticsCalculated()
 {
-    if (m_results[WS]->FindMember("statistics-calculated") == NULL)
+    rapidjson::Document::MemberIterator member = m_results[WS]->FindMember("statistics-calculated");
+    if (member == m_results[WS]->MemberEnd())
         return false;
 
-    return (*m_results[WS])["statistics-calculated"].GetBool();
+    return member->value.GetBool();
 }

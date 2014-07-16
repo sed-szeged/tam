@@ -34,18 +34,10 @@ void CFLScore::run()
             // Calculate FL score
             technique->calculate(clusterIt->second, "");
 
-            IFaultLocalizationTechniquePlugin::FLValues values = technique->getValues();
-
-            rapidjson::Value faultLocVal;
-            faultLocVal.SetArray();
-            IFaultLocalizationTechniquePlugin::FLValues::iterator flValuesIt;
-            for (flValuesIt = values.begin(); flValuesIt != values.end(); ++flValuesIt) {
-                rapidjson::Value flVal;
-                flVal.SetObject();
-                flVal.AddMember(QString::number(flValuesIt->first).toStdString().c_str(), flValuesIt->second, m_results->GetAllocator());
-                faultLocVal.PushBack(flVal, m_results->GetAllocator());
-            }
-            clusterVal.AddMember(flTechniqueName.c_str(), faultLocVal, m_results->GetAllocator());
+            rapidjson::Value key;
+            key.SetString(flTechniqueName.c_str(), m_results->GetAllocator());
+            rapidjson::Value &values = technique->getValues();
+            clusterVal.AddMember(key, values, m_results->GetAllocator());
 
             /*for (IndexType k = 0; k < m_failedCodeElements.size(); k++) {
                 IndexType cid = m_failedCodeElements[k];
@@ -53,6 +45,8 @@ void CFLScore::run()
                 scoresByCluster[clusterIt->first][cid][flTechniqueName] = score;
             }*/
         }
-        m_results->AddMember(clusterIt->first.c_str(), clusterVal, m_results->GetAllocator());
+        rapidjson::Value key;
+        key.SetString(clusterIt->first.c_str(), m_results->GetAllocator());
+        m_results->AddMember(key, clusterVal, m_results->GetAllocator());
     }
 }

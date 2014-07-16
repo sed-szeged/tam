@@ -16,7 +16,6 @@ void CTestSuiteLoader::load(CWorkspace *workspace)
     m_resPath = workspace->getResultsPath().toStdString();
     m_changesPath = workspace->getChangesetPath().toStdString();
     m_testSuite = workspace->getTestSuite();
-    m_isStatisticsCalculated = workspace->isStatisticsCalculated();
 
     if (!isRunning())
         start();

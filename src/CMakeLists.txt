@@ -38,14 +38,14 @@ include_directories(${CMAKE_SOURCE_DIR}/../ext)
 # rapidjson
 ExternalProject_Add(
     rapidjson
-    SVN_REPOSITORY "http://rapidjson.googlecode.com/svn/trunk"
+    SVN_REPOSITORY "https://github.com/miloyip/rapidjson"
     UPDATE_COMMAND "" # skip update
     CONFIGURE_COMMAND "" # skip configure
     BUILD_COMMAND "" # skip build
     INSTALL_COMMAND "" # skip install
     )
 
-include_directories(${CMAKE_BINARY_DIR}/ThirdParty/src/rapidjson/include)
+include_directories(${CMAKE_BINARY_DIR}/ThirdParty/src/rapidjson/trunk/include)
 
 # Add SoDA
 ExternalProject_Add(

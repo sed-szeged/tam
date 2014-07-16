@@ -30,7 +30,7 @@ public:
     ~CMainWindow();
 
     CWorkspace* getWorkspace() { return m_workspace; }
-    CTestSuiteMetrics* getMetrics() { return m_metrics; }
+    CTestSuiteMetrics* getMetrics() { return m_metricsThread; }
     CKernel* getKernel() { return m_kernel; }
     CClusterList* getClusterList() { return m_clusterList; }
 
@@ -40,6 +40,7 @@ private slots:
     void statusUpdate(QString label);
     void loadFinished(QString msg);
     void calcStatsFinished(QString msg);
+    void calcMetricsFinished(QString msg);
 
     void on_actionExit_triggered();
 
@@ -100,7 +101,7 @@ private:
     CWorkspace *m_workspace;
     CKernel *m_kernel;
 
-    CTestSuiteMetrics *m_metrics;
+    CTestSuiteMetrics *m_metricsThread;
     QCompleter *m_revCompleter;
     QStandardItemModel *m_metricsPluginModel;
     QStandardItemModel *m_scorePluginModel;

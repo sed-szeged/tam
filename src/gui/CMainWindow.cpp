@@ -26,7 +26,6 @@ CMainWindow::CMainWindow(QWidget *parent) :
 
     m_workspace = new CWorkspace(this);
     m_clusterList = new CClusterList(this);
-    m_metrics = new CTestSuiteMetrics(this);
 
     createStatusBar();
     fillWidgets();
@@ -41,7 +40,7 @@ CMainWindow::~CMainWindow()
     delete m_workspace;
     delete m_kernel;
     delete m_clusterList;
-    delete m_metrics;
+    delete m_metricsThread;
     delete m_scorePluginModel;
     delete m_metricsPluginModel;
 }
@@ -249,7 +248,19 @@ void CMainWindow::on_buttonCalculateMetrics_clicked()
             metrics.push_back(m_metricsPluginModel->item(i)->text().toStdString());
     }
 
-    m_metrics->calculateMetrics(metrics, (IndexType)ui->lineEditRevisionMetrics->text().toLongLong());
+    m_metricsThread = new CTestSuiteMetrics(this);
+    connect(m_metricsThread, SIGNAL(updateStatusLabel(QString)), this, SLOT(statusUpdate(QString)));
+    connect(m_metricsThread, SIGNAL(processFinished(QString)), this, SLOT(calcMetricsFinished(QString)));
+    m_statusProgressBar->setMaximum(0);
+    m_metricsThread->calculateMetrics(metrics, (IndexType)ui->lineEditRevisionMetrics->text().toLongLong(), this);
+}
+
+void CMainWindow::calcMetricsFinished(QString msg)
+{
+    ui->statusBar->showMessage(msg, 5000);
+    m_statusProgressBar->setMaximum(0);
+    m_statusLabel->clear();
+    delete m_metricsThread;
 }
 
 void CMainWindow::on_buttonBrowseCov_clicked()

@@ -1,27 +1,41 @@
 #ifndef CTESTSUITEMETRICS_H
 #define CTESTSUITEMETRICS_H
 
-#include "engine/plugin/ITestSuiteMetricPlugin.h"
+#include <QThread>
+#include "engine/CKernel.h"
 #include "data/CClusterDefinition.h"
+#include "rapidjson/document.h"
 
 using namespace soda;
 
 class CMainWindow;
 
-class CTestSuiteMetrics
+class CTestSuiteMetrics : public QThread
 {
+    Q_OBJECT;
 public:
-    CTestSuiteMetrics(CMainWindow *window);
+    CTestSuiteMetrics(QObject *parent = 0);
     ~CTestSuiteMetrics();
 
-    void calculateMetrics(StringVector &metrics, IndexType revision);
+    void calculateMetrics(StringVector metrics, IndexType revision, CMainWindow *mainWindow);
+
+protected:
+    void run();
+
+signals:
+    void updateStatusLabel(QString label);
+    void processFinished(QString msg);
 
 private:
 
-    void calculateMetric(const std::string &name, IndexType revision);
+    void calculateMetric(const std::string &name);
 
-    CMainWindow *m_mainWindow;
-
+    rapidjson::Document *m_results;
+    CKernel *m_kernel;
+    std::map<std::string, CClusterDefinition> *m_clusters;
+    StringVector m_metricNames;
+    CSelectionData *m_testSuite;
+    IndexType m_revision;
     std::set<std::string> m_metricsCalculated;
 };
 

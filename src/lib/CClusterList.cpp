@@ -27,21 +27,23 @@ void CClusterList::toJson(rapidjson::Document &doc)
         rapidjson::Value cluster;
         cluster.SetObject();
 
-        rapidjson::Value tcid;
-        tcid.SetArray();
+        rapidjson::Value tcids;
+        tcids.SetArray();
         for (IntVector::const_iterator itr = it->second.getTestCases().begin(); itr != it->second.getTestCases().end(); ++itr) {
-            tcid.PushBack(*itr, doc.GetAllocator());
+            tcids.PushBack(*itr, doc.GetAllocator());
         }
-        cluster.AddMember("tests", tcid, doc.GetAllocator());
+        cluster.AddMember("tests", tcids, doc.GetAllocator());
 
-        rapidjson::Value ceid;
-        ceid.SetArray();
+        rapidjson::Value ceids;
+        ceids.SetArray();
         for (IntVector::const_iterator itr = it->second.getCodeElements().begin(); itr != it->second.getCodeElements().end(); ++itr) {
-            ceid.PushBack(*itr, doc.GetAllocator());
+            ceids.PushBack(*itr, doc.GetAllocator());
         }
-        cluster.AddMember("code-elements", ceid, doc.GetAllocator());
+        cluster.AddMember("code-elements", ceids, doc.GetAllocator());
 
-        doc.AddMember(it->first.c_str(), cluster, doc.GetAllocator());
+        rapidjson::Value key;
+        key.SetString(it->first.c_str(), doc.GetAllocator());
+        doc.AddMember(key, cluster, doc.GetAllocator());
     }
 }
 
