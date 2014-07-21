@@ -7,7 +7,6 @@ CTestSuiteLoader::CTestSuiteLoader(QObject *parent) : QThread(parent)
 
 CTestSuiteLoader::~CTestSuiteLoader()
 {
-    wait();
 }
 
 void CTestSuiteLoader::load(CWorkspace *workspace)
@@ -35,6 +34,6 @@ void CTestSuiteLoader::run()
 
     emit updateStatusLabel("Globalizing...");
     m_testSuite->globalize();
-    emit processFinished("Test-suite loading finished");
+    emit processFinished("Test-suite loading has been finished");
 
 }

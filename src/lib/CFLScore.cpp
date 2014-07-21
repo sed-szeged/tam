@@ -1,38 +1,42 @@
 #include "CFLScore.h"
 #include "util/CTestSuiteScore.h"
+#include "gui/CMainWindow.h"
+#include "CWorkspace.h"
 
 #include <QString>
 
-CFLScore::CFLScore()
+CFLScore::CFLScore(QObject *parent) : QThread(parent)
 {
 }
 
-void CFLScore::calculateScore()
+void CFLScore::calculateScore(IndexType revision, StringVector faultLocalizationTechniques, StringVector selectedClusters, CMainWindow *mainWindow)
 {
+    m_kernel = mainWindow->getKernel();
+    m_revision = revision;
+    m_testSuite = mainWindow->getWorkspace()->getTestSuite();
+    m_clusters = &mainWindow->getClusterList()->getClusters();
+    m_results = mainWindow->getWorkspace()->getResultsByName(SCORE);
+    m_faultLocalizationTechniques = faultLocalizationTechniques;
+    m_selectedClusters = selectedClusters;
 
+    if (!isRunning())
+        start();
 }
 
 void CFLScore::run()
 {
-    /*for (rapidjson::Value::ConstValueIterator failIt = (*itr)["failed-code-elements"].Begin(); failIt != (*itr)["failed-code-elements"].End(); ++failIt) {
-        if (!selectionData.getCoverage()->getCodeElements().containsValue(failIt->GetString())) {
-            continue;
-        }
-        IndexType cid = selectionData.getCoverage()->getCodeElements().getID(failIt->GetString());
-        failedCodeElements.push_back(cid);
-    }*/
-
-    std::map<std::string, CClusterDefinition>::iterator clusterIt;
-    for (clusterIt = m_clusters->begin(); clusterIt != m_clusters->end(); clusterIt++) {
+    for (StringVector::const_iterator it = m_selectedClusters.begin(); it != m_selectedClusters.end(); ++it) {
         rapidjson::Value clusterVal;
         clusterVal.SetObject();
         for (IndexType i = 0; i < m_faultLocalizationTechniques.size(); i++) {
             std::string flTechniqueName = m_faultLocalizationTechniques[i];
             IFaultLocalizationTechniquePlugin *technique = m_kernel->getFaultLocalizationTechniquePluginManager().getPlugin(flTechniqueName);
 
-            technique->init(m_selectionData, m_revision);
+            emit updateStatusLabel(("Calculating " + flTechniqueName + " for " + *it).c_str());
+
+            technique->init(m_testSuite, m_revision);
             // Calculate FL score
-            technique->calculate(clusterIt->second, "");
+            technique->calculate((*m_clusters)[(*it)], "");
 
             rapidjson::Value key;
             key.SetString(flTechniqueName.c_str(), m_results->GetAllocator());
@@ -41,12 +45,12 @@ void CFLScore::run()
 
             /*for (IndexType k = 0; k < m_failedCodeElements.size(); k++) {
                 IndexType cid = m_failedCodeElements[k];
-                double score = CTestSuiteScore::flScore(clusterIt->second, values[cid], technique->getDistribution());
-                scoresByCluster[clusterIt->first][cid][flTechniqueName] = score;
+                double score = CTestSuiteScore::flScore(clusterIt->second, value, technique->getDistribution());
             }*/
         }
         rapidjson::Value key;
-        key.SetString(clusterIt->first.c_str(), m_results->GetAllocator());
+        key.SetString((*it).c_str(), m_results->GetAllocator());
         m_results->AddMember(key, clusterVal, m_results->GetAllocator());
     }
+    emit processFinished("Calculation of scores has been finished");
 }

@@ -10,14 +10,17 @@ CTestSuiteMetrics::~CTestSuiteMetrics()
 {
 }
 
-void CTestSuiteMetrics::calculateMetrics(StringVector metrics, IndexType revision, CMainWindow *mainWindow)
+void CTestSuiteMetrics::calculateMetrics(StringVector metrics, StringVector selectedClusters, IndexType revision, CMainWindow *mainWindow)
 {
     m_metricNames = metrics;
     m_revision = revision;
     m_testSuite = mainWindow->getWorkspace()->getTestSuite();
-    m_clusters = &mainWindow->getClusterList()->getClusters();
     m_kernel = mainWindow->getKernel();
     m_results = mainWindow->getWorkspace()->getResultsByName(METRICS);
+
+    for (StringVector::const_iterator it = selectedClusters.begin(); it != selectedClusters.end(); ++it) {
+        m_clusters[*it] = mainWindow->getClusterList()->getClusters()[*it];
+    }
 
     if (!isRunning())
         start();
@@ -26,10 +29,10 @@ void CTestSuiteMetrics::calculateMetrics(StringVector metrics, IndexType revisio
 void CTestSuiteMetrics::run()
 {
     for (StringVector::iterator it = m_metricNames.begin(); it != m_metricNames.end(); it++) {
-        emit updateStatusLabel(("Calculating " + *it + "...").c_str());
-        calculateMetric(*it);
+        if (m_metricsCalculated.find(*it) == m_metricsCalculated.end())
+            calculateMetric(*it);
     }
-    emit processFinished("Calculation of metrics finished");
+    emit processFinished("Calculation of metrics has been finished");
 }
 
 void CTestSuiteMetrics::calculateMetric(const std::string &name)
@@ -43,7 +46,8 @@ void CTestSuiteMetrics::calculateMetric(const std::string &name)
         }
     }
 
-    metric->init(m_testSuite, m_clusters, m_revision);
+    emit updateStatusLabel(("Calculating metric: " + name + "...").c_str());
+    metric->init(m_testSuite, &m_clusters, m_revision);
 
     metric->calculate(*m_results);
     m_metricsCalculated.insert(name);

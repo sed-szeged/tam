@@ -40,7 +40,6 @@ CMainWindow::~CMainWindow()
     delete m_workspace;
     delete m_kernel;
     delete m_clusterList;
-    delete m_metricsThread;
     delete m_scorePluginModel;
     delete m_metricsPluginModel;
 }
@@ -79,6 +78,8 @@ void CMainWindow::fillWidgets()
     }
 
     ui->listViewFaultlocalization->setModel(m_scorePluginModel);
+    ui->listViewMetricsSelClu->setModel(new QStandardItemModel(this));
+    ui->listViewScoreSelClu->setModel(new QStandardItemModel(this));
 }
 
 void CMainWindow::createStatusBar()
@@ -133,9 +134,9 @@ void CMainWindow::on_actionExit_triggered()
 void CMainWindow::on_actionDumpCoverage_triggered()
 {
     rapidjson::StringBuffer s;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+    rapidjson::Writer<rapidjson::StringBuffer> writer(s);
         s.Clear();
-        m_workspace->getResultsByName(WS)->Accept(writer);
+        m_workspace->getResultsByName(METRICS)->Accept(writer);
         std::cout << s.GetString() << std::endl;
 }
 
@@ -210,7 +211,7 @@ void CMainWindow::on_buttonClusterTestList_clicked()
     rapidjson::Value s;
     s.SetString(fileName.toStdString().c_str(), fileName.length(), workspace->GetAllocator());
     workspace->AddMember("cluster-test-list", s, workspace->GetAllocator());
-    ui->labelClusterTestList->setText(fileName);
+    ui->labelClusterTestList->setText(QFileInfo(fileName).fileName());
 }
 
 void CMainWindow::on_buttonClusterCEList_clicked()
@@ -225,12 +226,22 @@ void CMainWindow::on_buttonClusterCEList_clicked()
     rapidjson::Value s;
     s.SetString(fileName.toStdString().c_str(), fileName.length(), workspace->GetAllocator());
     workspace->AddMember("cluster-code-elements-list", s, workspace->GetAllocator());
-    ui->labelClusterCodeElementList->setText(fileName);
+    ui->labelClusterCodeElementList->setText(QFileInfo(fileName).fileName());
 }
 
 void CMainWindow::on_buttonCalcCluster_clicked()
 {
     m_clusterList->createClusters();
+
+    QStandardItemModel *modelMetrics = qobject_cast<QStandardItemModel*>(ui->listViewMetricsSelClu->model());
+    QStandardItemModel *modelScore = qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model());
+    for (std::map<std::string, CClusterDefinition>::const_iterator it = m_clusterList->getClusters().begin(); it != m_clusterList->getClusters().end(); ++it) {
+        QStandardItem *item = new QStandardItem(tr(it->first.c_str()));
+        item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        item->setData(Qt::Unchecked, Qt::CheckStateRole);
+        modelMetrics->appendRow(item);
+        modelScore->appendRow(item->clone());
+    }
 }
 
 void CMainWindow::on_checkBoxMetricsSelectAll_stateChanged(int state)
@@ -248,19 +259,26 @@ void CMainWindow::on_buttonCalculateMetrics_clicked()
             metrics.push_back(m_metricsPluginModel->item(i)->text().toStdString());
     }
 
-    m_metricsThread = new CTestSuiteMetrics(this);
-    connect(m_metricsThread, SIGNAL(updateStatusLabel(QString)), this, SLOT(statusUpdate(QString)));
-    connect(m_metricsThread, SIGNAL(processFinished(QString)), this, SLOT(calcMetricsFinished(QString)));
+    StringVector selectedClusters;
+    QStandardItemModel *modelSelClusters = qobject_cast<QStandardItemModel*>(ui->listViewMetricsSelClu->model());
+    for (int i = 0; i < modelSelClusters->rowCount(); ++i) {
+        if (modelSelClusters->item(i)->checkState() == Qt::Checked)
+            selectedClusters.push_back(modelSelClusters->item(i)->text().toStdString());
+    }
+
+    CTestSuiteMetrics *metricsThread = new CTestSuiteMetrics(this);
+    connect(metricsThread, SIGNAL(updateStatusLabel(QString)), this, SLOT(statusUpdate(QString)));
+    connect(metricsThread, SIGNAL(processFinished(QString)), this, SLOT(calcMetricsFinished(QString)));
+    connect(metricsThread, SIGNAL(finished()), metricsThread, SLOT(deleteLater()));
     m_statusProgressBar->setMaximum(0);
-    m_metricsThread->calculateMetrics(metrics, (IndexType)ui->lineEditRevisionMetrics->text().toLongLong(), this);
+    metricsThread->calculateMetrics(metrics, selectedClusters, (IndexType)ui->lineEditRevisionMetrics->text().toLongLong(), this);
 }
 
 void CMainWindow::calcMetricsFinished(QString msg)
 {
     ui->statusBar->showMessage(msg, 5000);
-    m_statusProgressBar->setMaximum(0);
+    m_statusProgressBar->setMaximum(1);
     m_statusLabel->clear();
-    delete m_metricsThread;
 }
 
 void CMainWindow::on_buttonBrowseCov_clicked()
@@ -298,11 +316,12 @@ void CMainWindow::on_buttonBrowseCha_clicked()
 
 void CMainWindow::on_buttonLoad_clicked()
 {
-    m_loadThread = new CTestSuiteLoader(this);
-    connect(m_loadThread, SIGNAL(updateStatusLabel(QString)), this, SLOT(statusUpdate(QString)));
-    connect(m_loadThread, SIGNAL(processFinished(QString)), this, SLOT(loadFinished(QString)));
+    CTestSuiteLoader *loadThread = new CTestSuiteLoader(this);
+    connect(loadThread, SIGNAL(updateStatusLabel(QString)), this, SLOT(statusUpdate(QString)));
+    connect(loadThread, SIGNAL(processFinished(QString)), this, SLOT(loadFinished(QString)));
+    connect(loadThread, SIGNAL(finished()), loadThread, SLOT(deleteLater()));
     m_statusProgressBar->setMaximum(0);
-    m_loadThread->load(m_workspace);
+    loadThread->load(m_workspace);
 }
 
 void CMainWindow::statusUpdate(QString label)
@@ -315,7 +334,6 @@ void CMainWindow::loadFinished(QString msg)
     ui->statusBar->showMessage(msg, 5000);
     m_statusProgressBar->setMaximum(1);
     m_statusLabel->clear();
-    delete m_loadThread;
     m_testSuiteAvailableLabel->setVisible(true);
 
     ui->tableViewTests->setModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getTestcases()));
@@ -329,11 +347,12 @@ void CMainWindow::calculateStatistics()
     if (m_workspace->isStatisticsCalculated())
         return;
 
-    m_statsThread = new CStatisticsThread(this);
-    connect(m_statsThread, SIGNAL(updateStatusLabel(QString)), this, SLOT(statusUpdate(QString)));
-    connect(m_statsThread, SIGNAL(processFinished(QString)), this, SLOT(calcStatsFinished(QString)));
+    CStatisticsThread *statsThread = new CStatisticsThread(this);
+    connect(statsThread, SIGNAL(updateStatusLabel(QString)), this, SLOT(statusUpdate(QString)));
+    connect(statsThread, SIGNAL(processFinished(QString)), this, SLOT(calcStatsFinished(QString)));
+    connect(statsThread, SIGNAL(finished()), statsThread, SLOT(deleteLater()));
     m_statusProgressBar->setMaximum(0);
-    m_statsThread->calcStatistics(m_workspace);
+    statsThread->calcStatistics(m_workspace);
 }
 
 void CMainWindow::calcStatsFinished(QString msg)
@@ -341,7 +360,6 @@ void CMainWindow::calcStatsFinished(QString msg)
     ui->statusBar->showMessage(msg, 5000);
     m_statusProgressBar->setMaximum(1);
     m_statusLabel->clear();
-    delete m_statsThread;
     m_workspace->getResultsByName(WS)->AddMember("statistics-calculated", true, m_workspace->getResultsByName(WS)->GetAllocator());
 }
 
@@ -360,6 +378,7 @@ void CMainWindow::createCompleterForMetrics()
     m_revCompleter = new QCompleter(revs, this);
     m_revCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     ui->lineEditRevisionMetrics->setCompleter(m_revCompleter);
+    ui->lineEditScoreRevision->setCompleter(m_revCompleter);
 }
 
 void CMainWindow::on_tabWidgetStatistics_currentChanged(int index)
@@ -403,4 +422,34 @@ void CMainWindow::on_tabWidgetMetrics_currentChanged(int index)
     else if (tabText == "Heat map")
         metrics.generateHeatMap(ui->webViewHeatmap);
 
+}
+
+void CMainWindow::on_pushButtonScoreCalc_clicked()
+{
+    StringVector flTechnique;
+    for (int i = 0; i < m_scorePluginModel->rowCount(); ++i) {
+        if (m_scorePluginModel->item(i)->checkState() == Qt::Checked)
+            flTechnique.push_back(m_scorePluginModel->item(i)->text().toStdString());
+    }
+
+    StringVector selectedClusters;
+    QStandardItemModel *modelSelClusters = qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model());
+    for (int i = 0; i < modelSelClusters->rowCount(); ++i) {
+        if (modelSelClusters->item(i)->checkState() == Qt::Checked)
+            selectedClusters.push_back(modelSelClusters->item(i)->text().toStdString());
+    }
+
+    CFLScore *scoreThread = new CFLScore(this);
+    connect(scoreThread, SIGNAL(updateStatusLabel(QString)), this, SLOT(statusUpdate(QString)));
+    connect(scoreThread, SIGNAL(processFinished(QString)), this, SLOT(calcScoreFinished(QString)));
+    connect(scoreThread, SIGNAL(finished()), scoreThread, SLOT(deleteLater()));
+    m_statusProgressBar->setMaximum(0);
+    scoreThread->calculateScore((IndexType)ui->lineEditScoreRevision->text().toLongLong(), flTechnique, selectedClusters, this);
+}
+
+void CMainWindow::calcScoreFinished(QString msg)
+{
+    ui->statusBar->showMessage(msg, 5000);
+    m_statusProgressBar->setMaximum(1);
+    m_statusLabel->clear();
 }

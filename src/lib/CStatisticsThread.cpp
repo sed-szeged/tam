@@ -34,5 +34,5 @@ void CStatisticsThread::run()
     emit updateStatusLabel("Calculating fail statistics...");
     stat.calcFailStatistics(*m_resStats);
 
-    emit processFinished("Statistics calculations finished.");
+    emit processFinished("Calculation of statistics has been finished.");
 }

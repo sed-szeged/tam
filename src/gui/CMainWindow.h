@@ -6,6 +6,7 @@
 #include "lib/CClusterList.h"
 #include "lib/CTestSuiteLoader.h"
 #include "lib/CStatisticsThread.h"
+#include "lib/CFLScore.h"
 
 #include <QCompleter>
 #include <QMainWindow>
@@ -30,7 +31,6 @@ public:
     ~CMainWindow();
 
     CWorkspace* getWorkspace() { return m_workspace; }
-    CTestSuiteMetrics* getMetrics() { return m_metricsThread; }
     CKernel* getKernel() { return m_kernel; }
     CClusterList* getClusterList() { return m_clusterList; }
 
@@ -41,6 +41,7 @@ private slots:
     void loadFinished(QString msg);
     void calcStatsFinished(QString msg);
     void calcMetricsFinished(QString msg);
+    void calcScoreFinished(QString msg);
 
     void on_actionExit_triggered();
 
@@ -80,6 +81,8 @@ private slots:
 
     void on_tabWidgetMetrics_currentChanged(int index);
 
+    void on_pushButtonScoreCalc_clicked();
+
 private:
 
     void createStatusBar();
@@ -96,12 +99,9 @@ private:
     QLabel *m_testSuiteAvailableLabel;
     QProgressBar *m_statusProgressBar;
 
-    CStatisticsThread *m_statsThread;
-    CTestSuiteLoader *m_loadThread;
     CWorkspace *m_workspace;
     CKernel *m_kernel;
 
-    CTestSuiteMetrics *m_metricsThread;
     QCompleter *m_revCompleter;
     QStandardItemModel *m_metricsPluginModel;
     QStandardItemModel *m_scorePluginModel;

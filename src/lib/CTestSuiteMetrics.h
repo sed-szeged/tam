@@ -17,7 +17,7 @@ public:
     CTestSuiteMetrics(QObject *parent = 0);
     ~CTestSuiteMetrics();
 
-    void calculateMetrics(StringVector metrics, IndexType revision, CMainWindow *mainWindow);
+    void calculateMetrics(StringVector metrics, StringVector selectedClusters, IndexType revision, CMainWindow *mainWindow);
 
 protected:
     void run();
@@ -32,7 +32,7 @@ private:
 
     rapidjson::Document *m_results;
     CKernel *m_kernel;
-    std::map<std::string, CClusterDefinition> *m_clusters;
+    std::map<std::string, CClusterDefinition> m_clusters;
     StringVector m_metricNames;
     CSelectionData *m_testSuite;
     IndexType m_revision;
