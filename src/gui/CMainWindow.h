@@ -44,47 +44,35 @@ private slots:
     void calcScoreFinished(QString msg);
 
     void on_actionExit_triggered();
-
     void on_actionNewWorkspace_triggered();
-
     void on_actionDumpCoverage_triggered();
-
     void on_actionLoadWorkspace_triggered();
-
     void on_actionSaveWorkspace_triggered();
-
-    void on_buttonClusterTestList_clicked();
-
-    void on_buttonClusterCEList_clicked();
-
-    void on_buttonCalculateMetrics_clicked();
-
-    void on_checkBoxMetricsSelectAll_stateChanged(int arg1);
-
-    void on_buttonCalcCluster_clicked();
-
-    void on_buttonBrowseCov_clicked();
-
-    void on_buttonBrowseRes_clicked();
-
-    void on_buttonBrowseCha_clicked();
-
-    void on_buttonLoad_clicked();
-
     void on_actionSaveWorkspaceAs_triggered();
 
-    void on_tabWidgetStatistics_currentChanged(int index);
+    void on_buttonClusterTestList_clicked();
+    void on_buttonClusterCEList_clicked();
+    void on_buttonCalcCluster_clicked();
 
-    void on_tabWidgetMain_currentChanged(int index);
+    void on_buttonCalculateMetrics_clicked();
+    void on_checkBoxMetricsSelectAll_stateChanged(int arg1);
 
-    void on_tabWidgetCluster_currentChanged(int index);
-
-    void on_tabWidgetMetrics_currentChanged(int index);
+    void on_buttonBrowseCov_clicked();
+    void on_buttonBrowseRes_clicked();
+    void on_buttonBrowseCha_clicked();
+    void on_buttonLoad_clicked();
 
     void on_pushButtonScoreCalc_clicked();
 
+    void on_tabWidgetStatistics_currentChanged(int index);
+    void on_tabWidgetMain_currentChanged(int index);
+    void on_tabWidgetCluster_currentChanged(int index);
+    void on_tabWidgetMetrics_currentChanged(int index);
+    void on_tabWidgetScore_currentChanged(int index);
+
 private:
 
+    void updateAvailableClusters();
     void createStatusBar();
     void createCompleterForMetrics();
     void calculateStatistics();

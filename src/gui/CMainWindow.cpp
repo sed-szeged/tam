@@ -2,6 +2,7 @@
 #include "CShowStatistics.h"
 #include "CShowClusters.h"
 #include "CShowMetrics.h"
+#include "CShowScores.h"
 #include "CIDManagerTableModel.h"
 #include "ui_CMainWindow.h"
 #include "lib/CWorkspace.h"
@@ -126,6 +127,22 @@ void CMainWindow::updateLabels()
         ui->labelChan->setText(fileInfo.fileName());
 }
 
+void CMainWindow::updateAvailableClusters()
+{
+    QStandardItemModel *modelMetrics = qobject_cast<QStandardItemModel*>(ui->listViewMetricsSelClu->model());
+    QStandardItemModel *modelScore = qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model());
+    for (std::map<std::string, CClusterDefinition>::const_iterator it = m_clusterList->getClusters().begin(); it != m_clusterList->getClusters().end(); ++it) {
+        if (modelMetrics->findItems(tr(it->first.c_str())).size())
+            continue;
+
+        QStandardItem *item = new QStandardItem(tr(it->first.c_str()));
+        item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        item->setData(Qt::Unchecked, Qt::CheckStateRole);
+        modelMetrics->appendRow(item);
+        modelScore->appendRow(item->clone());
+    }
+}
+
 void CMainWindow::on_actionExit_triggered()
 {
     qApp->exit();
@@ -134,9 +151,9 @@ void CMainWindow::on_actionExit_triggered()
 void CMainWindow::on_actionDumpCoverage_triggered()
 {
     rapidjson::StringBuffer s;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
         s.Clear();
-        m_workspace->getResultsByName(METRICS)->Accept(writer);
+        m_workspace->getResultsByName(WS)->Accept(writer);
         std::cout << s.GetString() << std::endl;
 }
 
@@ -163,6 +180,7 @@ void CMainWindow::on_actionLoadWorkspace_triggered()
         m_workspace->load();
         ui->statusBar->showMessage("Workspace loaded from file: " + m_workspace->getFileName(), 5000);
         updateLabels();
+        updateAvailableClusters();
     }
 }
 
@@ -208,9 +226,13 @@ void CMainWindow::on_buttonClusterTestList_clicked()
         return;
 
     rapidjson::Document *workspace = m_workspace->getResultsByName(WS);
-    rapidjson::Value s;
-    s.SetString(fileName.toStdString().c_str(), fileName.length(), workspace->GetAllocator());
-    workspace->AddMember("cluster-test-list", s, workspace->GetAllocator());
+    rapidjson::Document::MemberIterator memberIt = workspace->FindMember("cluster-test-list");
+    if (memberIt == workspace->MemberEnd()) {
+        rapidjson::Value s;
+        s.SetString(fileName.toStdString().c_str(), fileName.length(), workspace->GetAllocator());
+        workspace->AddMember("cluster-test-list", s, workspace->GetAllocator());
+    } else
+        memberIt->value.SetString(fileName.toStdString().c_str(), fileName.length(), workspace->GetAllocator());
     ui->labelClusterTestList->setText(QFileInfo(fileName).fileName());
 }
 
@@ -223,25 +245,20 @@ void CMainWindow::on_buttonClusterCEList_clicked()
         return;
 
     rapidjson::Document *workspace = m_workspace->getResultsByName(WS);
-    rapidjson::Value s;
-    s.SetString(fileName.toStdString().c_str(), fileName.length(), workspace->GetAllocator());
-    workspace->AddMember("cluster-code-elements-list", s, workspace->GetAllocator());
+    rapidjson::Document::MemberIterator memberIt = workspace->FindMember("cluster-code-elements-list");
+    if (memberIt == workspace->MemberEnd()) {
+        rapidjson::Value s;
+        s.SetString(fileName.toStdString().c_str(), fileName.length(), workspace->GetAllocator());
+        workspace->AddMember("cluster-code-elements-list", s, workspace->GetAllocator());
+    } else
+        memberIt->value.SetString(fileName.toStdString().c_str(), fileName.length(), workspace->GetAllocator());
     ui->labelClusterCodeElementList->setText(QFileInfo(fileName).fileName());
 }
 
 void CMainWindow::on_buttonCalcCluster_clicked()
 {
     m_clusterList->createClusters();
-
-    QStandardItemModel *modelMetrics = qobject_cast<QStandardItemModel*>(ui->listViewMetricsSelClu->model());
-    QStandardItemModel *modelScore = qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model());
-    for (std::map<std::string, CClusterDefinition>::const_iterator it = m_clusterList->getClusters().begin(); it != m_clusterList->getClusters().end(); ++it) {
-        QStandardItem *item = new QStandardItem(tr(it->first.c_str()));
-        item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        item->setData(Qt::Unchecked, Qt::CheckStateRole);
-        modelMetrics->appendRow(item);
-        modelScore->appendRow(item->clone());
-    }
+    updateAvailableClusters();
 }
 
 void CMainWindow::on_checkBoxMetricsSelectAll_stateChanged(int state)
@@ -363,6 +380,36 @@ void CMainWindow::calcStatsFinished(QString msg)
     m_workspace->getResultsByName(WS)->AddMember("statistics-calculated", true, m_workspace->getResultsByName(WS)->GetAllocator());
 }
 
+void CMainWindow::on_pushButtonScoreCalc_clicked()
+{
+    StringVector flTechnique;
+    for (int i = 0; i < m_scorePluginModel->rowCount(); ++i) {
+        if (m_scorePluginModel->item(i)->checkState() == Qt::Checked)
+            flTechnique.push_back(m_scorePluginModel->item(i)->text().toStdString());
+    }
+
+    StringVector selectedClusters;
+    QStandardItemModel *modelSelClusters = qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model());
+    for (int i = 0; i < modelSelClusters->rowCount(); ++i) {
+        if (modelSelClusters->item(i)->checkState() == Qt::Checked)
+            selectedClusters.push_back(modelSelClusters->item(i)->text().toStdString());
+    }
+
+    CFLScore *scoreThread = new CFLScore(this);
+    connect(scoreThread, SIGNAL(updateStatusLabel(QString)), this, SLOT(statusUpdate(QString)));
+    connect(scoreThread, SIGNAL(processFinished(QString)), this, SLOT(calcScoreFinished(QString)));
+    connect(scoreThread, SIGNAL(finished()), scoreThread, SLOT(deleteLater()));
+    m_statusProgressBar->setMaximum(0);
+    scoreThread->calculateScore((IndexType)ui->lineEditScoreRevision->text().toLongLong(), flTechnique, selectedClusters, this);
+}
+
+void CMainWindow::calcScoreFinished(QString msg)
+{
+    ui->statusBar->showMessage(msg, 5000);
+    m_statusProgressBar->setMaximum(1);
+    m_statusLabel->clear();
+}
+
 void CMainWindow::createCompleterForMetrics()
 {
     if (m_revCompleter) {
@@ -424,32 +471,11 @@ void CMainWindow::on_tabWidgetMetrics_currentChanged(int index)
 
 }
 
-void CMainWindow::on_pushButtonScoreCalc_clicked()
+void CMainWindow::on_tabWidgetScore_currentChanged(int index)
 {
-    StringVector flTechnique;
-    for (int i = 0; i < m_scorePluginModel->rowCount(); ++i) {
-        if (m_scorePluginModel->item(i)->checkState() == Qt::Checked)
-            flTechnique.push_back(m_scorePluginModel->item(i)->text().toStdString());
+    QString tabText = ui->tabWidgetScore->tabBar()->tabText(index);
+    if (tabText == "Scores") {
+        CShowScores scores;
+        scores.generateResults(ui->webViewScores, m_workspace->getResultsByName(SCORE), m_workspace->getTestSuite());
     }
-
-    StringVector selectedClusters;
-    QStandardItemModel *modelSelClusters = qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model());
-    for (int i = 0; i < modelSelClusters->rowCount(); ++i) {
-        if (modelSelClusters->item(i)->checkState() == Qt::Checked)
-            selectedClusters.push_back(modelSelClusters->item(i)->text().toStdString());
-    }
-
-    CFLScore *scoreThread = new CFLScore(this);
-    connect(scoreThread, SIGNAL(updateStatusLabel(QString)), this, SLOT(statusUpdate(QString)));
-    connect(scoreThread, SIGNAL(processFinished(QString)), this, SLOT(calcScoreFinished(QString)));
-    connect(scoreThread, SIGNAL(finished()), scoreThread, SLOT(deleteLater()));
-    m_statusProgressBar->setMaximum(0);
-    scoreThread->calculateScore((IndexType)ui->lineEditScoreRevision->text().toLongLong(), flTechnique, selectedClusters, this);
-}
-
-void CMainWindow::calcScoreFinished(QString msg)
-{
-    ui->statusBar->showMessage(msg, 5000);
-    m_statusProgressBar->setMaximum(1);
-    m_statusLabel->clear();
 }

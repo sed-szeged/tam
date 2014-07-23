@@ -14,7 +14,6 @@ void CShowClusters::generateCharts(std::map<std::string, CClusterDefinition> &cl
         "<html xmlns=\"http://www.w3.org/1999/xhtml\">"
           "<head>"
             "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>"
-            "<!-- One script tag loads all the required libraries! Do not specify any chart types in the autoload statement. -->"
             "<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>"
             "<script type=\"text/javascript\">google.load('visualization', '1.1', {packages: ['controls']});</script>"
             "<script type=\"text/javascript\">google.load('visualization', '1', {packages:['table']});</script>"

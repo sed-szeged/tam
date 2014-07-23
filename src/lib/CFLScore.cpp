@@ -40,7 +40,8 @@ void CFLScore::run()
 
             rapidjson::Value key;
             key.SetString(flTechniqueName.c_str(), m_results->GetAllocator());
-            rapidjson::Value &values = technique->getValues();
+            rapidjson::Value values(rapidjson::kObjectType);
+            values.CopyFrom(technique->getValues(), m_results->GetAllocator());
             clusterVal.AddMember(key, values, m_results->GetAllocator());
 
             /*for (IndexType k = 0; k < m_failedCodeElements.size(); k++) {
@@ -50,6 +51,7 @@ void CFLScore::run()
         }
         rapidjson::Value key;
         key.SetString((*it).c_str(), m_results->GetAllocator());
+        m_results->RemoveMember(key);
         m_results->AddMember(key, clusterVal, m_results->GetAllocator());
     }
     emit processFinished("Calculation of scores has been finished");

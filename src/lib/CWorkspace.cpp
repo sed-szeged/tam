@@ -55,9 +55,13 @@ void CWorkspace::load()
 
 void CWorkspace::setCoveragePath(QString path)
 {
-    rapidjson::Value s;
-    s.SetString(path.toStdString().c_str(), path.length(), m_results[WS]->GetAllocator());
-    m_results[WS]->AddMember("coverage-binary", s, m_results[WS]->GetAllocator());
+    rapidjson::Document::MemberIterator memberIt = m_results[WS]->FindMember("coverage-binary");
+    if (memberIt == m_results[WS]->MemberEnd()) {
+        rapidjson::Value s;
+        s.SetString(path.toStdString().c_str(), path.length(), m_results[WS]->GetAllocator());
+        m_results[WS]->AddMember("coverage-binary", s, m_results[WS]->GetAllocator());
+    } else
+        memberIt->value.SetString(path.toStdString().c_str(), path.length(), m_results[WS]->GetAllocator());
 }
 
 QString CWorkspace::getCoveragePath()
@@ -70,9 +74,13 @@ QString CWorkspace::getCoveragePath()
 
 void CWorkspace::setResultsPath(QString path)
 {
-    rapidjson::Value s;
-    s.SetString(path.toStdString().c_str(), path.length(), m_results[WS]->GetAllocator());
-    m_results[WS]->AddMember("results-binary", s, m_results[WS]->GetAllocator());
+    rapidjson::Document::MemberIterator memberIt = m_results[WS]->FindMember("results-binary");
+    if (memberIt == m_results[WS]->MemberEnd()) {
+        rapidjson::Value s;
+        s.SetString(path.toStdString().c_str(), path.length(), m_results[WS]->GetAllocator());
+        m_results[WS]->AddMember("results-binary", s, m_results[WS]->GetAllocator());
+    } else
+        memberIt->value.SetString(path.toStdString().c_str(), path.length(), m_results[WS]->GetAllocator());
 }
 
 QString CWorkspace::getResultsPath()
@@ -85,9 +93,13 @@ QString CWorkspace::getResultsPath()
 
 void CWorkspace::setChangesetPath(QString path)
 {
-    rapidjson::Value s;
-    s.SetString(path.toStdString().c_str(), path.length(), m_results[WS]->GetAllocator());
-    m_results[WS]->AddMember("changeset-binary", s, m_results[WS]->GetAllocator());
+    rapidjson::Document::MemberIterator memberIt = m_results[WS]->FindMember("changeset-binary");
+    if (memberIt == m_results[WS]->MemberEnd()) {
+        rapidjson::Value s;
+        s.SetString(path.toStdString().c_str(), path.length(), m_results[WS]->GetAllocator());
+        m_results[WS]->AddMember("changeset-binary", s, m_results[WS]->GetAllocator());
+    } else
+        memberIt->value.SetString(path.toStdString().c_str(), path.length(), m_results[WS]->GetAllocator());
 
     if (!path.isEmpty())
         m_isChangesAvailable = true;
