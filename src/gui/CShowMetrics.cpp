@@ -1,8 +1,8 @@
 #include <iostream>
 #include "CShowMetrics.h"
 
-CShowMetrics::CShowMetrics(rapidjson::Document& metrics, std::map<std::string, CClusterDefinition>& clusterList) :
-    m_metrics(metrics), m_clusterList(clusterList)
+CShowMetrics::CShowMetrics(rapidjson::Document& metrics, ClusterMap& clusters) :
+    m_metrics(metrics), m_clusters(clusters)
 {
 }
 
@@ -167,7 +167,7 @@ void CShowMetrics::generateCharts(QWebView *webView)
         rapidjson::Value& val = itr->value;
         covVal.append("['" + QString(parts[0]) + "'," + QString::number(val["fault-detection"].GetDouble()) + "," + QString::number(val["tpce"].GetDouble()) + "," + QString::number(val["coverage-efficiency"].GetDouble()) + "," + QString::number(val["partition-efficiency"].GetDouble()) + "],");
 
-        IndexType nrOfTests = m_clusterList.at(itr->name.GetString()).getTestCases().size();
+        IndexType nrOfTests = m_clusters.at(itr->name.GetString()).getTestCases().size();
         IndexType specTests = nrOfTests * val["specialization"].GetDouble();
         if (specTests != nrOfTests)
             special.append("['" + QString(parts[0]) + "'," + QString::number(specTests) + "," + QString::number(nrOfTests - specTests) + "],");

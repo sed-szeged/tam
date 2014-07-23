@@ -57,7 +57,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>2</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -490,10 +490,33 @@
              <string>Create clusters</string>
             </property>
            </widget>
+           <widget class="QGroupBox" name="groupBox_4">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>180</y>
+              <width>281</width>
+              <height>331</height>
+             </rect>
+            </property>
+            <property name="title">
+             <string>Clusters</string>
+            </property>
+            <widget class="QListView" name="listViewClusters">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>30</y>
+               <width>211</width>
+               <height>192</height>
+              </rect>
+             </property>
+            </widget>
+           </widget>
           </widget>
-          <widget class="QWidget" name="data">
+          <widget class="QWidget" name="statistics">
            <attribute name="title">
-            <string>Data</string>
+            <string>Statistics</string>
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <item>

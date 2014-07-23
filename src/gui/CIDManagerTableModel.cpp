@@ -23,8 +23,7 @@ QVariant CIDManagerTableModel::data(const QModelIndex &index, int role) const
     if(index.row() >= m_data->size() || index.row() < 0)
         return QVariant();
 
-    if(role == Qt::DisplayRole || role == Qt::EditRole)
-    {
+    if(role == Qt::DisplayRole || role == Qt::EditRole) {
         switch(index.column())
         {
         case ID:

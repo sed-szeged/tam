@@ -14,14 +14,14 @@ public:
     ~CClusterList();
 
     void createClusters();
-    std::map<std::string, CClusterDefinition>& getClusters() { return *m_clusters; }
+    ClusterMap& getClusters() { return *m_clusters; }
     void fromJson(rapidjson::Document &doc);
     void toJson(rapidjson::Document &doc);
 
 private:
 
     CMainWindow *m_mainWindow;
-    std::map<std::string, CClusterDefinition> *m_clusters;
+    ClusterMap *m_clusters;
 };
 
 #endif // CCLUSTERLIST_H

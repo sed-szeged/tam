@@ -5,7 +5,7 @@
 
 CClusterList::CClusterList(CMainWindow *mainWindow) :
     m_mainWindow(mainWindow),
-    m_clusters(new std::map<std::string, CClusterDefinition>())
+    m_clusters(new ClusterMap())
 {
 }
 
@@ -23,7 +23,7 @@ void CClusterList::createClusters()
 
 void CClusterList::toJson(rapidjson::Document &doc)
 {
-    for (std::map<std::string, CClusterDefinition>::iterator it = m_clusters->begin(); it != m_clusters->end(); ++it) {
+    for (ClusterMap::iterator it = m_clusters->begin(); it != m_clusters->end(); ++it) {
         rapidjson::Value cluster;
         cluster.SetObject();
 

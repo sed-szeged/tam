@@ -11,7 +11,7 @@ using namespace soda;
 class CShowMetrics
 {
 public:
-    CShowMetrics(rapidjson::Document& metrics, std::map<std::string, CClusterDefinition>& clusterList);
+    CShowMetrics(rapidjson::Document& metrics, ClusterMap& clusters);
     ~CShowMetrics();
 
     void generateResults(QWebView *webView);
@@ -21,7 +21,7 @@ public:
 private:
 
     rapidjson::Document& m_metrics;
-    std::map<std::string, CClusterDefinition>& m_clusterList;
+    ClusterMap& m_clusters;
 };
 
 #endif // CSHOWMETRICS_H

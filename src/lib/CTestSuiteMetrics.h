@@ -32,7 +32,7 @@ private:
 
     rapidjson::Document *m_results;
     CKernel *m_kernel;
-    std::map<std::string, CClusterDefinition> m_clusters;
+    ClusterMap m_clusters;
     StringVector m_metricNames;
     CSelectionData *m_testSuite;
     IndexType m_revision;

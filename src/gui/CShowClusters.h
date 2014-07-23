@@ -11,7 +11,7 @@ class CShowClusters
 public:
     CShowClusters();
     ~CShowClusters();
-    void generateCharts(std::map<std::string, CClusterDefinition> &clusterList, QWebView *webView);
+    void generateCharts(ClusterMap &clusters, QWebView *webView);
 };
 
 #endif // CSHOWCLUSTERS_H

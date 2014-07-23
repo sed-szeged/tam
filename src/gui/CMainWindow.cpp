@@ -131,7 +131,7 @@ void CMainWindow::updateAvailableClusters()
 {
     QStandardItemModel *modelMetrics = qobject_cast<QStandardItemModel*>(ui->listViewMetricsSelClu->model());
     QStandardItemModel *modelScore = qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model());
-    for (std::map<std::string, CClusterDefinition>::const_iterator it = m_clusterList->getClusters().begin(); it != m_clusterList->getClusters().end(); ++it) {
+    for (ClusterMap::const_iterator it = m_clusterList->getClusters().begin(); it != m_clusterList->getClusters().end(); ++it) {
         if (modelMetrics->findItems(tr(it->first.c_str())).size())
             continue;
 

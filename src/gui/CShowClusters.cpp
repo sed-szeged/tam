@@ -8,7 +8,7 @@ CShowClusters::~CShowClusters()
 {
 }
 
-void CShowClusters::generateCharts(std::map<std::string, CClusterDefinition> &clusterList, QWebView *webView)
+void CShowClusters::generateCharts(ClusterMap &clusters, QWebView *webView)
 {
     QString html = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
         "<html xmlns=\"http://www.w3.org/1999/xhtml\">"
@@ -60,7 +60,7 @@ void CShowClusters::generateCharts(std::map<std::string, CClusterDefinition> &cl
 
     QString clusterTable;
     QString clusterChart;
-    for (std::map<std::string, CClusterDefinition>::iterator it = clusterList.begin(); it != clusterList.end(); ++it) {
+    for (ClusterMap::iterator it = clusters.begin(); it != clusters.end(); ++it) {
         QStringList parts = QString(it->first.c_str()).split(" - ");
         if (parts.size() == 2 && parts[0] != parts[1])
             continue;

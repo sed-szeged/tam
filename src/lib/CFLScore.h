@@ -32,7 +32,7 @@ private:
     CSelectionData *m_testSuite;
     rapidjson::Document *m_results;
     CKernel *m_kernel;
-    std::map<std::string, CClusterDefinition> *m_clusters;
+    ClusterMap *m_clusters;
 };
 
 #endif // CFLSCORE_H
