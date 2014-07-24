@@ -81,6 +81,7 @@ void CMainWindow::fillWidgets()
     ui->listViewFaultlocalization->setModel(m_scorePluginModel);
     ui->listViewMetricsSelClu->setModel(new QStandardItemModel(this));
     ui->listViewScoreSelClu->setModel(new QStandardItemModel(this));
+    ui->listViewClusters->setModel(new QStandardItemModel(this));
 }
 
 void CMainWindow::createStatusBar()
@@ -131,6 +132,7 @@ void CMainWindow::updateAvailableClusters()
 {
     QStandardItemModel *modelMetrics = qobject_cast<QStandardItemModel*>(ui->listViewMetricsSelClu->model());
     QStandardItemModel *modelScore = qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model());
+    QStandardItemModel *modelClusters = qobject_cast<QStandardItemModel*>(ui->listViewClusters->model());
     for (ClusterMap::const_iterator it = m_clusterList->getClusters().begin(); it != m_clusterList->getClusters().end(); ++it) {
         if (modelMetrics->findItems(tr(it->first.c_str())).size())
             continue;
@@ -140,6 +142,9 @@ void CMainWindow::updateAvailableClusters()
         item->setData(Qt::Unchecked, Qt::CheckStateRole);
         modelMetrics->appendRow(item);
         modelScore->appendRow(item->clone());
+        QStandardItem *clusterItem = new QStandardItem(tr(it->first.c_str()));
+        clusterItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+        modelClusters->appendRow(clusterItem);
     }
 }
 
@@ -380,7 +385,7 @@ void CMainWindow::calcStatsFinished(QString msg)
     m_workspace->getResultsByName(WS)->AddMember("statistics-calculated", true, m_workspace->getResultsByName(WS)->GetAllocator());
 }
 
-void CMainWindow::on_pushButtonScoreCalc_clicked()
+void CMainWindow::on_buttonScoreCalc_clicked()
 {
     StringVector flTechnique;
     for (int i = 0; i < m_scorePluginModel->rowCount(); ++i) {
@@ -408,6 +413,22 @@ void CMainWindow::calcScoreFinished(QString msg)
     ui->statusBar->showMessage(msg, 5000);
     m_statusProgressBar->setMaximum(1);
     m_statusLabel->clear();
+}
+
+void CMainWindow::on_buttonDeleteCluster_clicked()
+{
+    QModelIndexList list = ui->listViewClusters->selectionModel()->selectedIndexes();
+    if (list.empty())
+        return;
+
+    QString cluster = qobject_cast<QStandardItemModel*>(ui->listViewClusters->model())->itemFromIndex(list.first())->text();
+    QStandardItem *item = qobject_cast<QStandardItemModel*>(ui->listViewClusters->model())->findItems(cluster).first();
+    ui->listViewClusters->model()->removeRow(item->index().row());
+    item = qobject_cast<QStandardItemModel*>(ui->listViewMetricsSelClu->model())->findItems(cluster).first();
+    ui->listViewMetricsSelClu->model()->removeRow(item->index().row());
+    item = qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model())->findItems(cluster).first();
+    ui->listViewScoreSelClu->model()->removeRow(item->index().row());
+    m_clusterList->getClusters().erase(cluster.toStdString());
 }
 
 void CMainWindow::createCompleterForMetrics()
@@ -452,7 +473,7 @@ void CMainWindow::on_tabWidgetMain_currentChanged(int index)
 
 void CMainWindow::on_tabWidgetCluster_currentChanged(int index)
 {
-    if (ui->tabWidgetCluster->tabBar()->tabText(index) == "Data") {
+    if (ui->tabWidgetCluster->tabBar()->tabText(index) == "Statistics") {
         CShowClusters clusters;
         clusters.generateCharts(m_clusterList->getClusters(), ui->webViewCluster);
     }

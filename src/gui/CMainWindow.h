@@ -62,13 +62,15 @@ private slots:
     void on_buttonBrowseCha_clicked();
     void on_buttonLoad_clicked();
 
-    void on_pushButtonScoreCalc_clicked();
+    void on_buttonScoreCalc_clicked();
 
     void on_tabWidgetStatistics_currentChanged(int index);
     void on_tabWidgetMain_currentChanged(int index);
     void on_tabWidgetCluster_currentChanged(int index);
     void on_tabWidgetMetrics_currentChanged(int index);
     void on_tabWidgetScore_currentChanged(int index);
+
+    void on_buttonDeleteCluster_clicked();
 
 private:
 

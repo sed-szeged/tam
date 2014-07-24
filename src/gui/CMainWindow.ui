@@ -370,133 +370,13 @@
            <attribute name="title">
             <string>Options</string>
            </attribute>
-           <widget class="QComboBox" name="comboBoxClusterPlugins">
-            <property name="geometry">
-             <rect>
-              <x>150</x>
-              <y>15</y>
-              <width>111</width>
-              <height>27</height>
-             </rect>
-            </property>
-            <property name="sizeAdjustPolicy">
-             <enum>QComboBox::AdjustToContents</enum>
-            </property>
-           </widget>
-           <widget class="QLabel" name="labelClusterAlgorithm">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>20</y>
-              <width>131</width>
-              <height>17</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Cluster algorithm:</string>
-            </property>
-           </widget>
-           <widget class="QLabel" name="labelClusterTestListTitle">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>60</y>
-              <width>111</width>
-              <height>17</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Cluster test list:</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="buttonClusterTestList">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="geometry">
-             <rect>
-              <x>470</x>
-              <y>55</y>
-              <width>81</width>
-              <height>27</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Browse...</string>
-            </property>
-           </widget>
-           <widget class="QLabel" name="labelClusterCodeElementListTitle">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>100</y>
-              <width>181</width>
-              <height>17</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Cluster code element list:</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="buttonClusterCEList">
-            <property name="geometry">
-             <rect>
-              <x>470</x>
-              <y>95</y>
-              <width>81</width>
-              <height>27</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Browse...</string>
-            </property>
-           </widget>
-           <widget class="QLabel" name="labelClusterTestList">
-            <property name="geometry">
-             <rect>
-              <x>130</x>
-              <y>60</y>
-              <width>311</width>
-              <height>17</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>No cluster test list selected</string>
-            </property>
-           </widget>
-           <widget class="QLabel" name="labelClusterCodeElementList">
-            <property name="geometry">
-             <rect>
-              <x>190</x>
-              <y>100</y>
-              <width>251</width>
-              <height>17</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>No cluster code element list selected</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="buttonCalcCluster">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>130</y>
-              <width>111</width>
-              <height>27</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Create clusters</string>
-            </property>
-           </widget>
            <widget class="QGroupBox" name="groupBox_4">
             <property name="geometry">
              <rect>
-              <x>20</x>
-              <y>180</y>
-              <width>281</width>
-              <height>331</height>
+              <x>10</x>
+              <y>230</y>
+              <width>321</width>
+              <height>281</height>
              </rect>
             </property>
             <property name="title">
@@ -508,13 +388,175 @@
                <x>10</x>
                <y>30</y>
                <width>211</width>
-               <height>192</height>
+               <height>241</height>
               </rect>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::SingleSelection</enum>
+             </property>
+            </widget>
+            <widget class="QPushButton" name="buttonNewCluster">
+             <property name="geometry">
+              <rect>
+               <x>240</x>
+               <y>30</y>
+               <width>71</width>
+               <height>27</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>New</string>
+             </property>
+            </widget>
+            <widget class="QPushButton" name="buttonDeleteCluster">
+             <property name="geometry">
+              <rect>
+               <x>240</x>
+               <y>110</y>
+               <width>71</width>
+               <height>27</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Delete</string>
+             </property>
+            </widget>
+           </widget>
+           <widget class="QGroupBox" name="groupBox_5">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>10</y>
+              <width>551</width>
+              <height>191</height>
+             </rect>
+            </property>
+            <property name="title">
+             <string>Cluster algorithms</string>
+            </property>
+            <widget class="QPushButton" name="buttonCalcCluster">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>150</y>
+               <width>111</width>
+               <height>27</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Create clusters</string>
+             </property>
+            </widget>
+            <widget class="QLabel" name="labelClusterCodeElementListTitle">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>110</y>
+               <width>181</width>
+               <height>17</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Cluster code element list:</string>
+             </property>
+            </widget>
+            <widget class="QLabel" name="labelClusterCodeElementList">
+             <property name="geometry">
+              <rect>
+               <x>190</x>
+               <y>110</y>
+               <width>251</width>
+               <height>17</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>No cluster code element list selected</string>
+             </property>
+            </widget>
+            <widget class="QPushButton" name="buttonClusterCEList">
+             <property name="geometry">
+              <rect>
+               <x>460</x>
+               <y>105</y>
+               <width>81</width>
+               <height>27</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Browse...</string>
+             </property>
+            </widget>
+            <widget class="QLabel" name="labelClusterTestListTitle">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>70</y>
+               <width>111</width>
+               <height>17</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Cluster test list:</string>
+             </property>
+            </widget>
+            <widget class="QPushButton" name="buttonClusterTestList">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="geometry">
+              <rect>
+               <x>460</x>
+               <y>65</y>
+               <width>81</width>
+               <height>27</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Browse...</string>
+             </property>
+            </widget>
+            <widget class="QLabel" name="labelClusterTestList">
+             <property name="geometry">
+              <rect>
+               <x>130</x>
+               <y>70</y>
+               <width>311</width>
+               <height>17</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>No cluster test list selected</string>
+             </property>
+            </widget>
+            <widget class="QLabel" name="labelClusterAlgorithm">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>30</y>
+               <width>131</width>
+               <height>17</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>Cluster algorithm:</string>
+             </property>
+            </widget>
+            <widget class="QComboBox" name="comboBoxClusterPlugins">
+             <property name="geometry">
+              <rect>
+               <x>180</x>
+               <y>30</y>
+               <width>111</width>
+               <height>27</height>
+              </rect>
+             </property>
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContents</enum>
              </property>
             </widget>
            </widget>
           </widget>
-          <widget class="QWidget" name="statistics">
+          <widget class="QWidget" name="clusterStatistics">
            <attribute name="title">
             <string>Statistics</string>
            </attribute>
@@ -692,7 +734,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidgetScore">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="optionsScore">
            <attribute name="title">
@@ -783,7 +825,7 @@
              </property>
             </widget>
            </widget>
-           <widget class="QPushButton" name="pushButtonScoreCalc">
+           <widget class="QPushButton" name="buttonScoreCalc">
             <property name="geometry">
              <rect>
               <x>448</x>
