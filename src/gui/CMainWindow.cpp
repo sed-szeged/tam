@@ -23,7 +23,7 @@ CMainWindow::CMainWindow(QWidget *parent) :
     m_revCompleter(NULL), m_kernel(new CKernel())
 {
     ui->setupUi(this);
-    setFixedSize(size());
+    //setFixedSize(size());
 
     m_workspace = new CWorkspace(this);
     m_clusterList = new CClusterList(this);

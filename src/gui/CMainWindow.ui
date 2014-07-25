@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
-    <height>647</height>
+    <width>666</width>
+    <height>660</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -24,12 +24,12 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout1" stretch="2">
+   <layout class="QHBoxLayout" name="horizontalLayout_23">
     <item>
      <widget class="QTabWidget" name="tabWidgetMain">
       <property name="enabled">
@@ -57,7 +57,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>4</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -82,151 +82,150 @@
            <number>0</number>
           </property>
           <widget class="QWidget" name="general">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <attribute name="title">
             <string>General</string>
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
             <item>
              <widget class="QGroupBox" name="groupBox_2">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="title">
                <string>Test-suite</string>
               </property>
-              <widget class="QLabel" name="label_7">
-               <property name="geometry">
-                <rect>
-                 <x>17</x>
-                 <y>110</y>
-                 <width>124</width>
-                 <height>17</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Changeset matrix:</string>
-               </property>
-              </widget>
-              <widget class="QLabel" name="label_6">
-               <property name="geometry">
-                <rect>
-                 <x>17</x>
-                 <y>70</y>
-                 <width>114</width>
-                 <height>17</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Results file path:</string>
-               </property>
-              </widget>
-              <widget class="QLabel" name="label_3">
-               <property name="geometry">
-                <rect>
-                 <x>17</x>
-                 <y>30</y>
-                 <width>128</width>
-                 <height>17</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Coverage file path:</string>
-               </property>
-              </widget>
-              <widget class="QLabel" name="labelChan">
-               <property name="geometry">
-                <rect>
-                 <x>151</x>
-                 <y>110</y>
-                 <width>291</width>
-                 <height>17</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>No file selected</string>
-               </property>
-              </widget>
-              <widget class="QLabel" name="labelCov">
-               <property name="geometry">
-                <rect>
-                 <x>151</x>
-                 <y>30</y>
-                 <width>291</width>
-                 <height>17</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>No file selected</string>
-               </property>
-              </widget>
-              <widget class="QLabel" name="labelRes">
-               <property name="geometry">
-                <rect>
-                 <x>151</x>
-                 <y>70</y>
-                 <width>291</width>
-                 <height>17</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>No file selected</string>
-               </property>
-              </widget>
-              <widget class="QPushButton" name="buttonBrowseCov">
-               <property name="geometry">
-                <rect>
-                 <x>450</x>
-                 <y>25</y>
-                 <width>85</width>
-                 <height>27</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Browse...</string>
-               </property>
-              </widget>
-              <widget class="QPushButton" name="buttonBrowseRes">
-               <property name="geometry">
-                <rect>
-                 <x>450</x>
-                 <y>65</y>
-                 <width>85</width>
-                 <height>27</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Browse...</string>
-               </property>
-              </widget>
-              <widget class="QPushButton" name="buttonBrowseCha">
-               <property name="geometry">
-                <rect>
-                 <x>450</x>
-                 <y>105</y>
-                 <width>85</width>
-                 <height>27</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Browse...</string>
-               </property>
-              </widget>
-              <widget class="QPushButton" name="buttonLoad">
-               <property name="geometry">
-                <rect>
-                 <x>450</x>
-                 <y>145</y>
-                 <width>85</width>
-                 <height>27</height>
-                </rect>
-               </property>
-               <property name="statusTip">
-                <string>Load test-suite</string>
-               </property>
-               <property name="text">
-                <string>Load</string>
-               </property>
-               <property name="flat">
-                <bool>false</bool>
-               </property>
-              </widget>
+              <layout class="QVBoxLayout" name="verticalLayout_11">
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_10">
+                 <item>
+                  <layout class="QGridLayout" name="gridLayout">
+                   <item row="0" column="0">
+                    <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="0,1">
+                     <item>
+                      <widget class="QLabel" name="label_3">
+                       <property name="text">
+                        <string>Coverage file path:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="labelCov">
+                       <property name="text">
+                        <string>No file selected</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QPushButton" name="buttonBrowseCov">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Browse...</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="0,1">
+                     <property name="spacing">
+                      <number>20</number>
+                     </property>
+                     <item>
+                      <widget class="QLabel" name="label_6">
+                       <property name="text">
+                        <string>Results file path:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="labelRes">
+                       <property name="text">
+                        <string>No file selected</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QPushButton" name="buttonBrowseRes">
+                     <property name="text">
+                      <string>Browse...</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="0,1">
+                     <property name="spacing">
+                      <number>10</number>
+                     </property>
+                     <item>
+                      <widget class="QLabel" name="label_7">
+                       <property name="text">
+                        <string>Changeset matrix:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="labelChan">
+                       <property name="text">
+                        <string>No file selected</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QPushButton" name="buttonBrowseCha">
+                     <property name="text">
+                      <string>Browse...</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="1">
+                    <widget class="QPushButton" name="buttonLoad">
+                     <property name="statusTip">
+                      <string>Load test-suite</string>
+                     </property>
+                     <property name="text">
+                      <string>Load</string>
+                     </property>
+                     <property name="flat">
+                      <bool>false</bool>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+              </layout>
              </widget>
             </item>
            </layout>
@@ -280,7 +279,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidgetStatistics">
           <property name="currentIndex">
-           <number>0</number>
+           <number>6</number>
           </property>
           <widget class="QWidget" name="tabGeneral">
            <attribute name="title">
@@ -370,191 +369,213 @@
            <attribute name="title">
             <string>Options</string>
            </attribute>
-           <widget class="QGroupBox" name="groupBox_4">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>230</y>
-              <width>321</width>
-              <height>281</height>
-             </rect>
-            </property>
-            <property name="title">
-             <string>Clusters</string>
-            </property>
-            <widget class="QListView" name="listViewClusters">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>30</y>
-               <width>211</width>
-               <height>241</height>
-              </rect>
-             </property>
-             <property name="selectionMode">
-              <enum>QAbstractItemView::SingleSelection</enum>
-             </property>
-            </widget>
-            <widget class="QPushButton" name="buttonNewCluster">
-             <property name="geometry">
-              <rect>
-               <x>240</x>
-               <y>30</y>
-               <width>71</width>
-               <height>27</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>New</string>
-             </property>
-            </widget>
-            <widget class="QPushButton" name="buttonDeleteCluster">
-             <property name="geometry">
-              <rect>
-               <x>240</x>
-               <y>110</y>
-               <width>71</width>
-               <height>27</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Delete</string>
-             </property>
-            </widget>
-           </widget>
-           <widget class="QGroupBox" name="groupBox_5">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>10</y>
-              <width>551</width>
-              <height>191</height>
-             </rect>
-            </property>
-            <property name="title">
-             <string>Cluster algorithms</string>
-            </property>
-            <widget class="QPushButton" name="buttonCalcCluster">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>150</y>
-               <width>111</width>
-               <height>27</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Create clusters</string>
-             </property>
-            </widget>
-            <widget class="QLabel" name="labelClusterCodeElementListTitle">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>110</y>
-               <width>181</width>
-               <height>17</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Cluster code element list:</string>
-             </property>
-            </widget>
-            <widget class="QLabel" name="labelClusterCodeElementList">
-             <property name="geometry">
-              <rect>
-               <x>190</x>
-               <y>110</y>
-               <width>251</width>
-               <height>17</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>No cluster code element list selected</string>
-             </property>
-            </widget>
-            <widget class="QPushButton" name="buttonClusterCEList">
-             <property name="geometry">
-              <rect>
-               <x>460</x>
-               <y>105</y>
-               <width>81</width>
-               <height>27</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Browse...</string>
-             </property>
-            </widget>
-            <widget class="QLabel" name="labelClusterTestListTitle">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>70</y>
-               <width>111</width>
-               <height>17</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Cluster test list:</string>
-             </property>
-            </widget>
-            <widget class="QPushButton" name="buttonClusterTestList">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="geometry">
-              <rect>
-               <x>460</x>
-               <y>65</y>
-               <width>81</width>
-               <height>27</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Browse...</string>
-             </property>
-            </widget>
-            <widget class="QLabel" name="labelClusterTestList">
-             <property name="geometry">
-              <rect>
-               <x>130</x>
-               <y>70</y>
-               <width>311</width>
-               <height>17</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>No cluster test list selected</string>
-             </property>
-            </widget>
-            <widget class="QLabel" name="labelClusterAlgorithm">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>30</y>
-               <width>131</width>
-               <height>17</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Cluster algorithm:</string>
-             </property>
-            </widget>
-            <widget class="QComboBox" name="comboBoxClusterPlugins">
-             <property name="geometry">
-              <rect>
-               <x>180</x>
-               <y>30</y>
-               <width>111</width>
-               <height>27</height>
-              </rect>
-             </property>
-             <property name="sizeAdjustPolicy">
-              <enum>QComboBox::AdjustToContents</enum>
-             </property>
-            </widget>
-           </widget>
+           <layout class="QVBoxLayout" name="verticalLayout_14">
+            <item>
+             <widget class="QGroupBox" name="groupBox_5">
+              <property name="title">
+               <string>Cluster algorithms</string>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_19">
+               <item>
+                <layout class="QGridLayout" name="gridLayout_4">
+                 <item row="0" column="0">
+                  <layout class="QHBoxLayout" name="horizontalLayout_18" stretch="1,0">
+                   <item>
+                    <widget class="QLabel" name="labelClusterAlgorithm">
+                     <property name="text">
+                      <string>Cluster algorithm:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QComboBox" name="comboBoxClusterPlugins">
+                     <property name="sizeAdjustPolicy">
+                      <enum>QComboBox::AdjustToContents</enum>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item row="1" column="0">
+                  <layout class="QGridLayout" name="gridLayout_2">
+                   <item row="0" column="0">
+                    <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="0,1">
+                     <item>
+                      <widget class="QLabel" name="labelClusterTestListTitle">
+                       <property name="text">
+                        <string>Test list:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="labelClusterTestList">
+                       <property name="text">
+                        <string>No cluster test list selected</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QPushButton" name="buttonClusterTestList">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="text">
+                      <string>Browse...</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="0,1">
+                     <item>
+                      <widget class="QLabel" name="labelClusterCodeElementListTitle">
+                       <property name="text">
+                        <string>Code element list:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="labelClusterCodeElementList">
+                       <property name="text">
+                        <string>No cluster code element list selected</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QPushButton" name="buttonClusterCEList">
+                     <property name="text">
+                      <string>Browse...</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QPushButton" name="buttonCalcCluster">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="layoutDirection">
+                    <enum>Qt::LeftToRight</enum>
+                   </property>
+                   <property name="text">
+                    <string>Create clusters</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_4">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="title">
+               <string>Clusters</string>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_17">
+               <item>
+                <widget class="QListView" name="listViewClusters">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="selectionMode">
+                  <enum>QAbstractItemView::SingleSelection</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_12">
+                 <item>
+                  <layout class="QGridLayout" name="gridLayout_3">
+                   <item row="0" column="0">
+                    <widget class="QPushButton" name="buttonNewCluster">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>New</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QPushButton" name="pushButton">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Edit</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QPushButton" name="buttonDeleteCluster">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Remove</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_2">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
           </widget>
           <widget class="QWidget" name="clusterStatistics">
            <attribute name="title">
@@ -587,110 +608,143 @@
            <number>0</number>
           </property>
           <widget class="QWidget" name="optionsMetrics">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <attribute name="title">
             <string>Options</string>
            </attribute>
-           <widget class="QLabel" name="labelRevisionNumber">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>20</y>
-              <width>121</width>
-              <height>17</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Revision number:</string>
-            </property>
-           </widget>
-           <widget class="QLineEdit" name="lineEditRevisionMetrics">
-            <property name="geometry">
-             <rect>
-              <x>140</x>
-              <y>15</y>
-              <width>113</width>
-              <height>27</height>
-             </rect>
-            </property>
-           </widget>
-           <widget class="QGroupBox" name="groupBox">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>60</y>
-              <width>221</width>
-              <height>161</height>
-             </rect>
-            </property>
-            <property name="title">
-             <string>Metrics</string>
-            </property>
-            <widget class="QListView" name="listViewMetrics">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>30</y>
-               <width>201</width>
-               <height>91</height>
-              </rect>
-             </property>
-             <property name="horizontalScrollBarPolicy">
-              <enum>Qt::ScrollBarAlwaysOff</enum>
-             </property>
-             <property name="sizeAdjustPolicy">
-              <enum>QAbstractScrollArea::AdjustToContents</enum>
-             </property>
-            </widget>
-            <widget class="QCheckBox" name="checkBoxMetricsSelectAll">
-             <property name="geometry">
-              <rect>
-               <x>15</x>
-               <y>130</y>
-               <width>97</width>
-               <height>22</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Select all</string>
-             </property>
-            </widget>
-           </widget>
-           <widget class="QPushButton" name="buttonCalculateMetrics">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>240</y>
-              <width>99</width>
-              <height>27</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Calculate</string>
-            </property>
-           </widget>
-           <widget class="QGroupBox" name="groupBox_3">
-            <property name="geometry">
-             <rect>
-              <x>290</x>
-              <y>60</y>
-              <width>261</width>
-              <height>161</height>
-             </rect>
-            </property>
-            <property name="title">
-             <string>Selected clusters</string>
-            </property>
-            <widget class="QListView" name="listViewMetricsSelClu">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>30</y>
-               <width>231</width>
-               <height>111</height>
-              </rect>
-             </property>
-            </widget>
-           </widget>
+           <layout class="QVBoxLayout" name="verticalLayout_15">
+            <item>
+             <layout class="QGridLayout" name="gridLayout_6">
+              <item row="0" column="0">
+               <widget class="QLabel" name="labelRevisionNumber">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Revision number:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="lineEditRevisionMetrics">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QGroupBox" name="groupBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="title">
+                 <string>Metrics</string>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_25">
+                 <item>
+                  <layout class="QGridLayout" name="gridLayout_5">
+                   <item row="0" column="0">
+                    <widget class="QListView" name="listViewMetrics">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="horizontalScrollBarPolicy">
+                      <enum>Qt::ScrollBarAlwaysOff</enum>
+                     </property>
+                     <property name="sizeAdjustPolicy">
+                      <enum>QAbstractScrollArea::AdjustIgnored</enum>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QCheckBox" name="checkBoxMetricsSelectAll">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Select all</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QGroupBox" name="groupBox_3">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="title">
+                 <string>Selected clusters</string>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_20">
+                 <item>
+                  <widget class="QListView" name="listViewMetricsSelClu">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QPushButton" name="buttonCalculateMetrics">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Calculate</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>189</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </widget>
           <widget class="QWidget" name="results">
            <attribute name="title">
@@ -740,104 +794,167 @@
            <attribute name="title">
             <string>Options</string>
            </attribute>
-           <widget class="QGroupBox" name="groupBoxFaultLocTech">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>210</y>
-              <width>211</width>
-              <height>91</height>
-             </rect>
+           <layout class="QVBoxLayout" name="verticalLayout_13">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetMaximumSize</enum>
             </property>
-            <property name="title">
-             <string>Fault localization technique</string>
-            </property>
-            <widget class="QListView" name="listViewFaultlocalization">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>30</y>
-               <width>151</width>
-               <height>51</height>
-              </rect>
-             </property>
-            </widget>
-           </widget>
-           <widget class="QGroupBox" name="groupBoxSelectedRevs">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>10</y>
-              <width>321</width>
-              <height>191</height>
-             </rect>
-            </property>
-            <property name="title">
-             <string>Selected revision TODO: add failed CE</string>
-            </property>
-            <widget class="QLineEdit" name="lineEditScoreRevision">
-             <property name="geometry">
-              <rect>
-               <x>140</x>
-               <y>30</y>
-               <width>113</width>
-               <height>27</height>
-              </rect>
-             </property>
-            </widget>
-            <widget class="QLabel" name="labelScoreRevision">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>35</y>
-               <width>121</width>
-               <height>17</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>Revision number:</string>
-             </property>
-            </widget>
-           </widget>
-           <widget class="QGroupBox" name="groupBoxSelectedClusters">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>310</y>
-              <width>281</width>
-              <height>171</height>
-             </rect>
-            </property>
-            <property name="title">
-             <string>Selected clusters</string>
-            </property>
-            <widget class="QListView" name="listViewScoreSelClu">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>30</y>
-               <width>251</width>
-               <height>141</height>
-              </rect>
-             </property>
-             <property name="viewMode">
-              <enum>QListView::ListMode</enum>
-             </property>
-            </widget>
-           </widget>
-           <widget class="QPushButton" name="buttonScoreCalc">
-            <property name="geometry">
-             <rect>
-              <x>448</x>
-              <y>490</y>
-              <width>91</width>
-              <height>27</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Calculate</string>
-            </property>
-           </widget>
+            <item>
+             <layout class="QGridLayout" name="gridLayout_9">
+              <property name="rightMargin">
+               <number>130</number>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="labelScoreRevision">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Revision number:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="lineEditScoreRevision">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QGridLayout" name="gridLayout_10">
+              <item row="0" column="0">
+               <widget class="QGroupBox" name="groupBoxSelectedClusters">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="title">
+                 <string>Selected clusters</string>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_22">
+                 <item>
+                  <widget class="QListView" name="listViewScoreSelClu">
+                   <property name="viewMode">
+                    <enum>QListView::ListMode</enum>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QGroupBox" name="groupBoxSelectedRevs">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="title">
+                 <string>Failed code elements</string>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_24">
+                 <item>
+                  <layout class="QVBoxLayout" name="verticalLayout_16">
+                   <item>
+                    <widget class="QListView" name="listViewFailedCodeElements"/>
+                   </item>
+                   <item>
+                    <layout class="QGridLayout" name="gridLayout_8">
+                     <item row="0" column="0">
+                      <widget class="QPushButton" name="buttonAddFailedCodeElement">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string>Add</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="QPushButton" name="buttonRemoveFailedCodeElement">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string>Remove</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QGridLayout" name="gridLayout_7">
+              <item row="0" column="0" rowspan="2">
+               <widget class="QGroupBox" name="groupBoxFaultLocTech">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="title">
+                 <string>Fault localization technique</string>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_21">
+                 <item>
+                  <widget class="QListView" name="listViewFaultlocalization"/>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QPushButton" name="buttonScoreCalc">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Calculate</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </widget>
           <widget class="QWidget" name="scores">
            <attribute name="title">
@@ -862,7 +979,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>640</width>
+     <width>666</width>
      <height>25</height>
     </rect>
    </property>
