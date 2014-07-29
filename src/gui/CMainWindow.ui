@@ -57,7 +57,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -279,7 +279,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidgetStatistics">
           <property name="currentIndex">
-           <number>6</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tabGeneral">
            <attribute name="title">
@@ -383,7 +383,7 @@
                    <item>
                     <widget class="QLabel" name="labelClusterAlgorithm">
                      <property name="text">
-                      <string>Cluster algorithm:</string>
+                      <string>Cluster algorithm</string>
                      </property>
                     </widget>
                    </item>
@@ -517,7 +517,7 @@
                     </widget>
                    </item>
                    <item row="1" column="0">
-                    <widget class="QPushButton" name="pushButton">
+                    <widget class="QPushButton" name="buttonEditCluster">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                        <horstretch>0</horstretch>
@@ -632,7 +632,7 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Revision number:</string>
+                 <string>Revision number</string>
                 </property>
                </widget>
               </item>
@@ -836,7 +836,7 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Revision number:</string>
+                 <string>Revision number</string>
                 </property>
                </widget>
               </item>
@@ -932,24 +932,6 @@
             </item>
             <item>
              <layout class="QGridLayout" name="gridLayout_7">
-              <item row="0" column="0" rowspan="2">
-               <widget class="QGroupBox" name="groupBoxFaultLocTech">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="title">
-                 <string>Fault localization technique</string>
-                </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_21">
-                 <item>
-                  <widget class="QListView" name="listViewFaultlocalization"/>
-                 </item>
-                </layout>
-               </widget>
-              </item>
               <item row="0" column="1">
                <widget class="QPushButton" name="buttonScoreCalc">
                 <property name="sizePolicy">
@@ -975,6 +957,24 @@
                  </size>
                 </property>
                </spacer>
+              </item>
+              <item row="0" column="0" rowspan="2">
+               <widget class="QGroupBox" name="groupBoxFaultLocTech">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="title">
+                 <string>Fault localization technique</string>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_21">
+                 <item>
+                  <widget class="QListView" name="listViewFaultlocalization"/>
+                 </item>
+                </layout>
+               </widget>
               </item>
              </layout>
             </item>

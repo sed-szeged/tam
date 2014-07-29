@@ -3,6 +3,7 @@
 #include "CShowClusters.h"
 #include "CShowMetrics.h"
 #include "CShowScores.h"
+#include "CClusterEditorDialog.h"
 #include "CIDManagerTableModel.h"
 #include "ui_CMainWindow.h"
 #include "lib/CWorkspace.h"
@@ -23,7 +24,6 @@ CMainWindow::CMainWindow(QWidget *parent) :
     m_revCompleter(NULL), m_kernel(new CKernel())
 {
     ui->setupUi(this);
-    //setFixedSize(size());
 
     m_workspace = new CWorkspace(this);
     m_clusterList = new CClusterList(this);
@@ -364,6 +364,24 @@ void CMainWindow::loadFinished(QString msg)
     calculateStatistics();
 }
 
+void CMainWindow::createCompleterForMetrics()
+{
+    if (m_revCompleter) {
+        delete m_revCompleter;
+        m_revCompleter = NULL;
+    }
+
+    QStandardItemModel *revs = new QStandardItemModel(this);
+    IntVector revsVec = m_workspace->getTestSuite()->getResults()->getRevisionNumbers();
+    for (IntVector::const_iterator it = revsVec.begin(); it != revsVec.end(); ++it) {
+        revs->appendRow(new QStandardItem(QString::number(*it)));
+    }
+    m_revCompleter = new QCompleter(revs, this);
+    m_revCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    ui->lineEditRevisionMetrics->setCompleter(m_revCompleter);
+    ui->lineEditScoreRevision->setCompleter(m_revCompleter);
+}
+
 void CMainWindow::calculateStatistics()
 {
     if (m_workspace->isStatisticsCalculated())
@@ -415,13 +433,30 @@ void CMainWindow::calcScoreFinished(QString msg)
     m_statusLabel->clear();
 }
 
+void CMainWindow::on_buttonNewCluster_clicked()
+{
+    CClusterEditorDialog dia(this, m_workspace->getTestSuite(), &m_clusterList->getClusters());
+    dia.exec();
+}
+
+void CMainWindow::on_buttonEditCluster_clicked()
+{
+    QModelIndexList list = ui->listViewClusters->selectionModel()->selectedIndexes();
+    if (list.empty())
+        return;
+
+    QString cluster = list.first().data().toString();
+    CClusterEditorDialog dia(this, m_workspace->getTestSuite(), &m_clusterList->getClusters());
+    dia.exec();
+}
+
 void CMainWindow::on_buttonDeleteCluster_clicked()
 {
     QModelIndexList list = ui->listViewClusters->selectionModel()->selectedIndexes();
     if (list.empty())
         return;
 
-    QString cluster = qobject_cast<QStandardItemModel*>(ui->listViewClusters->model())->itemFromIndex(list.first())->text();
+    QString cluster = list.first().data().toString();
     QStandardItem *item = qobject_cast<QStandardItemModel*>(ui->listViewClusters->model())->findItems(cluster).first();
     ui->listViewClusters->model()->removeRow(item->index().row());
     item = qobject_cast<QStandardItemModel*>(ui->listViewMetricsSelClu->model())->findItems(cluster).first();
@@ -429,24 +464,6 @@ void CMainWindow::on_buttonDeleteCluster_clicked()
     item = qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model())->findItems(cluster).first();
     ui->listViewScoreSelClu->model()->removeRow(item->index().row());
     m_clusterList->getClusters().erase(cluster.toStdString());
-}
-
-void CMainWindow::createCompleterForMetrics()
-{
-    if (m_revCompleter) {
-        delete m_revCompleter;
-        m_revCompleter = NULL;
-    }
-
-    QStandardItemModel *revs = new QStandardItemModel(this);
-    IntVector revsVec = m_workspace->getTestSuite()->getResults()->getRevisionNumbers();
-    for (IntVector::const_iterator it = revsVec.begin(); it != revsVec.end(); ++it) {
-        revs->appendRow(new QStandardItem(QString::number(*it)));
-    }
-    m_revCompleter = new QCompleter(revs, this);
-    m_revCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    ui->lineEditRevisionMetrics->setCompleter(m_revCompleter);
-    ui->lineEditScoreRevision->setCompleter(m_revCompleter);
 }
 
 void CMainWindow::on_tabWidgetStatistics_currentChanged(int index)

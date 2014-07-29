@@ -33,7 +33,7 @@ public:
     CWorkspace* getWorkspace() { return m_workspace; }
     CKernel* getKernel() { return m_kernel; }
     CClusterList* getClusterList() { return m_clusterList; }
-
+    void updateAvailableClusters();
     Ui::CMainWindow* getUi() { return ui; }
 
 private slots:
@@ -54,6 +54,10 @@ private slots:
     void on_buttonClusterCEList_clicked();
     void on_buttonCalcCluster_clicked();
 
+    void on_buttonNewCluster_clicked();
+    void on_buttonEditCluster_clicked();
+    void on_buttonDeleteCluster_clicked();
+
     void on_buttonCalculateMetrics_clicked();
     void on_checkBoxMetricsSelectAll_stateChanged(int arg1);
 
@@ -70,11 +74,7 @@ private slots:
     void on_tabWidgetMetrics_currentChanged(int index);
     void on_tabWidgetScore_currentChanged(int index);
 
-    void on_buttonDeleteCluster_clicked();
-
 private:
-
-    void updateAvailableClusters();
     void createStatusBar();
     void createCompleterForMetrics();
     void calculateStatistics();
