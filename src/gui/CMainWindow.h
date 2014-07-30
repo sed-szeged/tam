@@ -74,9 +74,14 @@ private slots:
     void on_tabWidgetMetrics_currentChanged(int index);
     void on_tabWidgetScore_currentChanged(int index);
 
+    void on_comboBoxClusterPlugins_currentIndexChanged(const QString &arg1);
+
+protected:
+    bool eventFilter(QObject *object, QEvent *event);
+
 private:
     void createStatusBar();
-    void createCompleterForMetrics();
+    void createRevisionCompleter();
     void calculateStatistics();
     void fillWidgets();
     void updateLabels();

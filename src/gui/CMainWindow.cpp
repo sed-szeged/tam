@@ -8,6 +8,7 @@
 #include "ui_CMainWindow.h"
 #include "lib/CWorkspace.h"
 
+#include <QMessageBox>
 #include <QFileDialog>
 #include <QLayout>
 #include <QStatusBar>
@@ -24,6 +25,10 @@ CMainWindow::CMainWindow(QWidget *parent) :
     m_revCompleter(NULL), m_kernel(new CKernel())
 {
     ui->setupUi(this);
+
+    ui->buttonLoad->installEventFilter(this);
+    ui->buttonCalculateMetrics->installEventFilter(this);
+    ui->buttonScoreCalc->installEventFilter(this);
 
     m_workspace = new CWorkspace(this);
     m_clusterList = new CClusterList(this);
@@ -225,6 +230,62 @@ bool CMainWindow::saveWorkspaceAs()
     return saveWorkspace();
 }
 
+void CMainWindow::on_buttonBrowseCov_clicked()
+{
+    QFileInfo fileInfo;
+    fileInfo.setFile(QFileDialog::getOpenFileName(this, tr("Open coverage file")));
+    if (!fileInfo.exists())
+        return;
+
+    ui->labelCov->setText(fileInfo.fileName());
+    m_workspace->setCoveragePath(fileInfo.filePath());
+}
+
+void CMainWindow::on_buttonBrowseRes_clicked()
+{
+    QFileInfo fileInfo;
+    fileInfo.setFile(QFileDialog::getOpenFileName(this, tr("Open results file")));
+    if (!fileInfo.exists())
+        return;
+
+    ui->labelRes->setText(fileInfo.fileName());
+    m_workspace->setResultsPath(fileInfo.filePath());
+}
+
+void CMainWindow::on_buttonBrowseCha_clicked()
+{
+    QFileInfo fileInfo;
+    fileInfo.setFile(QFileDialog::getOpenFileName(this, tr("Open changeset file")));
+    if (!fileInfo.exists())
+        return;
+
+    ui->labelChan->setText(fileInfo.fileName());
+    m_workspace->setChangesetPath(fileInfo.filePath());
+}
+
+void CMainWindow::on_buttonLoad_clicked()
+{
+    CTestSuiteLoader *loadThread = new CTestSuiteLoader(this);
+    connect(loadThread, SIGNAL(updateStatusLabel(QString)), this, SLOT(statusUpdate(QString)));
+    connect(loadThread, SIGNAL(processFinished(QString)), this, SLOT(loadFinished(QString)));
+    connect(loadThread, SIGNAL(finished()), loadThread, SLOT(deleteLater()));
+    m_statusProgressBar->setMaximum(0);
+    loadThread->load(m_workspace);
+}
+
+void CMainWindow::loadFinished(QString msg)
+{
+    ui->statusBar->showMessage(msg, 5000);
+    m_statusProgressBar->setMaximum(1);
+    m_statusLabel->clear();
+    m_testSuiteAvailableLabel->setVisible(true);
+
+    ui->tableViewTests->setModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getTestcases()));
+    ui->tableViewCE->setModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getCodeElements()));
+    createRevisionCompleter();
+    calculateStatistics();
+}
+
 void CMainWindow::on_buttonClusterTestList_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open cluster test list file"),
@@ -339,68 +400,12 @@ void CMainWindow::calcMetricsFinished(QString msg)
     m_statusLabel->clear();
 }
 
-void CMainWindow::on_buttonBrowseCov_clicked()
-{
-    QFileInfo fileInfo;
-    fileInfo.setFile(QFileDialog::getOpenFileName(this, tr("Open coverage file")));
-    if (!fileInfo.exists())
-        return;
-
-    ui->labelCov->setText(fileInfo.fileName());
-    m_workspace->setCoveragePath(fileInfo.filePath());
-}
-
-void CMainWindow::on_buttonBrowseRes_clicked()
-{
-    QFileInfo fileInfo;
-    fileInfo.setFile(QFileDialog::getOpenFileName(this, tr("Open results file")));
-    if (!fileInfo.exists())
-        return;
-
-    ui->labelRes->setText(fileInfo.fileName());
-    m_workspace->setResultsPath(fileInfo.filePath());
-}
-
-void CMainWindow::on_buttonBrowseCha_clicked()
-{
-    QFileInfo fileInfo;
-    fileInfo.setFile(QFileDialog::getOpenFileName(this, tr("Open changeset file")));
-    if (!fileInfo.exists())
-        return;
-
-    ui->labelChan->setText(fileInfo.fileName());
-    m_workspace->setChangesetPath(fileInfo.filePath());
-}
-
-void CMainWindow::on_buttonLoad_clicked()
-{
-    CTestSuiteLoader *loadThread = new CTestSuiteLoader(this);
-    connect(loadThread, SIGNAL(updateStatusLabel(QString)), this, SLOT(statusUpdate(QString)));
-    connect(loadThread, SIGNAL(processFinished(QString)), this, SLOT(loadFinished(QString)));
-    connect(loadThread, SIGNAL(finished()), loadThread, SLOT(deleteLater()));
-    m_statusProgressBar->setMaximum(0);
-    loadThread->load(m_workspace);
-}
-
 void CMainWindow::statusUpdate(QString label)
 {
     m_statusLabel->setText(label);
 }
 
-void CMainWindow::loadFinished(QString msg)
-{
-    ui->statusBar->showMessage(msg, 5000);
-    m_statusProgressBar->setMaximum(1);
-    m_statusLabel->clear();
-    m_testSuiteAvailableLabel->setVisible(true);
-
-    ui->tableViewTests->setModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getTestcases()));
-    ui->tableViewCE->setModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getCodeElements()));
-    createCompleterForMetrics();
-    calculateStatistics();
-}
-
-void CMainWindow::createCompleterForMetrics()
+void CMainWindow::createRevisionCompleter()
 {
     if (m_revCompleter) {
         delete m_revCompleter;
@@ -518,5 +523,63 @@ void CMainWindow::on_tabWidgetScore_currentChanged(int index)
     if (tabText == "Scores") {
         CShowScores scores;
         scores.generateResults(ui->webViewScores, m_workspace->getResultsByName(SCORE), m_workspace->getTestSuite());
+    }
+}
+
+bool CMainWindow::eventFilter(QObject *object, QEvent *event)
+{
+    if (object == ui->buttonLoad && event->type() == QEvent::MouseButtonRelease) {
+        if (m_workspace->getCoveragePath().isEmpty()) {
+            QMessageBox::critical(this, "Error", "Missing coverage file path.");
+            return true;
+        }
+        else if (!QFileInfo(m_workspace->getCoveragePath()).exists()) {
+            QMessageBox::critical(this, "Error", "Not existing coverage file.");
+            return true;
+        }
+        else if (m_workspace->getResultsPath().isEmpty()) {
+            QMessageBox::critical(this, "Error", "Missing results file path.");
+            return true;
+        }
+        else if (!QFileInfo(m_workspace->getResultsPath()).exists()) {
+            QMessageBox::critical(this, "Error", "Not existing results file.");
+            return true;
+        }
+        else if (!m_workspace->getChangesetPath().isEmpty() && !QFileInfo(m_workspace->getChangesetPath()).exists()) {
+            QMessageBox::critical(this, "Error", "Not existing changes file.");
+            return true;
+        }
+    }
+    else if (object == ui->buttonCalculateMetrics && event->type() == QEvent::MouseButtonRelease) {
+        if (ui->lineEditRevisionMetrics->text().isEmpty()) {
+            QMessageBox::critical(this, "Error", "Missing revision number.");
+            return true;
+        }
+    }
+    else if (object == ui->buttonScoreCalc && event->type() == QEvent::MouseButtonRelease) {
+        if (ui->lineEditRevisionMetrics->text().isEmpty()) {
+            QMessageBox::critical(this, "Error", "Missing revision number.");
+            return true;
+        }
+    }
+    return false;
+}
+
+void CMainWindow::on_comboBoxClusterPlugins_currentIndexChanged(const QString &arg1)
+{
+    if (arg1 != "label-test-codeelements") {
+        ui->buttonClusterCEList->hide();
+        ui->labelClusterCodeElementList->hide();
+        ui->labelClusterCodeElementListTitle->hide();
+        ui->buttonClusterTestList->hide();
+        ui->labelClusterTestList->hide();
+        ui->labelClusterTestListTitle->hide();
+    } else {
+        ui->buttonClusterCEList->show();
+        ui->labelClusterCodeElementList->show();
+        ui->labelClusterCodeElementListTitle->show();
+        ui->buttonClusterTestList->show();
+        ui->labelClusterTestList->show();
+        ui->labelClusterTestListTitle->show();
     }
 }
