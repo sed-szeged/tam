@@ -16,14 +16,18 @@ class CClusterEditorDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit CClusterEditorDialog(QWidget *parent, CSelectionData *data, ClusterMap *clusters);
+    explicit CClusterEditorDialog(QWidget *parent, CSelectionData *data, ClusterMap *clusters, QString clusterName = QString());
     ~CClusterEditorDialog();
 
     void addTestCases(QStringList list);
     void addCodeElements(QStringList list);
 
+protected:
+    bool eventFilter(QObject *object, QEvent *event);
+
 private:
     CClusterDefinition createCluster();
+    void fillListViews(QString clusterName);
 
 private slots:
     void on_toolButtonAddTests_clicked();

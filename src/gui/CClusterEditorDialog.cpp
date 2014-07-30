@@ -3,23 +3,38 @@
 #include "CMainWindow.h"
 #include "CClusterEditorAddDialog.h"
 #include "ui_CClusterEditorDialog.h"
-#include <iostream>
+#include <QMessageBox>
+#include <QPushButton>
 
-CClusterEditorDialog::CClusterEditorDialog(QWidget *parent, CSelectionData *data, ClusterMap *clusters) :
+CClusterEditorDialog::CClusterEditorDialog(QWidget *parent, CSelectionData *data, ClusterMap *clusters, QString clusterName) :
     QDialog(parent),
     ui(new Ui::CClusterEditorDialog),
     m_data(data), m_clusterMap(clusters)
 {
     ui->setupUi(this);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->installEventFilter(this);
     m_testCases = new QStandardItemModel(ui->listViewTests);
     ui->listViewTests->setModel(m_testCases);
     m_codeElements = new QStandardItemModel(ui->listViewCEs);
     ui->listViewCEs->setModel(m_codeElements);
+
+    fillListViews(clusterName);
 }
 
 CClusterEditorDialog::~CClusterEditorDialog()
 {
     delete ui;
+}
+
+bool CClusterEditorDialog::eventFilter(QObject *object, QEvent *event)
+{
+    if (object == ui->buttonBox->button(QDialogButtonBox::Ok) && event->type() == QEvent::MouseButtonRelease) {
+        if (ui->lineEditClusterName->text().isEmpty()) {
+            QMessageBox::critical(this, "Error", "Missing cluster name.");
+            return true;
+        }
+    }
+    return false;
 }
 
 void CClusterEditorDialog::on_toolButtonAddTests_clicked()
@@ -98,4 +113,31 @@ CClusterDefinition CClusterEditorDialog::createCluster()
     }
 
     return cluster;
+}
+
+void CClusterEditorDialog::fillListViews(QString clusterName)
+{
+    if (clusterName.isEmpty())
+        return;
+
+    ui->lineEditClusterName->setText(clusterName);
+
+    CClusterDefinition cluster = (*m_clusterMap)[clusterName.toStdString()];
+    IntVector idVector;
+    QStringList idNameList;
+
+    idVector = cluster.getTestCases();
+    for (IntVector::const_iterator it = idVector.begin(); it != idVector.end(); ++it) {
+        idNameList << m_data->getTestcases()->getValue((*it)).c_str();
+    }
+    addTestCases(idNameList);
+
+    idVector.clear();
+    idNameList.clear();
+
+    idVector = cluster.getCodeElements();
+    for (IntVector::const_iterator it = idVector.begin(); it != idVector.end(); ++it) {
+        idNameList << m_data->getCodeElements()->getValue((*it)).c_str();
+    }
+    addCodeElements(idNameList);
 }

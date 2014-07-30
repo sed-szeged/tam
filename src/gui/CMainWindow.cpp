@@ -158,7 +158,10 @@ void CMainWindow::on_actionDumpCoverage_triggered()
     rapidjson::StringBuffer s;
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
         s.Clear();
-        m_workspace->getResultsByName(WS)->Accept(writer);
+        rapidjson::Document doc;
+        doc.SetObject();
+        m_clusterList->toJson(doc);
+        doc.Accept(writer);
         std::cout << s.GetString() << std::endl;
 }
 
@@ -264,6 +267,39 @@ void CMainWindow::on_buttonCalcCluster_clicked()
 {
     m_clusterList->createClusters();
     updateAvailableClusters();
+}
+
+void CMainWindow::on_buttonNewCluster_clicked()
+{
+    CClusterEditorDialog dia(this, m_workspace->getTestSuite(), &m_clusterList->getClusters());
+    dia.exec();
+}
+
+void CMainWindow::on_buttonEditCluster_clicked()
+{
+    QModelIndexList list = ui->listViewClusters->selectionModel()->selectedIndexes();
+    if (list.empty())
+        return;
+
+    QString cluster = list.first().data().toString();
+    CClusterEditorDialog dia(this, m_workspace->getTestSuite(), &m_clusterList->getClusters(), cluster);
+    dia.exec();
+}
+
+void CMainWindow::on_buttonDeleteCluster_clicked()
+{
+    QModelIndexList list = ui->listViewClusters->selectionModel()->selectedIndexes();
+    if (list.empty())
+        return;
+
+    QString cluster = list.first().data().toString();
+    QStandardItem *item = qobject_cast<QStandardItemModel*>(ui->listViewClusters->model())->findItems(cluster).first();
+    ui->listViewClusters->model()->removeRow(item->index().row());
+    item = qobject_cast<QStandardItemModel*>(ui->listViewMetricsSelClu->model())->findItems(cluster).first();
+    ui->listViewMetricsSelClu->model()->removeRow(item->index().row());
+    item = qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model())->findItems(cluster).first();
+    ui->listViewScoreSelClu->model()->removeRow(item->index().row());
+    m_clusterList->getClusters().erase(cluster.toStdString());
 }
 
 void CMainWindow::on_checkBoxMetricsSelectAll_stateChanged(int state)
@@ -431,39 +467,6 @@ void CMainWindow::calcScoreFinished(QString msg)
     ui->statusBar->showMessage(msg, 5000);
     m_statusProgressBar->setMaximum(1);
     m_statusLabel->clear();
-}
-
-void CMainWindow::on_buttonNewCluster_clicked()
-{
-    CClusterEditorDialog dia(this, m_workspace->getTestSuite(), &m_clusterList->getClusters());
-    dia.exec();
-}
-
-void CMainWindow::on_buttonEditCluster_clicked()
-{
-    QModelIndexList list = ui->listViewClusters->selectionModel()->selectedIndexes();
-    if (list.empty())
-        return;
-
-    QString cluster = list.first().data().toString();
-    CClusterEditorDialog dia(this, m_workspace->getTestSuite(), &m_clusterList->getClusters());
-    dia.exec();
-}
-
-void CMainWindow::on_buttonDeleteCluster_clicked()
-{
-    QModelIndexList list = ui->listViewClusters->selectionModel()->selectedIndexes();
-    if (list.empty())
-        return;
-
-    QString cluster = list.first().data().toString();
-    QStandardItem *item = qobject_cast<QStandardItemModel*>(ui->listViewClusters->model())->findItems(cluster).first();
-    ui->listViewClusters->model()->removeRow(item->index().row());
-    item = qobject_cast<QStandardItemModel*>(ui->listViewMetricsSelClu->model())->findItems(cluster).first();
-    ui->listViewMetricsSelClu->model()->removeRow(item->index().row());
-    item = qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model())->findItems(cluster).first();
-    ui->listViewScoreSelClu->model()->removeRow(item->index().row());
-    m_clusterList->getClusters().erase(cluster.toStdString());
 }
 
 void CMainWindow::on_tabWidgetStatistics_currentChanged(int index)
