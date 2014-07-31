@@ -28,20 +28,14 @@ void CShowMetrics::generateResults(QWebView *webView)
                       "function drawTable() {"
                         "var data = new google.visualization.DataTable();"
                         "data.addColumn('string', '');"
-                        "data.addColumn('number', 'tpce');"
-                        "data.addColumn('number', 'cov');"
-                        "data.addColumn('number', 'effcov');"
-                        "data.addColumn('number', 'part');"
-                        "data.addColumn('number', 'effpart');"
-                        "data.addColumn('number', 'spec');"
-                        "data.addColumn('number', 'uniq');"
+                        "%1"
                         "data.addRows(["
-                          "%1"
+                          "%2"
                         "]);"
 
                         "var table = new google.visualization.Table(document.getElementById('summary_table'));"
                         "var formatter = new google.visualization.NumberFormat({decimalSymbol: '.',fractionDigits: 2});"
-                        "for(i=1; i<8;++i)"
+                        "for(i=1; i < data.getNumberOfColumns();++i)"
                         "  formatter.format(data, i);"
 
                         "table.draw(data, {allowHtml: true});"
@@ -51,21 +45,29 @@ void CShowMetrics::generateResults(QWebView *webView)
                 "<div id=\"summary_table\"></div>"
                   "</body></html>";
 
+    QString metrics;
     QString table;
+    bool first = true;
     for (rapidjson::Value::MemberIterator itr = m_metrics.MemberBegin(); itr != m_metrics.MemberEnd(); ++itr) {
         QStringList parts = QString(itr->name.GetString()).split(" - ");
         if (parts.size() == 2 && parts[0] != parts[1])
             continue;
 
         rapidjson::Value& val = itr->value;
-        table.append("['" + QString(parts[0]) + "'," + QString::number(val["tpce"].GetDouble()) + "," +
-                QString::number(val["fault-detection"].GetDouble()) + "," + QString::number(val["coverage-efficiency"].GetDouble()) + "," +
-                QString::number(val["partition-metric"].GetDouble()) + "," + QString::number(val["partition-efficiency"].GetDouble()) + "," +
-                QString::number(val["specialization"].GetDouble()) + "," + QString::number(val["uniqueness"].GetDouble()) + "],");
+        table.append("['" + QString(parts[0]) + "',");
+        for (rapidjson::Value::MemberIterator metrIt = val.MemberBegin(); metrIt != val.MemberEnd(); ++metrIt) {
+            if (first)
+                metrics.append("data.addColumn('number', '" + QString(metrIt->name.GetString()) + "');");
+
+            table.append(QString::number(metrIt->value.GetDouble()) + ",");
+        }
+        table.chop(1);
+        table.append("],");
+        first = false;
     }
 
     table.chop(1);
-    html = html.arg(table);
+    html = html.arg(metrics, table);
 
     webView->settings()->clearMemoryCaches();
     webView->setHtml(html);
