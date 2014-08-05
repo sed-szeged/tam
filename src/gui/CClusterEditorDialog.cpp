@@ -47,7 +47,6 @@ void CClusterEditorDialog::on_toolButtonAddTests_clicked()
 void CClusterEditorDialog::on_toolButtonRemoveTests_clicked()
 {
     QList<QPersistentModelIndex> indexes;
-
     foreach (const QModelIndex &i, ui->listViewTests->selectionModel()->selectedIndexes())
         indexes << i;
 
@@ -65,7 +64,6 @@ void CClusterEditorDialog::on_toolButtonAddCEs_clicked()
 void CClusterEditorDialog::on_toolButtonRemoveCEs_clicked()
 {
     QList<QPersistentModelIndex> indexes;
-
     foreach (const QModelIndex &i, ui->listViewCEs->selectionModel()->selectedIndexes())
         indexes << i;
 
@@ -120,6 +118,7 @@ void CClusterEditorDialog::fillListViews(QString clusterName)
     if (clusterName.isEmpty())
         return;
 
+    bool isTestSuiteAvailable = qobject_cast<CMainWindow*>(parent())->isTestSuiteAvailable();
     ui->lineEditClusterName->setText(clusterName);
 
     CClusterDefinition cluster = (*m_clusterMap)[clusterName.toStdString()];
@@ -128,7 +127,10 @@ void CClusterEditorDialog::fillListViews(QString clusterName)
 
     idVector = cluster.getTestCases();
     for (IntVector::const_iterator it = idVector.begin(); it != idVector.end(); ++it) {
-        idNameList << m_data->getTestcases()->getValue((*it)).c_str();
+        if (isTestSuiteAvailable)
+            idNameList << m_data->getTestcases()->getValue((*it)).c_str();
+        else
+            idNameList << QString::number(*it);
     }
     addTestCases(idNameList);
 
@@ -137,7 +139,10 @@ void CClusterEditorDialog::fillListViews(QString clusterName)
 
     idVector = cluster.getCodeElements();
     for (IntVector::const_iterator it = idVector.begin(); it != idVector.end(); ++it) {
-        idNameList << m_data->getCodeElements()->getValue((*it)).c_str();
+        if (isTestSuiteAvailable)
+            idNameList << m_data->getCodeElements()->getValue((*it)).c_str();
+        else
+            idNameList << QString::number(*it);
     }
     addCodeElements(idNameList);
 }
