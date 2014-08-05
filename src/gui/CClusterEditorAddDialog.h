@@ -17,7 +17,7 @@ class CClusterEditorAddDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit CClusterEditorAddDialog(QWidget *parent, CIDManager *manager, QStandardItemModel *addedItems, bool isCodeElements = false);
+    explicit CClusterEditorAddDialog(QWidget *parent, CIDManager *manager, QStandardItemModel *addedItems, bool isCodeElements = false, bool isFailedCodeElements = false);
     ~CClusterEditorAddDialog();
 
 private slots:
@@ -29,6 +29,7 @@ private:
     Ui::CClusterEditorAddDialog *ui;
     QSortFilterProxyModel *m_filter;
     bool m_isCodeElements;
+    bool m_isFailedCodeElements;
 };
 
 #endif // CCLUSTEREDITORADDDIALOG_H
