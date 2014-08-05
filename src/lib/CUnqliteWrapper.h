@@ -42,9 +42,13 @@ extern "C" {
 
 #define JX9_PROG_REMOVE_DOCUMENT "/* Delete records from collection */"\
  "if (!db_exists($coll)) {"\
+ "  $rc = false;"\
  "  return;"\
  "}"\
  "$rc = db_drop_record($coll, $id);"
+
+#define JX9_PROG_DROP_COLLECTION "/* Choosen collection passed with $coll variable. */"\
+ "$rc = db_drop_collection($coll);"
 
 /**
  * @brief The CUnqliteWrapper class provides methods for getting and storing data from a unqlite database.
@@ -90,6 +94,12 @@ public:
      * @param doc Returns the specified json object.
      */
     void fetchById(std::string collection, int id, rapidjson::Document &doc);
+
+    /**
+     * @brief Drops the specified collection from the database.
+     * @param collection Collection name.
+     */
+    bool dropCollection(std::string collection);
 
 private:
 

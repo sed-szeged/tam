@@ -109,6 +109,24 @@ void CUnqliteWrapper::fetchById(std::string collection, int id, rapidjson::Docum
     close();
 }
 
+bool CUnqliteWrapper::dropCollection(std::string collection)
+{
+    std::string jx9 = JX9_PROG_DROP_COLLECTION;
+
+    open();
+    compileVm(jx9);
+    passCollectionToVm(collection);
+    executeVm();
+
+    unqlite_value *resVal = unqlite_vm_extract_variable(m_Vm, "rc");
+    bool res = unqlite_value_to_bool(resVal);
+
+    unqlite_vm_release_value(m_Vm, resVal);
+    unqlite_vm_release(m_Vm);
+    close();
+    return res;
+}
+
 void CUnqliteWrapper::open()
 {
     if (m_isOpened)

@@ -31,6 +31,7 @@ bool CWorkspace::save()
 {
     CUnqliteWrapper *wrapper = new CUnqliteWrapper(m_fileName.toStdString());
     for (int i = 0; i < NUM_OF_COLS; ++i) {
+        wrapper->dropCollection(collections[i]);
         if (!wrapper->storeDocument(collections[i], *m_results[collections[i]]))
             return false;
     }
