@@ -86,6 +86,14 @@ private slots:
     void on_tabWidgetMetrics_currentChanged(int index);
     void on_tabWidgetScore_currentChanged(int index);
 
+    void on_toolButtonMetricMeasAdd_clicked();
+
+    void on_toolButtonMetricMeasRem_clicked();
+
+    void on_toolButtonScoreMeasAdd_clicked();
+
+    void on_toolButtonScoreMeasRem_clicked();
+
 protected:
     bool eventFilter(QObject *object, QEvent *event);
 

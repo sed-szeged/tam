@@ -15,6 +15,7 @@
 #include <QStatusBar>
 #include <QCheckBox>
 #include <QWebFrame>
+#include <QInputDialog>
 
 #include <iostream>
 
@@ -187,6 +188,16 @@ void CMainWindow::updateConfigurations()
             QList<QStandardItem *> list = qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model())->findItems(member->value[i].GetString());
             if (list.size())
                 list.first()->setCheckState(Qt::Checked);
+        }
+    }
+
+    member = scoreSettings.FindMember("failed-code-elements");
+    if (member != scoreSettings.MemberEnd()) {
+        QStandardItemModel *failedCodeElementModel = qobject_cast<QStandardItemModel*>(ui->listViewFailedCodeElements->model());
+        for (rapidjson::SizeType i = 0; i < member->value.Size(); ++i) {
+            QStandardItem *item = new QStandardItem(member->value[i].GetString());
+            item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+            failedCodeElementModel->appendRow(item);
         }
     }
 }
@@ -815,4 +826,35 @@ void CMainWindow::scoreClusterStateChanged(QStandardItem *item)
             break;
         }
     }
+}
+
+void CMainWindow::on_toolButtonMetricMeasAdd_clicked()
+{
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("New measurement"),
+                                         tr("Measurement name:"), QLineEdit::Normal,
+                                         QString(), &ok);
+    if (ok && !text.isEmpty() && ui->comboBoxMetricsMeasuremement->findText(text) == -1)
+        ui->comboBoxMetricsMeasuremement->addItem(text);
+}
+
+
+void CMainWindow::on_toolButtonMetricMeasRem_clicked()
+{
+    ui->comboBoxMetricsMeasuremement->removeItem(ui->comboBoxMetricsMeasuremement->currentIndex());
+}
+
+void CMainWindow::on_toolButtonScoreMeasAdd_clicked()
+{
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("New measurement"),
+                                         tr("Measurement name:"), QLineEdit::Normal,
+                                         QString(), &ok);
+    if (ok && !text.isEmpty() && ui->comboBoxScoreMeasurement->findText(text) == -1)
+        ui->comboBoxScoreMeasurement->addItem(text);
+}
+
+void CMainWindow::on_toolButtonScoreMeasRem_clicked()
+{
+    ui->comboBoxScoreMeasurement->removeItem(ui->comboBoxScoreMeasurement->currentIndex());
 }
