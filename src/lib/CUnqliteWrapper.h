@@ -23,7 +23,8 @@ extern "C" {
  "/* Record to store the string is replaced with the proper json structure */ "\
  "$zRec = %s;"\
  "$zRec = json_encode($zRec);"\
- "$rc = db_store($coll, $zRec);"
+ "$rc = db_store($coll, $zRec);"\
+ "$recordId = db_last_record_id($coll);"
 
 #define JX9_PROG_GET_ALL_DOC_FROM_COLLECTION "/* Retrieve collection records */"\
  "if (!db_exists($coll)) {"\
@@ -46,7 +47,7 @@ extern "C" {
  "$rc = db_drop_record($coll, $id);"
 
 /**
- * @brief The CUnqliteWrapper class provides a higher level methods for getting and storing data from a unqlite database.
+ * @brief The CUnqliteWrapper class provides methods for getting and storing data from a unqlite database.
  */
 class CUnqliteWrapper
 {
@@ -65,7 +66,7 @@ public:
      * @param doc Json object.
      * @return True if the operation was successful.
      */
-    bool storeDocument(std::string collection, rapidjson::Document &doc);
+    bool storeDocument(std::string collection, rapidjson::Document &doc, int *recordId = NULL);
 
     /**
      * @brief Removes a json object from the specified collection.

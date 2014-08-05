@@ -13,7 +13,7 @@ CUnqliteWrapper::~CUnqliteWrapper()
         close();
 }
 
-bool CUnqliteWrapper::storeDocument(std::string collection, rapidjson::Document &doc)
+bool CUnqliteWrapper::storeDocument(std::string collection, rapidjson::Document &doc, int *recordId)
 {
     // prepare script
     std::string jx9 = JX9_PROG_STORE_DOCUMENT;
@@ -31,8 +31,13 @@ bool CUnqliteWrapper::storeDocument(std::string collection, rapidjson::Document 
 
     unqlite_value *resVal = unqlite_vm_extract_variable(m_Vm, "rc");
     int res = unqlite_value_to_int(resVal);
+    unqlite_value *id = unqlite_vm_extract_variable(m_Vm, "recordId");
+    int recId = unqlite_value_to_int(id);
+    if (recordId != NULL)
+        *recordId = recId;
 
     unqlite_vm_release_value(m_Vm, resVal);
+    unqlite_vm_release_value(m_Vm, id);
     unqlite_vm_release(m_Vm);
     close();
     return res ? true : false;

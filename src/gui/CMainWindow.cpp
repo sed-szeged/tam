@@ -1,3 +1,4 @@
+#include "CClusterEditorAddDialog.h"
 #include "CMainWindow.h"
 #include "CShowStatistics.h"
 #include "CShowClusters.h"
@@ -69,7 +70,7 @@ void CMainWindow::fillWidgets()
         item->setData(Qt::Unchecked, Qt::CheckStateRole);
         m_metricsPluginModel->appendRow(item);
     }
-
+    connect(m_metricsPluginModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(metricsPluginStateChanged(QStandardItem*)));
     ui->listViewMetrics->setModel(m_metricsPluginModel);
 
     // fill listview with falt localization technique names
@@ -83,10 +84,18 @@ void CMainWindow::fillWidgets()
         m_scorePluginModel->appendRow(item);
     }
 
+    connect(m_scorePluginModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(scorePluginStateChanged(QStandardItem*)));
     ui->listViewFaultlocalization->setModel(m_scorePluginModel);
+
     ui->listViewMetricsSelClu->setModel(new QStandardItemModel(this));
+    connect(qobject_cast<QStandardItemModel*>(ui->listViewMetricsSelClu->model()), SIGNAL(itemChanged(QStandardItem*)), this, SLOT(metricsClusterStateChanged(QStandardItem*)));
     ui->listViewScoreSelClu->setModel(new QStandardItemModel(this));
+    connect(qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model()), SIGNAL(itemChanged(QStandardItem*)), this, SLOT(scoreClusterStateChanged(QStandardItem*)));
     ui->listViewClusters->setModel(new QStandardItemModel(this));
+
+    ui->lineEditRevisionMetrics->setValidator(new QIntValidator(ui->lineEditRevisionMetrics));
+    ui->lineEditScoreRevision->setValidator(new QIntValidator(ui->lineEditScoreRevision));
+    ui->listViewFailedCodeElements->setModel(new QStandardItemModel(this));
 }
 
 void CMainWindow::createStatusBar()
@@ -133,6 +142,55 @@ void CMainWindow::updateLabels()
         ui->labelChan->setText(fileInfo.fileName());
 }
 
+void CMainWindow::updateConfigurations()
+{
+    rapidjson::Value &metricsSettings = (*m_workspace->getResultsByName(WS))["metrics"];
+    rapidjson::Value::MemberIterator member = metricsSettings.FindMember("revision");
+    if (member != metricsSettings.MemberEnd())
+        ui->lineEditRevisionMetrics->setText(QString::number(member->value.GetInt()));
+
+    member = metricsSettings.FindMember("plugin");
+    if (member != metricsSettings.MemberEnd()) {
+        for (rapidjson::SizeType i = 0; i < member->value.Size(); ++i) {
+            QList<QStandardItem *> list = m_metricsPluginModel->findItems(member->value[i].GetString());
+            if (list.size())
+                list.first()->setCheckState(Qt::Checked);
+        }
+    }
+
+    member = metricsSettings.FindMember("cluster");
+    if (member != metricsSettings.MemberEnd()) {
+        for (rapidjson::SizeType i = 0; i < member->value.Size(); ++i) {
+            QList<QStandardItem *> list = qobject_cast<QStandardItemModel*>(ui->listViewMetricsSelClu->model())->findItems(member->value[i].GetString());
+            if (list.size())
+                list.first()->setCheckState(Qt::Checked);
+        }
+    }
+
+    rapidjson::Value &scoreSettings = (*m_workspace->getResultsByName(WS))["score"];
+    member = scoreSettings.FindMember("revision");
+    if (member != scoreSettings.MemberEnd())
+        ui->lineEditScoreRevision->setText(QString::number(member->value.GetInt()));
+
+    member = scoreSettings.FindMember("plugin");
+    if (member != scoreSettings.MemberEnd()) {
+        for (rapidjson::SizeType i = 0; i < member->value.Size(); ++i) {
+            QList<QStandardItem *> list = m_scorePluginModel->findItems(member->value[i].GetString());
+            if (list.size())
+                list.first()->setCheckState(Qt::Checked);
+        }
+    }
+
+    member = scoreSettings.FindMember("cluster");
+    if (member != scoreSettings.MemberEnd()) {
+        for (rapidjson::SizeType i = 0; i < member->value.Size(); ++i) {
+            QList<QStandardItem *> list = qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model())->findItems(member->value[i].GetString());
+            if (list.size())
+                list.first()->setCheckState(Qt::Checked);
+        }
+    }
+}
+
 void CMainWindow::updateAvailableClusters()
 {
     QStandardItemModel *modelMetrics = qobject_cast<QStandardItemModel*>(ui->listViewMetricsSelClu->model());
@@ -163,10 +221,7 @@ void CMainWindow::on_actionDumpCoverage_triggered()
     rapidjson::StringBuffer s;
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
         s.Clear();
-        rapidjson::Document doc;
-        doc.SetObject();
-        m_clusterList->toJson(doc);
-        doc.Accept(writer);
+        m_workspace->getResultsByName(WS)->Accept(writer);
         std::cout << s.GetString() << std::endl;
 }
 
@@ -194,6 +249,7 @@ void CMainWindow::on_actionLoadWorkspace_triggered()
         ui->statusBar->showMessage("Workspace loaded from file: " + m_workspace->getFileName(), 5000);
         updateLabels();
         updateAvailableClusters();
+        updateConfigurations();
     }
 }
 
@@ -444,6 +500,34 @@ void CMainWindow::calcStatsFinished(QString msg)
     m_workspace->getResultsByName(WS)->AddMember("statistics-calculated", true, m_workspace->getResultsByName(WS)->GetAllocator());
 }
 
+void CMainWindow::on_buttonAddFailedCodeElement_clicked()
+{
+    CClusterEditorAddDialog dia(this, m_workspace->getTestSuite()->getCodeElements(), qobject_cast<QStandardItemModel*>(ui->listViewFailedCodeElements->model()), true, true);
+    dia.setWindowTitle("Add failed code elements");
+    dia.exec();
+}
+
+void CMainWindow::on_buttonRemoveFailedCodeElement_clicked()
+{
+    QList<QPersistentModelIndex> indexes;
+    foreach (const QModelIndex &i, ui->listViewFailedCodeElements->selectionModel()->selectedIndexes())
+        indexes << i;
+
+    foreach (const QPersistentModelIndex &i, indexes) {
+        rapidjson::Value &settings = (*m_workspace->getResultsByName(WS))["score"];
+        for (rapidjson::Value::ValueIterator it = settings["failed-code-elements"].Begin(); it != settings["failed-code-elements"].End(); ++it) {
+            if (it->GetString() != i.data().toString())
+                continue;
+
+            rapidjson::Value::ValueIterator last = settings["failed-code-elements"].End() - 1;
+            it->Swap(*last);
+            settings["failed-code-elements"].PopBack();
+            break;
+        }
+        ui->listViewFailedCodeElements->model()->removeRow(i.row());
+    }
+}
+
 void CMainWindow::on_buttonScoreCalc_clicked()
 {
     StringVector flTechnique;
@@ -459,12 +543,19 @@ void CMainWindow::on_buttonScoreCalc_clicked()
             selectedClusters.push_back(modelSelClusters->item(i)->text().toStdString());
     }
 
+    IntVector failedCodeElements;
+    QStandardItemModel *modelFailedCodeElements = qobject_cast<QStandardItemModel*>(ui->listViewFailedCodeElements->model());
+    for (int i = 0; i < modelFailedCodeElements->rowCount(); ++i) {
+        IndexType ceid = m_workspace->getTestSuite()->getCodeElements()->getID(modelFailedCodeElements->item(i)->text().toStdString());
+        failedCodeElements.push_back(ceid);
+    }
+
     CFLScore *scoreThread = new CFLScore(this);
     connect(scoreThread, SIGNAL(updateStatusLabel(QString)), this, SLOT(statusUpdate(QString)));
     connect(scoreThread, SIGNAL(processFinished(QString)), this, SLOT(calcScoreFinished(QString)));
     connect(scoreThread, SIGNAL(finished()), scoreThread, SLOT(deleteLater()));
     m_statusProgressBar->setMaximum(0);
-    scoreThread->calculateScore((IndexType)ui->lineEditScoreRevision->text().toLongLong(), flTechnique, selectedClusters, this);
+    scoreThread->calculateScore((IndexType)ui->lineEditScoreRevision->text().toLongLong(), flTechnique, selectedClusters, failedCodeElements, this);
 }
 
 void CMainWindow::calcScoreFinished(QString msg)
@@ -565,9 +656,9 @@ bool CMainWindow::eventFilter(QObject *object, QEvent *event)
     return false;
 }
 
-void CMainWindow::on_comboBoxClusterPlugins_currentIndexChanged(const QString &arg1)
+void CMainWindow::on_comboBoxClusterPlugins_currentIndexChanged(const QString &plugin)
 {
-    if (arg1 != "label-test-codeelements") {
+    if (plugin != "label-test-codeelements") {
         ui->buttonClusterCEList->hide();
         ui->labelClusterCodeElementList->hide();
         ui->labelClusterCodeElementListTitle->hide();
@@ -581,5 +672,147 @@ void CMainWindow::on_comboBoxClusterPlugins_currentIndexChanged(const QString &a
         ui->buttonClusterTestList->show();
         ui->labelClusterTestList->show();
         ui->labelClusterTestListTitle->show();
+    }
+}
+
+void CMainWindow::on_lineEditRevisionMetrics_textEdited(const QString &text)
+{
+    rapidjson::Value &settings = (*m_workspace->getResultsByName(WS))["metrics"];
+    RevNumType rev = text.toInt();
+    rapidjson::Value::MemberIterator revIt = settings.FindMember("revision");
+    if (revIt == settings.MemberEnd())
+        settings.AddMember("revision", rev, m_workspace->getResultsByName(WS)->GetAllocator());
+    else if (text.isEmpty())
+        settings.RemoveMember(revIt);
+    else
+        revIt->value.SetInt(rev);
+}
+
+void CMainWindow::metricsPluginStateChanged(QStandardItem *item)
+{
+    String metricName = item->text().toStdString();
+    rapidjson::Value &settings = (*m_workspace->getResultsByName(WS))["metrics"];
+    if (item->checkState() == Qt::Checked) {
+        if (!settings.HasMember("plugin")) {
+            settings.AddMember("plugin", rapidjson::Value(rapidjson::kArrayType).Move(), m_workspace->getResultsByName(WS)->GetAllocator());
+        }
+        for (rapidjson::Value::ValueIterator it = settings["plugin"].Begin(); it != settings["plugin"].End(); ++it) {
+            if (it->GetString() != metricName)
+                continue;
+            return;
+        }
+        rapidjson::Value val(rapidjson::kStringType);
+        val.SetString(metricName.c_str(), m_workspace->getResultsByName(WS)->GetAllocator());
+        settings["plugin"].PushBack(val, m_workspace->getResultsByName(WS)->GetAllocator());
+    } else {
+        for (rapidjson::Value::ValueIterator it = settings["plugin"].Begin(); it != settings["plugin"].End(); ++it) {
+            if (it->GetString() != metricName)
+                continue;
+
+            rapidjson::Value::ValueIterator end = settings["plugin"].End() - 1;
+            it->Swap(*end);
+            settings["plugin"].PopBack();
+            break;
+        }
+    }
+}
+
+void CMainWindow::metricsClusterStateChanged(QStandardItem *item)
+{
+    String clusterName = item->text().toStdString();
+    rapidjson::Value &settings = (*m_workspace->getResultsByName(WS))["metrics"];
+    if (item->checkState() == Qt::Checked) {
+        if (!settings.HasMember("cluster")) {
+            settings.AddMember("cluster", rapidjson::Value(rapidjson::kArrayType).Move(), m_workspace->getResultsByName(WS)->GetAllocator());
+        }
+        for (rapidjson::Value::ValueIterator it = settings["cluster"].Begin(); it != settings["cluster"].End(); ++it) {
+            if (it->GetString() != clusterName)
+                continue;
+            return;
+        }
+        rapidjson::Value val(rapidjson::kStringType);
+        val.SetString(clusterName.c_str(), m_workspace->getResultsByName(WS)->GetAllocator());
+        settings["cluster"].PushBack(val, m_workspace->getResultsByName(WS)->GetAllocator());
+    } else {
+        for (rapidjson::Value::ValueIterator it = settings["cluster"].Begin(); it != settings["cluster"].End(); ++it) {
+            if (it->GetString() != clusterName)
+                continue;
+
+            rapidjson::Value::ValueIterator last = settings["cluster"].End() - 1;
+            it->Swap(*last);
+            settings["cluster"].PopBack();
+            break;
+        }
+    }
+}
+
+void CMainWindow::on_lineEditScoreRevision_textEdited(const QString &text)
+{
+    rapidjson::Value &settings = (*m_workspace->getResultsByName(WS))["score"];
+    RevNumType rev = text.toInt();
+    rapidjson::Value::MemberIterator revIt = settings.FindMember("revision");
+    if (revIt == settings.MemberEnd())
+        settings.AddMember("revision", rev, m_workspace->getResultsByName(WS)->GetAllocator());
+    else if (text.isEmpty())
+        settings.RemoveMember(revIt);
+    else
+        revIt->value.SetInt(rev);
+}
+
+void CMainWindow::scorePluginStateChanged(QStandardItem *item)
+{
+    String metricName = item->text().toStdString();
+    rapidjson::Value &settings = (*m_workspace->getResultsByName(WS))["score"];
+    if (item->checkState() == Qt::Checked) {
+        if (!settings.HasMember("plugin")) {
+            settings.AddMember("plugin", rapidjson::Value(rapidjson::kArrayType).Move(), m_workspace->getResultsByName(WS)->GetAllocator());
+        }
+        for (rapidjson::Value::ValueIterator it = settings["plugin"].Begin(); it != settings["plugin"].End(); ++it) {
+            if (it->GetString() != metricName)
+                continue;
+            return;
+        }
+        rapidjson::Value val(rapidjson::kStringType);
+        val.SetString(metricName.c_str(), m_workspace->getResultsByName(WS)->GetAllocator());
+        settings["plugin"].PushBack(val, m_workspace->getResultsByName(WS)->GetAllocator());
+    } else {
+        for (rapidjson::Value::ValueIterator it = settings["plugin"].Begin(); it != settings["plugin"].End(); ++it) {
+            if (it->GetString() != metricName)
+                continue;
+
+            rapidjson::Value::ValueIterator end = settings["plugin"].End() - 1;
+            it->Swap(*end);
+            settings["plugin"].PopBack();
+            break;
+        }
+    }
+}
+
+void CMainWindow::scoreClusterStateChanged(QStandardItem *item)
+{
+    String clusterName = item->text().toStdString();
+    rapidjson::Value &settings = (*m_workspace->getResultsByName(WS))["score"];
+    if (item->checkState() == Qt::Checked) {
+        if (!settings.HasMember("cluster")) {
+            settings.AddMember("cluster", rapidjson::Value(rapidjson::kArrayType).Move(), m_workspace->getResultsByName(WS)->GetAllocator());
+        }
+        for (rapidjson::Value::ValueIterator it = settings["cluster"].Begin(); it != settings["cluster"].End(); ++it) {
+            if (it->GetString() != clusterName)
+                continue;
+            return;
+        }
+        rapidjson::Value val(rapidjson::kStringType);
+        val.SetString(clusterName.c_str(), m_workspace->getResultsByName(WS)->GetAllocator());
+        settings["cluster"].PushBack(val, m_workspace->getResultsByName(WS)->GetAllocator());
+    } else {
+        for (rapidjson::Value::ValueIterator it = settings["cluster"].Begin(); it != settings["cluster"].End(); ++it) {
+            if (it->GetString() != clusterName)
+                continue;
+
+            rapidjson::Value::ValueIterator last = settings["cluster"].End() - 1;
+            it->Swap(*last);
+            settings["cluster"].PopBack();
+            break;
+        }
     }
 }

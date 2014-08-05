@@ -12,6 +12,11 @@ CWorkspace::CWorkspace(CMainWindow *mainWindow) :
         m_results[collections[i]] = new rapidjson::Document();
         m_results[collections[i]]->SetObject();
     }
+
+    if (!m_results[WS]->HasMember("metrics"))
+        m_results[WS]->AddMember("metrics", rapidjson::Value(rapidjson::kObjectType).Move(), m_results[WS]->GetAllocator());
+    if (!m_results[WS]->HasMember("score"))
+        m_results[WS]->AddMember("score", rapidjson::Value(rapidjson::kObjectType).Move(), m_results[WS]->GetAllocator());
 }
 
 CWorkspace::~CWorkspace()
@@ -46,10 +51,17 @@ void CWorkspace::load()
     for (int i = 0; i < NUM_OF_COLS; ++i) {
         wrapper->fetchById(collections[i], 0, *m_results[collections[i]]);
     }
+
     rapidjson::Document clusters;
     clusters.SetObject();
     wrapper->fetchById(CLUSTERS, 0, clusters);
     m_mainWindow->getClusterList()->fromJson(clusters);
+
+    if (!m_results[WS]->HasMember("metrics"))
+        m_results[WS]->AddMember("metrics", rapidjson::Value(rapidjson::kObjectType).Move(), m_results[WS]->GetAllocator());
+    if (!m_results[WS]->HasMember("score"))
+        m_results[WS]->AddMember("score", rapidjson::Value(rapidjson::kObjectType).Move(), m_results[WS]->GetAllocator());
+
     delete wrapper;
 }
 

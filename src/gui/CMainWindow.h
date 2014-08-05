@@ -30,6 +30,7 @@ public:
     explicit CMainWindow(QWidget *parent = 0);
     ~CMainWindow();
 
+    bool isTestSuiteAvailable() { return !m_testSuiteAvailableLabel->isHidden(); }
     CWorkspace* getWorkspace() { return m_workspace; }
     CKernel* getKernel() { return m_kernel; }
     CClusterList* getClusterList() { return m_clusterList; }
@@ -43,6 +44,14 @@ private slots:
     void calcMetricsFinished(QString msg);
     void calcScoreFinished(QString msg);
 
+    void on_lineEditRevisionMetrics_textEdited(const QString &text);
+    void metricsPluginStateChanged(QStandardItem *item);
+    void metricsClusterStateChanged(QStandardItem *item);
+
+    void on_lineEditScoreRevision_textEdited(const QString &text);
+    void scorePluginStateChanged(QStandardItem *item);
+    void scoreClusterStateChanged(QStandardItem *item);
+
     void on_actionExit_triggered();
     void on_actionNewWorkspace_triggered();
     void on_actionDumpCoverage_triggered();
@@ -53,6 +62,7 @@ private slots:
     void on_buttonClusterTestList_clicked();
     void on_buttonClusterCEList_clicked();
     void on_buttonCalcCluster_clicked();
+    void on_comboBoxClusterPlugins_currentIndexChanged(const QString &plugin);
 
     void on_buttonNewCluster_clicked();
     void on_buttonEditCluster_clicked();
@@ -67,14 +77,14 @@ private slots:
     void on_buttonLoad_clicked();
 
     void on_buttonScoreCalc_clicked();
+    void on_buttonAddFailedCodeElement_clicked();
+    void on_buttonRemoveFailedCodeElement_clicked();
 
     void on_tabWidgetStatistics_currentChanged(int index);
     void on_tabWidgetMain_currentChanged(int index);
     void on_tabWidgetCluster_currentChanged(int index);
     void on_tabWidgetMetrics_currentChanged(int index);
     void on_tabWidgetScore_currentChanged(int index);
-
-    void on_comboBoxClusterPlugins_currentIndexChanged(const QString &arg1);
 
 protected:
     bool eventFilter(QObject *object, QEvent *event);
@@ -85,6 +95,7 @@ private:
     void calculateStatistics();
     void fillWidgets();
     void updateLabels();
+    void updateConfigurations();
     bool saveWorkspace();
     bool saveWorkspaceAs();
 
