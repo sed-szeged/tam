@@ -659,7 +659,7 @@ bool CMainWindow::eventFilter(QObject *object, QEvent *event)
         }
     }
     else if (object == ui->buttonScoreCalc && event->type() == QEvent::MouseButtonRelease) {
-        if (ui->lineEditRevisionMetrics->text().isEmpty()) {
+        if (ui->lineEditScoreRevision->text().isEmpty()) {
             QMessageBox::critical(this, "Error", "Missing revision number.");
             return true;
         }
