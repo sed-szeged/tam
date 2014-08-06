@@ -84,7 +84,7 @@ void CShowStatistics::generateChartForTab(QWebView *view, int tabindex)
                       "[%1],"
                 "%2]);"
                 "var table = new google.visualization.Table(document.getElementById('table'));"
-                "table.draw(data, {page:'enable',pageSize:60,sortColumn:1});"
+                "table.draw(data, {page:'enable',pageSize:60,sortAscending:false,sortColumn:1});"
               "}"
             "</script></head><body>"
             "<h3 style=\"text-align:center;\">%3</h3>"
