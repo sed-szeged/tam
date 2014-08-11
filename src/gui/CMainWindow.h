@@ -36,6 +36,8 @@ public:
     CClusterList* getClusterList() { return m_clusterList; }
     void updateAvailableClusters();
     Ui::CMainWindow* getUi() { return ui; }
+    String getCurrentMetricMeasurement();
+    String getCurrentScoreMeasurement();
 
 private slots:
     void statusUpdate(QString label);
@@ -94,16 +96,25 @@ private slots:
 
     void on_toolButtonScoreMeasRem_clicked();
 
+    void on_comboBoxMetricsMeasurement_currentIndexChanged(int index);
+
+    void on_comboBoxScoreMeasurement_currentIndexChanged(int index);
+
 protected:
     bool eventFilter(QObject *object, QEvent *event);
 
 private:
+    void createNewWorkspace();
     void createStatusBar();
     void createRevisionCompleter();
     void calculateStatistics();
     void fillWidgets();
     void updateLabels();
-    void updateConfigurations();
+
+    void clearMetricsConfiguration();
+    void updateMetricsConfiguration();
+    void clearScoreConfiguration();
+    void updateScoreConfiguration();
     bool saveWorkspace();
     bool saveWorkspaceAs();
 

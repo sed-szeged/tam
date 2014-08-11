@@ -57,7 +57,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>0</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -628,7 +628,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QComboBox" name="comboBoxMetricsMeasuremement">
+               <widget class="QComboBox" name="comboBoxMetricsMeasurement">
                 <property name="currentText">
                  <string>default</string>
                 </property>
@@ -860,7 +860,7 @@
       </widget>
       <widget class="QWidget" name="score">
        <attribute name="title">
-        <string>Score</string>
+        <string>Fault-localization</string>
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_10">
         <item>

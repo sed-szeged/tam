@@ -42,6 +42,9 @@ void CFLScore::run()
             values.CopyFrom(technique->getValues(), m_results->GetAllocator());
             clusterVal.AddMember(key, values, m_results->GetAllocator());
 
+            if (!m_failedCodeElements.size())
+                continue;
+
             rapidjson::Value flValues(rapidjson::kObjectType);
             for (IndexType k = 0; k < m_failedCodeElements.size(); k++) {
                 IndexType cid = m_failedCodeElements[k];

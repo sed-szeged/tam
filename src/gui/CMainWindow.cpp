@@ -99,6 +99,13 @@ void CMainWindow::fillWidgets()
     ui->listViewFailedCodeElements->setModel(new QStandardItemModel(this));
 }
 
+void CMainWindow::createNewWorkspace()
+{
+    delete m_workspace;
+    m_workspace = new CWorkspace(this);
+    m_clusterList->getClusters().clear();
+}
+
 void CMainWindow::createStatusBar()
 {
     m_statusProgressBar = new QProgressBar(ui->statusBar);
@@ -143,9 +150,38 @@ void CMainWindow::updateLabels()
         ui->labelChan->setText(fileInfo.fileName());
 }
 
-void CMainWindow::updateConfigurations()
+String CMainWindow::getCurrentMetricMeasurement()
 {
-    rapidjson::Value &metricsSettings = (*m_workspace->getResultsByName(WS))["metrics"];
+    return ui->comboBoxMetricsMeasurement->currentText().toStdString();
+}
+
+String CMainWindow::getCurrentScoreMeasurement()
+{
+    return ui->comboBoxScoreMeasurement->currentText().toStdString();
+}
+
+void CMainWindow::clearMetricsConfiguration()
+{
+    ui->lineEditRevisionMetrics->setText(QString());
+
+    disconnect(m_metricsPluginModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(metricsPluginStateChanged(QStandardItem*)));
+    for (int i = 0; i < m_metricsPluginModel->rowCount(); ++i) {
+        m_metricsPluginModel->item(i)->setCheckState(Qt::Unchecked);
+    }
+    connect(m_metricsPluginModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(metricsPluginStateChanged(QStandardItem*)));
+
+    disconnect(qobject_cast<QStandardItemModel*>(ui->listViewMetricsSelClu->model()), SIGNAL(itemChanged(QStandardItem*)), this, SLOT(metricsClusterStateChanged(QStandardItem*)));
+    for (int i = 0; i < ui->listViewMetricsSelClu->model()->rowCount(); ++i) {
+        qobject_cast<QStandardItemModel*>(ui->listViewMetricsSelClu->model())->item(i)->setCheckState(Qt::Unchecked);
+    }
+    connect(qobject_cast<QStandardItemModel*>(ui->listViewMetricsSelClu->model()), SIGNAL(itemChanged(QStandardItem*)), this, SLOT(metricsClusterStateChanged(QStandardItem*)));
+}
+
+void CMainWindow::updateMetricsConfiguration()
+{
+    clearMetricsConfiguration();
+
+    rapidjson::Value &metricsSettings = (*m_workspace->getMeasurement("metric", getCurrentMetricMeasurement()));
     rapidjson::Value::MemberIterator member = metricsSettings.FindMember("revision");
     if (member != metricsSettings.MemberEnd())
         ui->lineEditRevisionMetrics->setText(QString::number(member->value.GetInt()));
@@ -167,9 +203,33 @@ void CMainWindow::updateConfigurations()
                 list.first()->setCheckState(Qt::Checked);
         }
     }
+}
 
-    rapidjson::Value &scoreSettings = (*m_workspace->getResultsByName(WS))["score"];
-    member = scoreSettings.FindMember("revision");
+void CMainWindow::clearScoreConfiguration()
+{
+    ui->lineEditScoreRevision->setText(QString());
+
+    disconnect(m_scorePluginModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(scorePluginStateChanged(QStandardItem*)));
+    for (int i = 0; i < m_scorePluginModel->rowCount(); ++i) {
+        m_scorePluginModel->item(i)->setCheckState(Qt::Unchecked);
+    }
+    connect(m_scorePluginModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(scorePluginStateChanged(QStandardItem*)));
+
+    disconnect(qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model()), SIGNAL(itemChanged(QStandardItem*)), this, SLOT(scoreClusterStateChanged(QStandardItem*)));
+    for (int i = 0; i < ui->listViewScoreSelClu->model()->rowCount(); ++i) {
+        qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model())->item(i)->setCheckState(Qt::Unchecked);
+    }
+    connect(qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model()), SIGNAL(itemChanged(QStandardItem*)), this, SLOT(scoreClusterStateChanged(QStandardItem*)));
+
+    ui->listViewFailedCodeElements->model()->removeRows(0 ,ui->listViewFailedCodeElements->model()->rowCount());
+}
+
+void CMainWindow::updateScoreConfiguration()
+{
+    clearScoreConfiguration();
+
+    rapidjson::Value &scoreSettings = (*m_workspace->getMeasurement("score", getCurrentScoreMeasurement()));
+    rapidjson::Value::MemberIterator member = scoreSettings.FindMember("revision");
     if (member != scoreSettings.MemberEnd())
         ui->lineEditScoreRevision->setText(QString::number(member->value.GetInt()));
 
@@ -230,10 +290,24 @@ void CMainWindow::on_actionExit_triggered()
 void CMainWindow::on_actionDumpCoverage_triggered()
 {
     rapidjson::StringBuffer s;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+    for (int i = 0; i < ui->comboBoxMetricsMeasurement->model()->rowCount(); ++i) {
         s.Clear();
-        m_workspace->getResultsByName(WS)->Accept(writer);
-        std::cout << s.GetString() << std::endl;
+        String name = qobject_cast<QStandardItemModel*>(ui->comboBoxMetricsMeasurement->model())->item(i)->text().toStdString();
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+        m_workspace->getMeasurement("metric", name)->Accept(writer);
+        std::cout << name << std::endl << s.GetString() << std::endl;
+    }
+    for (int i = 0; i < ui->comboBoxScoreMeasurement->model()->rowCount(); ++i) {
+        s.Clear();
+        String name = qobject_cast<QStandardItemModel*>(ui->comboBoxScoreMeasurement->model())->item(i)->text().toStdString();
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer2(s);
+        m_workspace->getMeasurement("score", name)->Accept(writer2);
+        std::cout << name << std::endl << s.GetString() << std::endl;
+    }
+    s.Clear();
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer3(s);
+    m_workspace->getResultsByName(SCORE)->Accept(writer3);
+    std::cout << "score" << std::endl << s.GetString() << std::endl;
 }
 
 void CMainWindow::on_actionNewWorkspace_triggered()
@@ -260,7 +334,8 @@ void CMainWindow::on_actionLoadWorkspace_triggered()
         ui->statusBar->showMessage("Workspace loaded from file: " + m_workspace->getFileName(), 5000);
         updateLabels();
         updateAvailableClusters();
-        updateConfigurations();
+        updateMetricsConfiguration();
+        updateScoreConfiguration();
     }
 }
 
@@ -525,7 +600,7 @@ void CMainWindow::on_buttonRemoveFailedCodeElement_clicked()
         indexes << i;
 
     foreach (const QPersistentModelIndex &i, indexes) {
-        rapidjson::Value &settings = (*m_workspace->getResultsByName(WS))["score"];
+        rapidjson::Value &settings = (*m_workspace->getMeasurement("score", getCurrentScoreMeasurement()));;
         for (rapidjson::Value::ValueIterator it = settings["failed-code-elements"].Begin(); it != settings["failed-code-elements"].End(); ++it) {
             if (it->GetString() != i.data().toString())
                 continue;
@@ -688,11 +763,11 @@ void CMainWindow::on_comboBoxClusterPlugins_currentIndexChanged(const QString &p
 
 void CMainWindow::on_lineEditRevisionMetrics_textEdited(const QString &text)
 {
-    rapidjson::Value &settings = (*m_workspace->getResultsByName(WS))["metrics"];
+    rapidjson::Value &settings = (*m_workspace->getMeasurement("metric", getCurrentMetricMeasurement()));
     RevNumType rev = text.toInt();
     rapidjson::Value::MemberIterator revIt = settings.FindMember("revision");
     if (revIt == settings.MemberEnd())
-        settings.AddMember("revision", rev, m_workspace->getResultsByName(WS)->GetAllocator());
+        settings.AddMember("revision", rev, m_workspace->getMeasurement("metric", getCurrentMetricMeasurement())->GetAllocator());
     else if (text.isEmpty())
         settings.RemoveMember(revIt);
     else
@@ -702,10 +777,10 @@ void CMainWindow::on_lineEditRevisionMetrics_textEdited(const QString &text)
 void CMainWindow::metricsPluginStateChanged(QStandardItem *item)
 {
     String metricName = item->text().toStdString();
-    rapidjson::Value &settings = (*m_workspace->getResultsByName(WS))["metrics"];
+    rapidjson::Value &settings = (*m_workspace->getMeasurement("metric", getCurrentMetricMeasurement()));
     if (item->checkState() == Qt::Checked) {
         if (!settings.HasMember("plugin")) {
-            settings.AddMember("plugin", rapidjson::Value(rapidjson::kArrayType).Move(), m_workspace->getResultsByName(WS)->GetAllocator());
+            settings.AddMember("plugin", rapidjson::Value(rapidjson::kArrayType).Move(), m_workspace->getMeasurement("metric", getCurrentMetricMeasurement())->GetAllocator());
         }
         for (rapidjson::Value::ValueIterator it = settings["plugin"].Begin(); it != settings["plugin"].End(); ++it) {
             if (it->GetString() != metricName)
@@ -713,9 +788,11 @@ void CMainWindow::metricsPluginStateChanged(QStandardItem *item)
             return;
         }
         rapidjson::Value val(rapidjson::kStringType);
-        val.SetString(metricName.c_str(), m_workspace->getResultsByName(WS)->GetAllocator());
-        settings["plugin"].PushBack(val, m_workspace->getResultsByName(WS)->GetAllocator());
+        val.SetString(metricName.c_str(), m_workspace->getMeasurement("metric", getCurrentMetricMeasurement())->GetAllocator());
+        settings["plugin"].PushBack(val, m_workspace->getMeasurement("metric", getCurrentMetricMeasurement())->GetAllocator());
     } else {
+        if (!settings.HasMember("plugin"))
+            return;
         for (rapidjson::Value::ValueIterator it = settings["plugin"].Begin(); it != settings["plugin"].End(); ++it) {
             if (it->GetString() != metricName)
                 continue;
@@ -731,10 +808,10 @@ void CMainWindow::metricsPluginStateChanged(QStandardItem *item)
 void CMainWindow::metricsClusterStateChanged(QStandardItem *item)
 {
     String clusterName = item->text().toStdString();
-    rapidjson::Value &settings = (*m_workspace->getResultsByName(WS))["metrics"];
+    rapidjson::Value &settings = (*m_workspace->getMeasurement("metric", getCurrentMetricMeasurement()));
     if (item->checkState() == Qt::Checked) {
         if (!settings.HasMember("cluster")) {
-            settings.AddMember("cluster", rapidjson::Value(rapidjson::kArrayType).Move(), m_workspace->getResultsByName(WS)->GetAllocator());
+            settings.AddMember("cluster", rapidjson::Value(rapidjson::kArrayType).Move(), m_workspace->getMeasurement("metric", getCurrentMetricMeasurement())->GetAllocator());
         }
         for (rapidjson::Value::ValueIterator it = settings["cluster"].Begin(); it != settings["cluster"].End(); ++it) {
             if (it->GetString() != clusterName)
@@ -742,9 +819,12 @@ void CMainWindow::metricsClusterStateChanged(QStandardItem *item)
             return;
         }
         rapidjson::Value val(rapidjson::kStringType);
-        val.SetString(clusterName.c_str(), m_workspace->getResultsByName(WS)->GetAllocator());
-        settings["cluster"].PushBack(val, m_workspace->getResultsByName(WS)->GetAllocator());
+        val.SetString(clusterName.c_str(), m_workspace->getMeasurement("metric", getCurrentMetricMeasurement())->GetAllocator());
+        settings["cluster"].PushBack(val, m_workspace->getMeasurement("metric", getCurrentMetricMeasurement())->GetAllocator());
     } else {
+        if (!settings.HasMember("cluster"))
+            return;
+
         for (rapidjson::Value::ValueIterator it = settings["cluster"].Begin(); it != settings["cluster"].End(); ++it) {
             if (it->GetString() != clusterName)
                 continue;
@@ -759,11 +839,11 @@ void CMainWindow::metricsClusterStateChanged(QStandardItem *item)
 
 void CMainWindow::on_lineEditScoreRevision_textEdited(const QString &text)
 {
-    rapidjson::Value &settings = (*m_workspace->getResultsByName(WS))["score"];
+    rapidjson::Value &settings = (*m_workspace->getMeasurement("score", getCurrentScoreMeasurement()));
     RevNumType rev = text.toInt();
     rapidjson::Value::MemberIterator revIt = settings.FindMember("revision");
     if (revIt == settings.MemberEnd())
-        settings.AddMember("revision", rev, m_workspace->getResultsByName(WS)->GetAllocator());
+        settings.AddMember("revision", rev, m_workspace->getMeasurement("score", getCurrentScoreMeasurement())->GetAllocator());
     else if (text.isEmpty())
         settings.RemoveMember(revIt);
     else
@@ -773,10 +853,10 @@ void CMainWindow::on_lineEditScoreRevision_textEdited(const QString &text)
 void CMainWindow::scorePluginStateChanged(QStandardItem *item)
 {
     String metricName = item->text().toStdString();
-    rapidjson::Value &settings = (*m_workspace->getResultsByName(WS))["score"];
+    rapidjson::Value &settings = (*m_workspace->getMeasurement("score", getCurrentScoreMeasurement()));
     if (item->checkState() == Qt::Checked) {
         if (!settings.HasMember("plugin")) {
-            settings.AddMember("plugin", rapidjson::Value(rapidjson::kArrayType).Move(), m_workspace->getResultsByName(WS)->GetAllocator());
+            settings.AddMember("plugin", rapidjson::Value(rapidjson::kArrayType).Move(), m_workspace->getMeasurement("score", getCurrentScoreMeasurement())->GetAllocator());
         }
         for (rapidjson::Value::ValueIterator it = settings["plugin"].Begin(); it != settings["plugin"].End(); ++it) {
             if (it->GetString() != metricName)
@@ -784,9 +864,11 @@ void CMainWindow::scorePluginStateChanged(QStandardItem *item)
             return;
         }
         rapidjson::Value val(rapidjson::kStringType);
-        val.SetString(metricName.c_str(), m_workspace->getResultsByName(WS)->GetAllocator());
-        settings["plugin"].PushBack(val, m_workspace->getResultsByName(WS)->GetAllocator());
+        val.SetString(metricName.c_str(), m_workspace->getMeasurement("score", getCurrentScoreMeasurement())->GetAllocator());
+        settings["plugin"].PushBack(val, m_workspace->getMeasurement("score", getCurrentScoreMeasurement())->GetAllocator());
     } else {
+        if (!settings.HasMember("plugin"))
+            return;
         for (rapidjson::Value::ValueIterator it = settings["plugin"].Begin(); it != settings["plugin"].End(); ++it) {
             if (it->GetString() != metricName)
                 continue;
@@ -802,10 +884,10 @@ void CMainWindow::scorePluginStateChanged(QStandardItem *item)
 void CMainWindow::scoreClusterStateChanged(QStandardItem *item)
 {
     String clusterName = item->text().toStdString();
-    rapidjson::Value &settings = (*m_workspace->getResultsByName(WS))["score"];
+    rapidjson::Value &settings = (*m_workspace->getMeasurement("score", getCurrentScoreMeasurement()));
     if (item->checkState() == Qt::Checked) {
         if (!settings.HasMember("cluster")) {
-            settings.AddMember("cluster", rapidjson::Value(rapidjson::kArrayType).Move(), m_workspace->getResultsByName(WS)->GetAllocator());
+            settings.AddMember("cluster", rapidjson::Value(rapidjson::kArrayType).Move(), m_workspace->getMeasurement("score", getCurrentScoreMeasurement())->GetAllocator());
         }
         for (rapidjson::Value::ValueIterator it = settings["cluster"].Begin(); it != settings["cluster"].End(); ++it) {
             if (it->GetString() != clusterName)
@@ -813,9 +895,11 @@ void CMainWindow::scoreClusterStateChanged(QStandardItem *item)
             return;
         }
         rapidjson::Value val(rapidjson::kStringType);
-        val.SetString(clusterName.c_str(), m_workspace->getResultsByName(WS)->GetAllocator());
-        settings["cluster"].PushBack(val, m_workspace->getResultsByName(WS)->GetAllocator());
+        val.SetString(clusterName.c_str(), m_workspace->getMeasurement("score", getCurrentScoreMeasurement())->GetAllocator());
+        settings["cluster"].PushBack(val, m_workspace->getMeasurement("score", getCurrentScoreMeasurement())->GetAllocator());
     } else {
+        if (!settings.HasMember("cluster"))
+            return;
         for (rapidjson::Value::ValueIterator it = settings["cluster"].Begin(); it != settings["cluster"].End(); ++it) {
             if (it->GetString() != clusterName)
                 continue;
@@ -828,20 +912,32 @@ void CMainWindow::scoreClusterStateChanged(QStandardItem *item)
     }
 }
 
+void CMainWindow::on_comboBoxMetricsMeasurement_currentIndexChanged(int index)
+{
+    updateMetricsConfiguration();
+}
+
 void CMainWindow::on_toolButtonMetricMeasAdd_clicked()
 {
     bool ok;
     QString text = QInputDialog::getText(this, tr("New measurement"),
                                          tr("Measurement name:"), QLineEdit::Normal,
                                          QString(), &ok);
-    if (ok && !text.isEmpty() && ui->comboBoxMetricsMeasuremement->findText(text) == -1)
-        ui->comboBoxMetricsMeasuremement->addItem(text);
+    if (ok && !text.isEmpty() && ui->comboBoxMetricsMeasurement->findText(text) == -1) {
+        m_workspace->addMeasurement("metric", text.toStdString());
+        ui->comboBoxMetricsMeasurement->addItem(text);
+    }
 }
-
 
 void CMainWindow::on_toolButtonMetricMeasRem_clicked()
 {
-    ui->comboBoxMetricsMeasuremement->removeItem(ui->comboBoxMetricsMeasuremement->currentIndex());
+    m_workspace->removeMeasurement("metric", ui->comboBoxMetricsMeasurement->currentText().toStdString());
+    ui->comboBoxMetricsMeasurement->removeItem(ui->comboBoxMetricsMeasurement->currentIndex());
+}
+
+void CMainWindow::on_comboBoxScoreMeasurement_currentIndexChanged(int index)
+{
+    updateScoreConfiguration();
 }
 
 void CMainWindow::on_toolButtonScoreMeasAdd_clicked()
@@ -850,11 +946,14 @@ void CMainWindow::on_toolButtonScoreMeasAdd_clicked()
     QString text = QInputDialog::getText(this, tr("New measurement"),
                                          tr("Measurement name:"), QLineEdit::Normal,
                                          QString(), &ok);
-    if (ok && !text.isEmpty() && ui->comboBoxScoreMeasurement->findText(text) == -1)
+    if (ok && !text.isEmpty() && ui->comboBoxScoreMeasurement->findText(text) == -1) {
+        m_workspace->addMeasurement("score", text.toStdString());
         ui->comboBoxScoreMeasurement->addItem(text);
+    }
 }
 
 void CMainWindow::on_toolButtonScoreMeasRem_clicked()
 {
+    m_workspace->removeMeasurement("score", ui->comboBoxScoreMeasurement->currentText().toStdString());
     ui->comboBoxScoreMeasurement->removeItem(ui->comboBoxScoreMeasurement->currentIndex());
 }

@@ -13,8 +13,10 @@ using namespace soda;
 #define WS collections[0]
 #define COV_STATS collections[1]
 #define RES_STATS collections[2]
-#define METRICS collections[3]
-#define SCORE collections[4]
+#define METRICS "metrics"
+#define METRICS_MEAS "metrics-measurements"
+#define SCORE "score"
+#define SCORE_MEAS "score-measurements"
 #define CLUSTERS "clusters"
 
 static const char* collections[NUM_OF_COLS] = { "workspace", "coverage-statistics", "results-statistics", "metrics", "score" };
@@ -43,6 +45,9 @@ public:
 
     CSelectionData* getTestSuite() { return m_testSuite; }
     rapidjson::Document* getResultsByName(String name) { return m_results[name]; }
+    void addMeasurement(String type, String name);
+    void removeMeasurement(String type, String name);
+    rapidjson::Document* getMeasurement(String type, String name) { return m_measurements[type][name]; }
 
 private:
 
@@ -50,6 +55,9 @@ private:
     bool m_isSaved;
     QString m_fileName;
     std::map<String, rapidjson::Document*> m_results;
+
+    std::map<String, std::map<String, rapidjson::Document*> > m_measurements;
+    //std::map<String, std::map<String, rapidjson::Document*> > m_results;
     CSelectionData *m_testSuite;
     CMainWindow *m_mainWindow;
 };

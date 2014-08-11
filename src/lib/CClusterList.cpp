@@ -51,6 +51,9 @@ void CClusterList::fromJson(rapidjson::Document &doc)
 {
     for (rapidjson::Value::ConstMemberIterator itr = doc.MemberBegin(); itr != doc.MemberEnd(); ++itr) {
         CClusterDefinition def;
+        if (!itr->value.IsObject())
+            continue;
+
         for (rapidjson::Value::ConstValueIterator it = itr->value["tests"].Begin(); it != itr->value["tests"].End(); ++it)
             def.addTestCase(it->GetUint64());
         for (rapidjson::Value::ConstValueIterator it = itr->value["code-elements"].Begin(); it != itr->value["code-elements"].End(); ++it)
