@@ -63,19 +63,20 @@ void CWorkspace::load()
         wrapper->fetchById(collections[i], 0, *m_results[collections[i]]);
     }
 
-    rapidjson::Document meas;
-    wrapper->fetchAll(METRICS_MEAS, meas);
-    for (rapidjson::Document::ValueIterator it = meas.Begin(); it != meas.End(); ++it) {
-        String measName = (*it)["name"].GetString();
-        removeMeasurement("metric", measName);
-        addMeasurement("metric", measName);
-        m_measurements["metric"][measName]->CopyFrom((*it), m_measurements["metric"][measName]->GetAllocator());
-    }
-
     rapidjson::Document clusters;
     wrapper->fetchById(CLUSTERS, 0, clusters);
     m_mainWindow->getClusterList()->fromJson(clusters);
 
+    rapidjson::Document meas;
+    wrapper->fetchAll(METRICS_MEAS, meas);
+    if (meas.IsArray()) {
+        for (rapidjson::Document::ValueIterator it = meas.Begin(); it != meas.End(); ++it) {
+            String measName = (*it)["name"].GetString();
+            removeMeasurement("metric", measName);
+            addMeasurement("metric", measName);
+            m_measurements["metric"][measName]->CopyFrom((*it), m_measurements["metric"][measName]->GetAllocator());
+        }
+    }
     delete wrapper;
 }
 
@@ -93,7 +94,7 @@ QString CWorkspace::getCoveragePath()
 {
     rapidjson::Document::MemberIterator member = m_results[WS]->FindMember("coverage-binary");
     if (member == m_results[WS]->MemberEnd() || member->value.IsNull())
-        return "No file selected";
+        return "";
     return member->value.GetString();
 }
 
@@ -111,7 +112,7 @@ QString CWorkspace::getResultsPath()
 {
     rapidjson::Document::MemberIterator member = m_results[WS]->FindMember("results-binary");
     if (member == m_results[WS]->MemberEnd() || member->value.IsNull())
-        return "No file selected";
+        return "";
     return member->value.GetString();
 }
 
@@ -133,7 +134,7 @@ QString CWorkspace::getChangesetPath()
 {
     rapidjson::Document::MemberIterator member = m_results[WS]->FindMember("changeset-binary");
     if (member == m_results[WS]->MemberEnd() || member->value.IsNull())
-        return "No file selected";
+        return "";
     return member->value.GetString();
 }
 
@@ -161,4 +162,13 @@ void CWorkspace::removeMeasurement(String type, String name)
 
     delete m_measurements[type][name];
     m_measurements[type].erase(name);
+}
+
+void CWorkspace::removeAllMeasurement()
+{
+    for (std::map<String, std::map<String, rapidjson::Document*> >::iterator it = m_measurements.begin(); it != m_measurements.end(); ++it) {
+        for (std::map<String, rapidjson::Document*>::iterator docIt = it->second.begin(); docIt != it->second.end(); ++docIt)
+            delete docIt->second;
+    }
+    m_measurements.clear();
 }

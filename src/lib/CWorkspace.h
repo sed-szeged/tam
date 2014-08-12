@@ -47,6 +47,7 @@ public:
     rapidjson::Document* getResultsByName(String name) { return m_results[name]; }
     void addMeasurement(String type, String name);
     void removeMeasurement(String type, String name);
+    void removeAllMeasurement();
     rapidjson::Document* getMeasurement(String type, String name) { return m_measurements[type][name]; }
 
 private:

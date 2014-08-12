@@ -104,6 +104,35 @@ void CMainWindow::createNewWorkspace()
     delete m_workspace;
     m_workspace = new CWorkspace(this);
     m_clusterList->getClusters().clear();
+
+    ui->listViewClusters->model()->removeRows(0, ui->listViewClusters->model()->rowCount());
+    ui->listViewMetricsSelClu->model()->removeRows(0, ui->listViewMetricsSelClu->model()->rowCount());
+    ui->listViewScoreSelClu->model()->removeRows(0, ui->listViewScoreSelClu->model()->rowCount());
+
+    for (int i = 0; i < ui->tabWidgetStatistics->tabBar()->count(); ++i) {
+        QWidget* widget = ui->tabWidgetStatistics->widget(i);
+        QList<QWebView*> webView = widget->findChildren<QWebView*>();
+        if (webView.count() == 1) {
+            webView[0]->settings()->clearMemoryCaches();
+            webView[0]->setHtml("");
+        }
+    }
+
+    clearMetricsConfiguration();
+    clearScoreConfiguration();
+    ui->comboBoxMetricsMeasurement->clear();
+    ui->comboBoxScoreMeasurement->clear();
+    m_workspace->removeAllMeasurement();
+    m_workspace->addMeasurement("metric", "default");
+    ui->comboBoxMetricsMeasurement->addItem("default");
+    m_workspace->addMeasurement("score", "default");
+    ui->comboBoxScoreMeasurement->addItem("default");
+
+    if (ui->tableViewCE->model())
+        delete ui->tableViewCE->model();
+    if (ui->tableViewTests->model())
+        delete ui->tableViewTests->model();
+    updateLabels();
 }
 
 void CMainWindow::createStatusBar()
@@ -135,19 +164,32 @@ void CMainWindow::updateLabels()
     fileInfo.setFile(res.HasMember("cluster-code-elements-list") ? res["cluster-code-elements-list"].GetString() : "");
     if (fileInfo.exists())
         ui->labelClusterCodeElementList->setText(fileInfo.fileName());
+    else
+        ui->labelClusterCodeElementList->setText("No cluster code element list selected");
+
     fileInfo.setFile(res.HasMember("cluster-test-list") ? res["cluster-test-list"].GetString() : "");
     if (fileInfo.exists())
         ui->labelClusterTestList->setText(fileInfo.fileName());
+    else
+        ui->labelClusterTestList->setText("No cluster test list selected");
 
     fileInfo.setFile(m_workspace->getCoveragePath());
     if (fileInfo.exists())
         ui->labelCov->setText(fileInfo.fileName());
+    else
+        ui->labelCov->setText("No file selected");
+
     fileInfo.setFile(m_workspace->getResultsPath());
     if (fileInfo.exists())
         ui->labelRes->setText(fileInfo.fileName());
+    else
+        ui->labelRes->setText("No file selected");
+
     fileInfo.setFile(m_workspace->getChangesetPath());
     if (fileInfo.exists())
         ui->labelChan->setText(fileInfo.fileName());
+    else
+        ui->labelChan->setText("No file selected");
 }
 
 String CMainWindow::getCurrentMetricMeasurement()
@@ -314,8 +356,7 @@ void CMainWindow::on_actionNewWorkspace_triggered()
 {
     /*if (!m_workspace->isSaved())
         saveWorkspace();*/
-    delete m_workspace;
-    m_workspace = new CWorkspace(this);
+    createNewWorkspace();
 }
 
 void CMainWindow::on_actionLoadWorkspace_triggered()
@@ -327,8 +368,7 @@ void CMainWindow::on_actionLoadWorkspace_triggered()
                                                     QString(),
                                                     tr("Unqlite database file (*.db);;All Files (*)"));
     if (!fileName.isEmpty()) {
-        delete m_workspace;
-        m_workspace = new CWorkspace(this);
+        createNewWorkspace();
         m_workspace->setFileName(fileName);
         m_workspace->load();
         ui->statusBar->showMessage("Workspace loaded from file: " + m_workspace->getFileName(), 5000);
@@ -914,6 +954,9 @@ void CMainWindow::scoreClusterStateChanged(QStandardItem *item)
 
 void CMainWindow::on_comboBoxMetricsMeasurement_currentIndexChanged(int index)
 {
+    if (index == -1)
+        return;
+
     updateMetricsConfiguration();
 }
 
@@ -937,6 +980,9 @@ void CMainWindow::on_toolButtonMetricMeasRem_clicked()
 
 void CMainWindow::on_comboBoxScoreMeasurement_currentIndexChanged(int index)
 {
+    if (index == -1)
+        return;
+
     updateScoreConfiguration();
 }
 
