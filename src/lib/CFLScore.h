@@ -15,7 +15,7 @@ class CFLScore : public QThread
     Q_OBJECT
 public:
     CFLScore(QObject *parent = 0);
-    void calculateScore(IndexType revision, StringVector faultLocalizationTechniques, StringVector selectedClusters, IntVector failedCodeElements, CMainWindow *mainWindow);
+    void calculateScore(RevNumType revision, StringVector faultLocalizationTechniques, StringVector selectedClusters, IntVector failedCodeElements, CMainWindow *mainWindow);
 protected:
     void run();
 
@@ -25,7 +25,7 @@ signals:
 
 private:
 
-    IndexType m_revision;
+    RevNumType m_revision;
     IntVector m_failedCodeElements;
     StringVector m_faultLocalizationTechniques;
     StringVector m_selectedClusters;

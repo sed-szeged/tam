@@ -9,7 +9,7 @@ CFLScore::CFLScore(QObject *parent) : QThread(parent)
 {
 }
 
-void CFLScore::calculateScore(IndexType revision, StringVector faultLocalizationTechniques, StringVector selectedClusters, IntVector failedCodeElements, CMainWindow *mainWindow)
+void CFLScore::calculateScore(RevNumType revision, StringVector faultLocalizationTechniques, StringVector selectedClusters, IntVector failedCodeElements, CMainWindow *mainWindow)
 {
     m_kernel = mainWindow->getKernel();
     m_revision = revision;

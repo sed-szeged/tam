@@ -10,7 +10,7 @@ CTestSuiteMetrics::~CTestSuiteMetrics()
 {
 }
 
-void CTestSuiteMetrics::calculateMetrics(StringVector metrics, StringVector selectedClusters, IndexType revision, CMainWindow *mainWindow)
+void CTestSuiteMetrics::calculateMetrics(StringVector metrics, StringVector selectedClusters, RevNumType revision, CMainWindow *mainWindow)
 {
     m_metricNames = metrics;
     m_revision = revision;

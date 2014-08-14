@@ -26,7 +26,7 @@
 
 CMainWindow::CMainWindow(QWidget *parent) :
     QMainWindow(parent), ui(new Ui::CMainWindow),
-    m_revCompleter(NULL), m_kernel(new CKernel())
+    m_kernel(new CKernel())
 {
     ui->setupUi(this);
 
@@ -96,9 +96,18 @@ void CMainWindow::fillWidgets()
     connect(qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model()), SIGNAL(itemChanged(QStandardItem*)), this, SLOT(scoreClusterStateChanged(QStandardItem*)));
     ui->listViewClusters->setModel(new QStandardItemModel(this));
 
-    ui->lineEditRevisionMetrics->setValidator(new QIntValidator(ui->lineEditRevisionMetrics));
-    ui->lineEditScoreRevision->setValidator(new QIntValidator(ui->lineEditScoreRevision));
     ui->listViewFailedCodeElements->setModel(new QStandardItemModel(this));
+}
+
+void CMainWindow::fillRevComboBoxes()
+{
+    QStringList revList;
+    IntVector revs = m_workspace->getTestSuite()->getResults()->getRevisionNumbers();
+    for (int i = 0; i < revs.size(); ++i)
+        revList << QString::number(revs[i]);
+
+    ui->comboBoxRevMetrics->addItems(revList);
+    ui->comboBoxRevScore->addItems(revList);
 }
 
 void CMainWindow::createNewWorkspace()
@@ -206,7 +215,7 @@ String CMainWindow::getCurrentScoreMeasurement()
 
 void CMainWindow::clearMetricsConfiguration()
 {
-    ui->lineEditRevisionMetrics->setText(QString());
+    ui->comboBoxRevMetrics->setCurrentIndex(-1);
 
     disconnect(m_metricsPluginModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(metricsPluginStateChanged(QStandardItem*)));
     for (int i = 0; i < m_metricsPluginModel->rowCount(); ++i) {
@@ -227,8 +236,10 @@ void CMainWindow::updateMetricsConfiguration()
 
     rapidjson::Value &metricsSettings = (*m_workspace->getMeasurement("metric", getCurrentMetricMeasurement()));
     rapidjson::Value::MemberIterator member = metricsSettings.FindMember("revision");
-    if (member != metricsSettings.MemberEnd())
-        ui->lineEditRevisionMetrics->setText(QString::number(member->value.GetInt()));
+    if (member != metricsSettings.MemberEnd()) {
+        int index = ui->comboBoxRevMetrics->findText(QString::number(member->value.GetInt()));
+        ui->comboBoxRevMetrics->setCurrentIndex(index);
+    }
 
     member = metricsSettings.FindMember("plugin");
     if (member != metricsSettings.MemberEnd()) {
@@ -251,7 +262,7 @@ void CMainWindow::updateMetricsConfiguration()
 
 void CMainWindow::clearScoreConfiguration()
 {
-    ui->lineEditScoreRevision->setText(QString());
+    ui->comboBoxRevScore->setCurrentIndex(-1);
 
     disconnect(m_scorePluginModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(scorePluginStateChanged(QStandardItem*)));
     for (int i = 0; i < m_scorePluginModel->rowCount(); ++i) {
@@ -274,8 +285,10 @@ void CMainWindow::updateScoreConfiguration()
 
     rapidjson::Value &scoreSettings = (*m_workspace->getMeasurement("score", getCurrentScoreMeasurement()));
     rapidjson::Value::MemberIterator member = scoreSettings.FindMember("revision");
-    if (member != scoreSettings.MemberEnd())
-        ui->lineEditScoreRevision->setText(QString::number(member->value.GetInt()));
+    if (member != scoreSettings.MemberEnd()) {
+        int index = ui->comboBoxRevScore->findText(QString::number(member->value.GetInt()));
+        ui->comboBoxRevScore->setCurrentIndex(index);
+    }
 
     member = scoreSettings.FindMember("plugin");
     if (member != scoreSettings.MemberEnd()) {
@@ -472,7 +485,7 @@ void CMainWindow::loadFinished(QString msg)
     filter->setSourceModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getTestcases()));
     filter->setFilterKeyColumn(1);
     ui->tableViewTests->setModel(filter);
-    createRevisionCompleter();
+    fillRevComboBoxes();
     calculateStatistics();
 }
 
@@ -580,7 +593,7 @@ void CMainWindow::on_buttonCalculateMetrics_clicked()
     connect(metricsThread, SIGNAL(processFinished(QString)), this, SLOT(calcMetricsFinished(QString)));
     connect(metricsThread, SIGNAL(finished()), metricsThread, SLOT(deleteLater()));
     m_statusProgressBar->setMaximum(0);
-    metricsThread->calculateMetrics(metrics, selectedClusters, (IndexType)ui->lineEditRevisionMetrics->text().toLongLong(), this);
+    metricsThread->calculateMetrics(metrics, selectedClusters, ui->comboBoxRevMetrics->currentText().toInt(), this);
 }
 
 void CMainWindow::calcMetricsFinished(QString msg)
@@ -593,24 +606,6 @@ void CMainWindow::calcMetricsFinished(QString msg)
 void CMainWindow::statusUpdate(QString label)
 {
     m_statusLabel->setText(label);
-}
-
-void CMainWindow::createRevisionCompleter()
-{
-    if (m_revCompleter) {
-        delete m_revCompleter;
-        m_revCompleter = NULL;
-    }
-
-    QStandardItemModel *revs = new QStandardItemModel(this);
-    IntVector revsVec = m_workspace->getTestSuite()->getResults()->getRevisionNumbers();
-    for (IntVector::const_iterator it = revsVec.begin(); it != revsVec.end(); ++it) {
-        revs->appendRow(new QStandardItem(QString::number(*it)));
-    }
-    m_revCompleter = new QCompleter(revs, this);
-    m_revCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    ui->lineEditRevisionMetrics->setCompleter(m_revCompleter);
-    ui->lineEditScoreRevision->setCompleter(m_revCompleter);
 }
 
 void CMainWindow::calculateStatistics()
@@ -689,7 +684,7 @@ void CMainWindow::on_buttonScoreCalc_clicked()
     connect(scoreThread, SIGNAL(processFinished(QString)), this, SLOT(calcScoreFinished(QString)));
     connect(scoreThread, SIGNAL(finished()), scoreThread, SLOT(deleteLater()));
     m_statusProgressBar->setMaximum(0);
-    scoreThread->calculateScore((IndexType)ui->lineEditScoreRevision->text().toLongLong(), flTechnique, selectedClusters, failedCodeElements, this);
+    scoreThread->calculateScore(ui->comboBoxRevScore->currentText().toInt(), flTechnique, selectedClusters, failedCodeElements, this);
 }
 
 void CMainWindow::calcScoreFinished(QString msg)
@@ -772,13 +767,13 @@ bool CMainWindow::eventFilter(QObject *object, QEvent *event)
         }
     }
     else if (object == ui->buttonCalculateMetrics && event->type() == QEvent::MouseButtonRelease) {
-        if (ui->lineEditRevisionMetrics->text().isEmpty()) {
+        if (ui->comboBoxRevMetrics->currentIndex() == -1) {
             QMessageBox::critical(this, "Error", "Missing revision number.");
             return true;
         }
     }
     else if (object == ui->buttonScoreCalc && event->type() == QEvent::MouseButtonRelease) {
-        if (ui->lineEditScoreRevision->text().isEmpty()) {
+        if (ui->comboBoxRevScore->currentIndex() == -1) {
             QMessageBox::critical(this, "Error", "Missing revision number.");
             return true;
         }
@@ -805,15 +800,16 @@ void CMainWindow::on_comboBoxClusterPlugins_currentIndexChanged(const QString &p
     }
 }
 
-void CMainWindow::on_lineEditRevisionMetrics_textEdited(const QString &text)
+void CMainWindow::on_comboBoxRevMetrics_currentIndexChanged(const QString &text)
 {
+    if (text.isEmpty())
+        return;
+
     rapidjson::Value &settings = (*m_workspace->getMeasurement("metric", getCurrentMetricMeasurement()));
     RevNumType rev = text.toInt();
     rapidjson::Value::MemberIterator revIt = settings.FindMember("revision");
     if (revIt == settings.MemberEnd())
         settings.AddMember("revision", rev, m_workspace->getMeasurement("metric", getCurrentMetricMeasurement())->GetAllocator());
-    else if (text.isEmpty())
-        settings.RemoveMember(revIt);
     else
         revIt->value.SetInt(rev);
 }
@@ -881,15 +877,16 @@ void CMainWindow::metricsClusterStateChanged(QStandardItem *item)
     }
 }
 
-void CMainWindow::on_lineEditScoreRevision_textEdited(const QString &text)
+void CMainWindow::on_comboBoxRevScore_currentIndexChanged(const QString &text)
 {
+    if (text.isEmpty())
+        return;
+
     rapidjson::Value &settings = (*m_workspace->getMeasurement("score", getCurrentScoreMeasurement()));
     RevNumType rev = text.toInt();
     rapidjson::Value::MemberIterator revIt = settings.FindMember("revision");
     if (revIt == settings.MemberEnd())
         settings.AddMember("revision", rev, m_workspace->getMeasurement("score", getCurrentScoreMeasurement())->GetAllocator());
-    else if (text.isEmpty())
-        settings.RemoveMember(revIt);
     else
         revIt->value.SetInt(rev);
 }

@@ -17,7 +17,7 @@ public:
     CTestSuiteMetrics(QObject *parent = 0);
     ~CTestSuiteMetrics();
 
-    void calculateMetrics(StringVector metrics, StringVector selectedClusters, IndexType revision, CMainWindow *mainWindow);
+    void calculateMetrics(StringVector metrics, StringVector selectedClusters, RevNumType revision, CMainWindow *mainWindow);
 
 protected:
     void run();
@@ -35,7 +35,7 @@ private:
     ClusterMap m_clusters;
     StringVector m_metricNames;
     CSelectionData *m_testSuite;
-    IndexType m_revision;
+    RevNumType m_revision;
     std::set<std::string> m_metricsCalculated;
 };
 

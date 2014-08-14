@@ -8,7 +8,6 @@
 #include "lib/CStatisticsThread.h"
 #include "lib/CFLScore.h"
 
-#include <QCompleter>
 #include <QMainWindow>
 #include <QProgressBar>
 #include <QLabel>
@@ -46,11 +45,11 @@ private slots:
     void calcMetricsFinished(QString msg);
     void calcScoreFinished(QString msg);
 
-    void on_lineEditRevisionMetrics_textEdited(const QString &text);
+    void on_comboBoxRevMetrics_currentIndexChanged(const QString &text);
     void metricsPluginStateChanged(QStandardItem *item);
     void metricsClusterStateChanged(QStandardItem *item);
 
-    void on_lineEditScoreRevision_textEdited(const QString &text);
+    void on_comboBoxRevScore_currentIndexChanged(const QString &text);
     void scorePluginStateChanged(QStandardItem *item);
     void scoreClusterStateChanged(QStandardItem *item);
 
@@ -116,9 +115,9 @@ protected:
 private:
     void createNewWorkspace();
     void createStatusBar();
-    void createRevisionCompleter();
     void calculateStatistics();
     void fillWidgets();
+    void fillRevComboBoxes();
     void updateLabels();
 
     void clearMetricsConfiguration();
@@ -137,7 +136,6 @@ private:
     CWorkspace *m_workspace;
     CKernel *m_kernel;
 
-    QCompleter *m_revCompleter;
     QStandardItemModel *m_metricsPluginModel;
     QStandardItemModel *m_scorePluginModel;
 
