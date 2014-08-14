@@ -1,7 +1,7 @@
 #include "CIDManagerTableModel.h"
 
 CIDManagerTableModel::CIDManagerTableModel(QObject *parent, IIDManager* idManager) : QAbstractTableModel(parent),
-    m_data(idManager)
+    m_data(idManager), m_ids(idManager->getIDList()), m_names(idManager->getValueList())
 {
 }
 
@@ -27,9 +27,9 @@ QVariant CIDManagerTableModel::data(const QModelIndex &index, int role) const
         switch(index.column())
         {
         case ID:
-            return QVariant::fromValue(m_data->getIDList()[index.row()]);
+            return QVariant::fromValue(m_ids[index.row()]);
         case NAME:
-            return QString(m_data->getValueList()[index.row()].c_str());
+            return QString(m_names[index.row()].c_str());
         }
     }
     return QVariant();

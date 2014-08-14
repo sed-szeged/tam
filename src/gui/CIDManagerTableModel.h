@@ -10,6 +10,8 @@ class CIDManagerTableModel : public QAbstractTableModel
 {
     Q_OBJECT
     IIDManager *m_data;
+    StringVector m_names;
+    IntVector m_ids;
 public:
     explicit CIDManagerTableModel(QObject *parent, IIDManager *idManager);
     enum {ID = 0, NAME, MAX_COLS};
