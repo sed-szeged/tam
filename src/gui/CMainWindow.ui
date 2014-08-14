@@ -57,7 +57,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -236,9 +236,22 @@
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_8">
             <item>
+             <widget class="QLineEdit" name="lineEditFilterTests">
+              <property name="placeholderText">
+               <string>Filter test cases...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QTableView" name="tableViewTests">
+              <property name="contextMenuPolicy">
+               <enum>Qt::CustomContextMenu</enum>
+              </property>
               <property name="sizeAdjustPolicy">
                <enum>QAbstractScrollArea::AdjustToContents</enum>
+              </property>
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectRows</enum>
               </property>
               <attribute name="horizontalHeaderStretchLastSection">
                <bool>true</bool>
@@ -256,9 +269,22 @@
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_9">
             <item>
+             <widget class="QLineEdit" name="lineEditFilterCE">
+              <property name="placeholderText">
+               <string>Filter code elements...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QTableView" name="tableViewCE">
+              <property name="contextMenuPolicy">
+               <enum>Qt::CustomContextMenu</enum>
+              </property>
               <property name="sizeAdjustPolicy">
                <enum>QAbstractScrollArea::AdjustToContents</enum>
+              </property>
+              <property name="selectionBehavior">
+               <enum>QAbstractItemView::SelectRows</enum>
               </property>
               <attribute name="horizontalHeaderStretchLastSection">
                <bool>true</bool>

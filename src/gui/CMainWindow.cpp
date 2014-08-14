@@ -1,3 +1,4 @@
+#include "CCoveredListDialog.h"
 #include "CClusterEditorAddDialog.h"
 #include "CMainWindow.h"
 #include "CShowStatistics.h"
@@ -16,6 +17,7 @@
 #include <QCheckBox>
 #include <QWebFrame>
 #include <QInputDialog>
+#include <QSortFilterProxyModel>
 
 #include <iostream>
 
@@ -462,8 +464,14 @@ void CMainWindow::loadFinished(QString msg)
     m_statusLabel->clear();
     m_testSuiteAvailableLabel->setVisible(true);
 
-    ui->tableViewTests->setModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getTestcases()));
-    ui->tableViewCE->setModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getCodeElements()));
+    QSortFilterProxyModel *filter = new QSortFilterProxyModel(this);
+    filter->setSourceModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getCodeElements()));
+    filter->setFilterKeyColumn(1);
+    ui->tableViewCE->setModel(filter);
+    filter = new QSortFilterProxyModel(this);
+    filter->setSourceModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getTestcases()));
+    filter->setFilterKeyColumn(1);
+    ui->tableViewTests->setModel(filter);
     createRevisionCompleter();
     calculateStatistics();
 }
@@ -754,11 +762,7 @@ bool CMainWindow::eventFilter(QObject *object, QEvent *event)
             QMessageBox::critical(this, "Error", "Not existing coverage file.");
             return true;
         }
-        else if (m_workspace->getResultsPath().isEmpty()) {
-            QMessageBox::critical(this, "Error", "Missing results file path.");
-            return true;
-        }
-        else if (!QFileInfo(m_workspace->getResultsPath()).exists()) {
+        else if (!m_workspace->getResultsPath().isEmpty() && !QFileInfo(m_workspace->getResultsPath()).exists()) {
             QMessageBox::critical(this, "Error", "Not existing results file.");
             return true;
         }
@@ -1002,4 +1006,58 @@ void CMainWindow::on_toolButtonScoreMeasRem_clicked()
 {
     m_workspace->removeMeasurement("score", ui->comboBoxScoreMeasurement->currentText().toStdString());
     ui->comboBoxScoreMeasurement->removeItem(ui->comboBoxScoreMeasurement->currentIndex());
+}
+
+void CMainWindow::on_lineEditFilterTests_textEdited(const QString &text)
+{
+    if (ui->tableViewTests->model() == NULL)
+        return;
+    qobject_cast<QSortFilterProxyModel*>(ui->tableViewTests->model())->setFilterFixedString(text);
+}
+
+void CMainWindow::on_lineEditFilterCE_textEdited(const QString &text)
+{
+    if (ui->tableViewCE->model() == NULL)
+        return;
+    qobject_cast<QSortFilterProxyModel*>(ui->tableViewCE->model())->setFilterFixedString(text);
+}
+
+void CMainWindow::on_tableViewTests_customContextMenuRequested(const QPoint &pos)
+{
+    if (ui->tableViewTests->selectionModel() == NULL || !ui->tableViewTests->selectionModel()->currentIndex().isValid())
+        return;
+
+    QPoint globalPos = ui->tableViewTests->mapToGlobal(pos);
+
+    QMenu myMenu;
+    myMenu.addAction("Covered code elements", this, SLOT(actionCoveredCodeElements_triggered()));
+    myMenu.exec(globalPos);
+}
+
+void CMainWindow::actionCoveredCodeElements_triggered()
+{
+    IndexType id = m_workspace->getTestSuite()->getCoverage()->getTestcases().getID(ui->tableViewTests->selectionModel()->currentIndex().data().toString().toStdString());
+    CCoveredListDialog dia(this, m_workspace->getTestSuite(), id, true);
+    dia.setWindowTitle("List of code elements covered by " + ui->tableViewTests->selectionModel()->currentIndex().data().toString() + " test");
+    dia.exec();
+}
+
+void CMainWindow::on_tableViewCE_customContextMenuRequested(const QPoint &pos)
+{
+    if (ui->tableViewCE->selectionModel() == NULL || !ui->tableViewCE->selectionModel()->currentIndex().isValid())
+        return;
+
+    QPoint globalPos = ui->tableViewCE->mapToGlobal(pos);
+
+    QMenu myMenu;
+    myMenu.addAction("Covered tests", this, SLOT(actionCoveredTests_triggered()));
+    myMenu.exec(globalPos);
+}
+
+void CMainWindow::actionCoveredTests_triggered()
+{
+    IndexType id = m_workspace->getTestSuite()->getCoverage()->getCodeElements().getID(ui->tableViewCE->selectionModel()->currentIndex().data().toString().toStdString());
+    CCoveredListDialog dia(this, m_workspace->getTestSuite(), id, false);
+    dia.setWindowTitle("List of test cases covered by " + ui->tableViewCE->selectionModel()->currentIndex().data().toString() + " code element");
+    dia.exec();
 }

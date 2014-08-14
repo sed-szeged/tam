@@ -100,6 +100,16 @@ private slots:
 
     void on_comboBoxScoreMeasurement_currentIndexChanged(int index);
 
+    void on_lineEditFilterTests_textEdited(const QString &text);
+
+    void on_lineEditFilterCE_textEdited(const QString &text);
+
+    void on_tableViewTests_customContextMenuRequested(const QPoint &pos);
+    void actionCoveredCodeElements_triggered();
+
+    void on_tableViewCE_customContextMenuRequested(const QPoint &pos);
+    void actionCoveredTests_triggered();
+
 protected:
     bool eventFilter(QObject *object, QEvent *event);
 
