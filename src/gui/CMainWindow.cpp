@@ -113,6 +113,7 @@ void CMainWindow::fillRevComboBoxes()
 void CMainWindow::createNewWorkspace()
 {
     delete m_workspace;
+    m_testSuiteAvailableLabel->hide();
     m_workspace = new CWorkspace(this);
     m_clusterList->getClusters().clear();
 
@@ -131,6 +132,10 @@ void CMainWindow::createNewWorkspace()
 
     clearMetricsConfiguration();
     clearScoreConfiguration();
+
+    ui->comboBoxRevMetrics->clear();
+    ui->comboBoxRevScore->clear();
+
     ui->comboBoxMetricsMeasurement->clear();
     ui->comboBoxScoreMeasurement->clear();
     m_workspace->removeAllMeasurement();
