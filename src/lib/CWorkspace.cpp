@@ -7,8 +7,9 @@
 #include <rapidjson/prettywriter.h>
 
 CWorkspace::CWorkspace(CMainWindow *mainWindow) :
-    m_isChangesAvailable(false), m_isSaved(false), m_fileName(QString()),
-    m_testSuite(new CSelectionData()), m_mainWindow(mainWindow)
+    m_isSaved(false), m_fileName(QString()),
+    m_testSuite(new CSelectionData()), m_mainWindow(mainWindow),
+    m_availableFileMask(FILE_NONE)
 {
     for (int i = 0; i < NUM_OF_COLS; ++i) {
         m_results[collections[i]] = new rapidjson::Document();
@@ -25,10 +26,7 @@ CWorkspace::~CWorkspace()
     for (std::map<std::string, rapidjson::Document*>::iterator it = m_results.begin(); it != m_results.end(); ++it) {
         delete it->second;
     }
-    for (std::map<String, std::map<String, rapidjson::Document*> >::iterator it = m_measurements.begin(); it != m_measurements.end(); ++it) {
-        for (std::map<String, rapidjson::Document*>::iterator docIt = it->second.begin(); docIt != it->second.end(); ++docIt)
-            delete docIt->second;
-    }
+    removeAllMeasurement();
 }
 
 bool CWorkspace::save()
@@ -78,6 +76,8 @@ void CWorkspace::load()
         }
     }
     delete wrapper;
+
+    updateFileMask();
 }
 
 void CWorkspace::setCoveragePath(QString path)
@@ -88,14 +88,19 @@ void CWorkspace::setCoveragePath(QString path)
         m_results[WS]->AddMember("coverage-binary", s, m_results[WS]->GetAllocator());
     } else
         memberIt->value.SetString(path.toStdString().c_str(), path.length(), m_results[WS]->GetAllocator());
+
+    if (!path.isEmpty())
+        m_availableFileMask |= FILE_COVERAGE;
+    else
+        m_availableFileMask &= ~FILE_COVERAGE;
 }
 
 QString CWorkspace::getCoveragePath()
 {
-    rapidjson::Document::MemberIterator member = m_results[WS]->FindMember("coverage-binary");
-    if (member == m_results[WS]->MemberEnd() || member->value.IsNull())
+    if (!(m_availableFileMask & FILE_COVERAGE))
         return "";
-    return member->value.GetString();
+
+    return (*m_results[WS])["coverage-binary"].GetString();
 }
 
 void CWorkspace::setResultsPath(QString path)
@@ -106,14 +111,19 @@ void CWorkspace::setResultsPath(QString path)
         m_results[WS]->AddMember("results-binary", s, m_results[WS]->GetAllocator());
     } else
         memberIt->value.SetString(path.toStdString().c_str(), path.length(), m_results[WS]->GetAllocator());
+
+    if (!path.isEmpty())
+        m_availableFileMask |= FILE_RESULTS;
+    else
+        m_availableFileMask &= ~FILE_RESULTS;
 }
 
 QString CWorkspace::getResultsPath()
 {
-    rapidjson::Document::MemberIterator member = m_results[WS]->FindMember("results-binary");
-    if (member == m_results[WS]->MemberEnd() || member->value.IsNull())
+    if (!(m_availableFileMask & FILE_RESULTS))
         return "";
-    return member->value.GetString();
+
+    return (*m_results[WS])["results-binary"].GetString();
 }
 
 void CWorkspace::setChangesetPath(QString path)
@@ -127,15 +137,17 @@ void CWorkspace::setChangesetPath(QString path)
         memberIt->value.SetString(path.toStdString().c_str(), path.length(), m_results[WS]->GetAllocator());
 
     if (!path.isEmpty())
-        m_isChangesAvailable = true;
+        m_availableFileMask |= FILE_CHANGESET;
+    else
+        m_availableFileMask &= ~FILE_CHANGESET;
 }
 
 QString CWorkspace::getChangesetPath()
 {
-    rapidjson::Document::MemberIterator member = m_results[WS]->FindMember("changeset-binary");
-    if (member == m_results[WS]->MemberEnd() || member->value.IsNull())
+    if (!(m_availableFileMask & FILE_CHANGESET))
         return "";
-    return member->value.GetString();
+
+    return (*m_results[WS])["changeset-binary"].GetString();
 }
 
 bool CWorkspace::isStatisticsCalculated()
@@ -171,4 +183,17 @@ void CWorkspace::removeAllMeasurement()
             delete docIt->second;
     }
     m_measurements.clear();
+}
+
+void CWorkspace::updateFileMask()
+{
+    rapidjson::Document::MemberIterator memberIt = m_results[WS]->FindMember("coverage-binary");
+    if (memberIt != m_results[WS]->MemberEnd() && memberIt->value.GetString() != "")
+        m_availableFileMask |= FILE_COVERAGE;
+    memberIt = m_results[WS]->FindMember("results-binary");
+    if (memberIt != m_results[WS]->MemberEnd() && memberIt->value.GetString() != "")
+        m_availableFileMask |= FILE_RESULTS;
+    memberIt = m_results[WS]->FindMember("changeset-binary");
+    if (memberIt != m_results[WS]->MemberEnd() && memberIt->value.GetString() != "")
+        m_availableFileMask |= FILE_CHANGESET;
 }

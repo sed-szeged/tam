@@ -24,8 +24,11 @@ void CTestSuiteLoader::run()
 {
     emit updateStatusLabel("Loading coverage file...");
     m_testSuite->loadCoverage(m_covPath);
-    emit updateStatusLabel("Loading results file...");
-    m_testSuite->loadResults(m_resPath);
+
+    if (!m_resPath.empty()) {
+        emit updateStatusLabel("Loading results file...");
+        m_testSuite->loadResults(m_resPath);
+    }
 
     if (!m_changesPath.empty()) {
         emit updateStatusLabel("Loading changeset file...");

@@ -151,6 +151,37 @@ void CMainWindow::createNewWorkspace()
     updateLabels();
 }
 
+QString CMainWindow::checkMetricsPluginsRequirements()
+{
+    for (int i = 0; i < m_metricsPluginModel->rowCount(); ++i) {
+        if (m_metricsPluginModel->item(i)->checkState() == Qt::Checked) {
+            if (isRequiredResultsForPlugin(m_metricsPluginModel->item(i)->text()))
+                return m_metricsPluginModel->item(i)->text();
+
+            if (m_metricsPluginModel->item(i)->text() == "fault-localization" ||
+                    m_metricsPluginModel->item(i)->text() == "uniqueness" ||
+                    m_metricsPluginModel->item(i)->text() == "specialization")
+                return m_metricsPluginModel->item(i)->text();
+        }
+    }
+
+    return QString();
+}
+
+bool CMainWindow::isRequiredResultsForPlugin(QString plugin)
+{
+    StringVector dependency = m_kernel->getTestSuiteMetricPluginManager().getPlugin(plugin.toStdString())->getDependency();
+    for (StringVector::const_iterator it = dependency.begin(); it != dependency.end(); ++it) {
+        if (isRequiredResultsForPlugin(QString((*it).c_str())))
+            return true;
+
+        if (*it == "fault-localization" || *it == "uniqueness" ||
+            *it == "specialization")
+            return true;
+    }
+    return false;
+}
+
 void CMainWindow::createStatusBar()
 {
     m_statusProgressBar = new QProgressBar(ui->statusBar);
@@ -757,28 +788,36 @@ bool CMainWindow::eventFilter(QObject *object, QEvent *event)
         if (m_workspace->getCoveragePath().isEmpty()) {
             QMessageBox::critical(this, "Error", "Missing coverage file path.");
             return true;
-        }
-        else if (!QFileInfo(m_workspace->getCoveragePath()).exists()) {
+        } else if (!QFileInfo(m_workspace->getCoveragePath()).exists()) {
             QMessageBox::critical(this, "Error", "Not existing coverage file.");
             return true;
-        }
-        else if (!m_workspace->getResultsPath().isEmpty() && !QFileInfo(m_workspace->getResultsPath()).exists()) {
+        } else if (!m_workspace->getResultsPath().isEmpty() && !QFileInfo(m_workspace->getResultsPath()).exists()) {
             QMessageBox::critical(this, "Error", "Not existing results file.");
             return true;
-        }
-        else if (!m_workspace->getChangesetPath().isEmpty() && !QFileInfo(m_workspace->getChangesetPath()).exists()) {
+        } else if (!m_workspace->getChangesetPath().isEmpty() && !QFileInfo(m_workspace->getChangesetPath()).exists()) {
             QMessageBox::critical(this, "Error", "Not existing changes file.");
             return true;
         }
-    }
-    else if (object == ui->buttonCalculateMetrics && event->type() == QEvent::MouseButtonRelease) {
-        if (ui->comboBoxRevMetrics->currentIndex() == -1) {
+    } else if (object == ui->buttonCalculateMetrics && event->type() == QEvent::MouseButtonRelease) {
+        QString resultsMetrics = checkMetricsPluginsRequirements();
+        if (m_testSuiteAvailableLabel->isHidden()) {
+            QMessageBox::critical(this, "Error", "Test suite not available.");
+            return true;
+        } else if (!(m_workspace->getFileMask() & FILE_RESULTS) && !resultsMetrics.isEmpty()) {
+            QMessageBox::critical(this, "Error", "Results file required for metric: " + resultsMetrics);
+            return true;
+        } else if (!resultsMetrics.isEmpty() && ui->comboBoxRevMetrics->currentIndex() == -1) {
             QMessageBox::critical(this, "Error", "Missing revision number.");
             return true;
         }
-    }
-    else if (object == ui->buttonScoreCalc && event->type() == QEvent::MouseButtonRelease) {
-        if (ui->comboBoxRevScore->currentIndex() == -1) {
+    } else if (object == ui->buttonScoreCalc && event->type() == QEvent::MouseButtonRelease) {
+        if (m_testSuiteAvailableLabel->isHidden()) {
+            QMessageBox::critical(this, "Error", "Test suite not available.");
+            return true;
+        } else if (!(m_workspace->getFileMask() & FILE_RESULTS)) {
+            QMessageBox::critical(this, "Error", "Missing results file.");
+            return true;
+        } else if (ui->comboBoxRevScore->currentIndex() == -1) {
             QMessageBox::critical(this, "Error", "Missing revision number.");
             return true;
         }

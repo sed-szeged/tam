@@ -8,8 +8,16 @@
 
 using namespace soda;
 
+enum FileMask
+{
+    FILE_NONE = 0x0,
+    FILE_COVERAGE = 0x1,
+    FILE_RESULTS = 0x2,
+    FILE_CHANGESET = 0x4
+};
+
 // names of the collections where results will be stored
-#define NUM_OF_COLS 5
+#define NUM_OF_COLS 3
 #define WS collections[0]
 #define COV_STATS collections[1]
 #define RES_STATS collections[2]
@@ -19,7 +27,7 @@ using namespace soda;
 #define SCORE_MEAS "score-measurements"
 #define CLUSTERS "clusters"
 
-static const char* collections[NUM_OF_COLS] = { "workspace", "coverage-statistics", "results-statistics", "metrics", "score" };
+static const char* collections[NUM_OF_COLS] = { "workspace", "coverage-statistics", "results-statistics" };
 
 class CWorkspace
 {
@@ -49,18 +57,21 @@ public:
     void removeMeasurement(String type, String name);
     void removeAllMeasurement();
     rapidjson::Document* getMeasurement(String type, String name) { return m_measurements[type][name]; }
+    int getFileMask() { return m_availableFileMask; }
 
 private:
 
-    bool m_isChangesAvailable;
+    void updateFileMask();
+
     bool m_isSaved;
     QString m_fileName;
-    std::map<String, rapidjson::Document*> m_results;
+    std::map<String, rapidjson::Document *> m_results;
 
-    std::map<String, std::map<String, rapidjson::Document*> > m_measurements;
-    //std::map<String, std::map<String, rapidjson::Document*> > m_results;
+    std::map<String, std::map<String, rapidjson::Document *> > m_measurements;
+    //std::map<String, std::map<String, rapidjson::Document *> > m_results;
     CSelectionData *m_testSuite;
     CMainWindow *m_mainWindow;
+    int m_availableFileMask;
 };
 
 #endif // CWORKSPACE_H

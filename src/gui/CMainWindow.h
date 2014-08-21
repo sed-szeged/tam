@@ -119,6 +119,8 @@ private:
     void fillWidgets();
     void fillRevComboBoxes();
     void updateLabels();
+    QString checkMetricsPluginsRequirements();
+    bool isRequiredResultsForPlugin(QString plugin);
 
     void clearMetricsConfiguration();
     void updateMetricsConfiguration();
