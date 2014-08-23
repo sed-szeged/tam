@@ -35,8 +35,8 @@ public:
     CClusterList* getClusterList() { return m_clusterList; }
     void updateAvailableClusters();
     Ui::CMainWindow* getUi() { return ui; }
-    String getCurrentMetricMeasurement();
-    String getCurrentScoreMeasurement();
+    String getMetricMeasurement();
+    String getScoreMeasurement();
 
 private slots:
     void statusUpdate(QString label);

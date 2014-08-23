@@ -63,8 +63,8 @@ void CClusterEditorAddDialog::on_buttonBox_accepted()
                 item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
                 failedCodeElementModel->appendRow(item);
 
-                rapidjson::Value &settings = (*qobject_cast<CMainWindow*>(parent())->getWorkspace()->getMeasurement("score", qobject_cast<CMainWindow*>(parent())->getCurrentScoreMeasurement()));
-                rapidjson::Document::AllocatorType &allocator = qobject_cast<CMainWindow*>(parent())->getWorkspace()->getMeasurement("score", qobject_cast<CMainWindow*>(parent())->getCurrentScoreMeasurement())->GetAllocator();
+                rapidjson::Value &settings = (*qobject_cast<CMainWindow*>(parent())->getWorkspace()->getMeasurement("score", qobject_cast<CMainWindow*>(parent())->getScoreMeasurement()));
+                rapidjson::Document::AllocatorType &allocator = qobject_cast<CMainWindow*>(parent())->getWorkspace()->getMeasurement("score", qobject_cast<CMainWindow*>(parent())->getScoreMeasurement())->GetAllocator();
                 if (!settings.HasMember("failed-code-elements")) {
                     settings.AddMember("failed-code-elements", rapidjson::Value(rapidjson::kArrayType).Move(), allocator);
                 }

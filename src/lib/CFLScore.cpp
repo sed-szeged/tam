@@ -15,7 +15,7 @@ void CFLScore::calculateScore(RevNumType revision, StringVector faultLocalizatio
     m_revision = revision;
     m_testSuite = mainWindow->getWorkspace()->getTestSuite();
     m_clusters = &mainWindow->getClusterList()->getClusters();
-    m_results = mainWindow->getWorkspace()->getResultsByName(SCORE);
+    m_results = mainWindow->getWorkspace()->getMeasurementResults(SCORE, mainWindow->getScoreMeasurement());
     m_faultLocalizationTechniques = faultLocalizationTechniques;
     m_failedCodeElements = failedCodeElements;
     m_selectedClusters = selectedClusters;

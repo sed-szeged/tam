@@ -17,7 +17,7 @@ CClusterList::~CClusterList()
 void CClusterList::createClusters()
 {
     ITestSuiteClusterPlugin *clusterAlgorithm = m_mainWindow->getKernel()->getTestSuiteClusterPluginManager().getPlugin(m_mainWindow->getUi()->comboBoxClusterPlugins->currentText().toStdString());
-    clusterAlgorithm->init(*m_mainWindow->getWorkspace()->getResultsByName(WS));
+    clusterAlgorithm->init(*m_mainWindow->getWorkspace()->getData(WS));
     clusterAlgorithm->execute(*m_mainWindow->getWorkspace()->getTestSuite(), *m_clusters);
 }
 

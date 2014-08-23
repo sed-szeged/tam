@@ -16,7 +16,7 @@ void CTestSuiteMetrics::calculateMetrics(StringVector metrics, StringVector sele
     m_revision = revision;
     m_testSuite = mainWindow->getWorkspace()->getTestSuite();
     m_kernel = mainWindow->getKernel();
-    m_results = mainWindow->getWorkspace()->getResultsByName(METRICS);
+    m_results = mainWindow->getWorkspace()->getMeasurementResults(METRICS, mainWindow->getMetricMeasurement());
 
     for (StringVector::const_iterator it = selectedClusters.begin(); it != selectedClusters.end(); ++it) {
         m_clusters[*it] = mainWindow->getClusterList()->getClusters()[*it];

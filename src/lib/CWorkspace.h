@@ -8,6 +8,8 @@
 
 using namespace soda;
 
+class CUnqliteWrapper;
+
 enum FileMask
 {
     FILE_NONE = 0x0,
@@ -52,23 +54,25 @@ public:
     void setFileName(QString name) { m_fileName = name; }
 
     CSelectionData* getTestSuite() { return m_testSuite; }
-    rapidjson::Document* getResultsByName(String name) { return m_results[name]; }
+    rapidjson::Document *getData(String name) { return m_data[name]; }
     void addMeasurement(String type, String name);
     void removeMeasurement(String type, String name);
     void removeAllMeasurement();
-    rapidjson::Document* getMeasurement(String type, String name) { return m_measurements[type][name]; }
+    rapidjson::Document *getMeasurement(String type, String name) { return m_measurements[type][name]; }
+    rapidjson::Document *getMeasurementResults(String type, String name) { return m_measurementsResults[type][name]; }
     int getFileMask() { return m_availableFileMask; }
 
 private:
 
+    void saveMeasurement(String type, CUnqliteWrapper *wrapper);
+    void loadResults(String type, CUnqliteWrapper *wrapper);
     void updateFileMask();
 
     bool m_isSaved;
     QString m_fileName;
-    std::map<String, rapidjson::Document *> m_results;
-
+    std::map<String, rapidjson::Document *> m_data;
     std::map<String, std::map<String, rapidjson::Document *> > m_measurements;
-    //std::map<String, std::map<String, rapidjson::Document *> > m_results;
+    std::map<String, std::map<String, rapidjson::Document *> > m_measurementsResults;
     CSelectionData *m_testSuite;
     CMainWindow *m_mainWindow;
     int m_availableFileMask;

@@ -51,8 +51,8 @@ void CShowStatistics::fillGeneralTab(QWebView *view)
             "Average failed test cases per revision: %9</br>"
               "</div></body></html>";
 
-    rapidjson::Document *covData = m_workspace->getResultsByName(COV_STATS);
-    rapidjson::Document *resData = m_workspace->getResultsByName(RES_STATS);
+    rapidjson::Document *covData = m_workspace->getData(COV_STATS);
+    rapidjson::Document *resData = m_workspace->getData(RES_STATS);
 
     html = html.arg(QString::number((*covData)["number_of_code_elements"].GetInt()),
             QString::number((*covData)["number_of_test_cases"].GetInt()),
@@ -91,7 +91,7 @@ void CShowStatistics::generateChartForTab(QWebView *view, int tabindex)
             "<div id=\"table\">"
               "</div></body></html>";
 
-    rapidjson::Document *data = m_workspace->getResultsByName(chartData[tabindex].dataSource.toStdString());
+    rapidjson::Document *data = m_workspace->getData(chartData[tabindex].dataSource.toStdString());
     QString dataStr;
     if (chartData[tabindex].dataColumn == "test_case_info") {
         const rapidjson::Value& val = (*data)["test_case_info"];

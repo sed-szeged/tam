@@ -14,8 +14,8 @@ CStatisticsThread::~CStatisticsThread()
 void CStatisticsThread::calcStatistics(CWorkspace *workspace)
 {
     m_testSuite = workspace->getTestSuite();
-    m_covStats = workspace->getResultsByName(COV_STATS);
-    m_resStats = workspace->getResultsByName(RES_STATS);
+    m_covStats = workspace->getData(COV_STATS);
+    m_resStats = workspace->getData(RES_STATS);
 
     if (!isRunning())
         start();
