@@ -39,6 +39,10 @@ public:
 
     bool save();
     void load();
+
+    bool isTestSuiteAvailable() { return m_isTestSuiteAvailable; }
+    void setTestSuiteAvailable(bool available) { m_isTestSuiteAvailable = available; }
+
     bool isStatisticsCalculated();
     bool isSaved() { return m_isSaved; }
     void setSaved(bool saved) { m_isSaved = saved; }
@@ -69,6 +73,7 @@ private:
     void updateFileMask();
 
     bool m_isSaved;
+    bool m_isTestSuiteAvailable;
     QString m_fileName;
     std::map<String, rapidjson::Document *> m_data;
     std::map<String, std::map<String, rapidjson::Document *> > m_measurements;

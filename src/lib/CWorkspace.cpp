@@ -7,7 +7,7 @@
 #include <rapidjson/prettywriter.h>
 
 CWorkspace::CWorkspace(CMainWindow *mainWindow) :
-    m_isSaved(false), m_fileName(QString()),
+    m_isSaved(false), m_isTestSuiteAvailable(false), m_fileName(QString()),
     m_testSuite(new CSelectionData()), m_mainWindow(mainWindow),
     m_availableFileMask(FILE_NONE)
 {
@@ -85,7 +85,7 @@ void CWorkspace::load()
 void CWorkspace::loadResults(String type, CUnqliteWrapper *wrapper)
 {
     rapidjson::Document meas;
-    wrapper->fetchAll(type + "-measurement", meas);
+    wrapper->fetchAll(type + "-measurements", meas);
     if (!meas.IsArray())
         return;
 
@@ -96,6 +96,13 @@ void CWorkspace::loadResults(String type, CUnqliteWrapper *wrapper)
         m_measurements[type][measName]->CopyFrom((*it), m_measurements[type][measName]->GetAllocator());
         int id = (*m_measurements[type][measName])["result-id"].GetInt();
         wrapper->fetchById(type, id, *m_measurementsResults[type][measName]);
+
+        if (measName != "default") {
+            if (type == METRICS)
+                m_mainWindow->getUi()->comboBoxMetricsMeasurement->addItem(measName.c_str());
+            else
+                m_mainWindow->getUi()->comboBoxScoreMeasurement->addItem(measName.c_str());
+        }
     }
 }
 

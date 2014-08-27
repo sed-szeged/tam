@@ -29,7 +29,7 @@ public:
     explicit CMainWindow(QWidget *parent = 0);
     ~CMainWindow();
 
-    bool isTestSuiteAvailable() { return !m_testSuiteAvailableLabel->isHidden(); }
+    bool isTestSuiteAvailable();
     CWorkspace* getWorkspace() { return m_workspace; }
     CKernel* getKernel() { return m_kernel; }
     CClusterList* getClusterList() { return m_clusterList; }
@@ -40,6 +40,7 @@ public:
 
 private slots:
     void statusUpdate(QString label);
+    void tmpStatusUpdate(QString msg);
     void loadFinished(QString msg);
     void calcStatsFinished(QString msg);
     void calcMetricsFinished(QString msg);
@@ -108,6 +109,10 @@ private slots:
 
     void on_tableViewCE_customContextMenuRequested(const QPoint &pos);
     void actionCoveredTests_triggered();
+
+    void on_actionMetrics_results_triggered();
+
+    void on_actionFault_localization_results_triggered();
 
 protected:
     bool eventFilter(QObject *object, QEvent *event);

@@ -1,13 +1,18 @@
 #include "CCoveredListDialog.h"
 #include "CClusterEditorAddDialog.h"
-#include "CMainWindow.h"
+#include "CClusterEditorDialog.h"
+#include "CResultsExportDialog.h"
+
 #include "CShowStatistics.h"
 #include "CShowClusters.h"
 #include "CShowMetrics.h"
 #include "CShowScores.h"
-#include "CClusterEditorDialog.h"
+
 #include "CIDManagerTableModel.h"
+
+#include "CMainWindow.h"
 #include "ui_CMainWindow.h"
+
 #include "lib/CWorkspace.h"
 
 #include <QMessageBox>
@@ -166,6 +171,11 @@ QString CMainWindow::checkMetricsPluginsRequirements()
     }
 
     return QString();
+}
+
+bool CMainWindow::isTestSuiteAvailable()
+{
+    return m_workspace->isTestSuiteAvailable();
 }
 
 bool CMainWindow::isRequiredResultsForPlugin(QString plugin)
@@ -383,17 +393,17 @@ void CMainWindow::on_actionExit_triggered()
 void CMainWindow::on_actionDumpCoverage_triggered()
 {
     rapidjson::StringBuffer s;
-    for (int i = 0; i < ui->comboBoxMetricsMeasurement->model()->rowCount(); ++i) {
+    /*for (int i = 0; i < ui->comboBoxScoreMeasurement->model()->rowCount(); ++i) {
         s.Clear();
         String name = qobject_cast<QStandardItemModel*>(ui->comboBoxMetricsMeasurement->model())->item(i)->text().toStdString();
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
-        m_workspace->getMeasurement(METRICS, name)->Accept(writer);
+        m_workspace->getMeasurement(SCORE, name)->Accept(writer);
         std::cout << name << std::endl << s.GetString() << std::endl;
-    }
+    }*/
     s.Clear();
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer3(s);
-    m_workspace->getMeasurementResults(METRICS, getScoreMeasurement())->Accept(writer3);
-    std::cout << METRICS << std::endl << s.GetString() << std::endl;
+    m_workspace->getMeasurementResults(SCORE, getScoreMeasurement())->Accept(writer3);
+    std::cout << SCORE << std::endl << s.GetString() << std::endl;
 }
 
 void CMainWindow::on_actionNewWorkspace_triggered()
@@ -505,6 +515,7 @@ void CMainWindow::loadFinished(QString msg)
     m_statusProgressBar->setMaximum(1);
     m_statusLabel->clear();
     m_testSuiteAvailableLabel->setVisible(true);
+    m_workspace->setTestSuiteAvailable(true);
 
     QSortFilterProxyModel *filter = new QSortFilterProxyModel(this);
     filter->setSourceModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getCodeElements()));
@@ -630,6 +641,11 @@ void CMainWindow::calcMetricsFinished(QString msg)
     ui->statusBar->showMessage(msg, 5000);
     m_statusProgressBar->setMaximum(1);
     m_statusLabel->clear();
+}
+
+void CMainWindow::tmpStatusUpdate(QString msg)
+{
+    ui->statusBar->showMessage(msg, 5000);
 }
 
 void CMainWindow::statusUpdate(QString label)
@@ -1093,5 +1109,29 @@ void CMainWindow::actionCoveredTests_triggered()
     IndexType id = m_workspace->getTestSuite()->getCoverage()->getCodeElements().getID(ui->tableViewCE->selectionModel()->currentIndex().data().toString().toStdString());
     CCoveredListDialog dia(this, m_workspace->getTestSuite(), id, false);
     dia.setWindowTitle("List of test cases covered by " + ui->tableViewCE->selectionModel()->currentIndex().data().toString() + " code element");
+    dia.exec();
+}
+
+void CMainWindow::on_actionMetrics_results_triggered()
+{
+    QStringList measurements;
+    for (int i = 0; i < ui->comboBoxMetricsMeasurement->count(); ++i) {
+        measurements << ui->comboBoxMetricsMeasurement->itemText(i);
+    }
+
+    CResultsExportDialog dia(this, measurements, m_workspace, true);
+    dia.setWindowTitle("Export metrics results");
+    dia.exec();
+}
+
+void CMainWindow::on_actionFault_localization_results_triggered()
+{
+    QStringList measurements;
+    for (int i = 0; i < ui->comboBoxScoreMeasurement->count(); ++i) {
+        measurements << ui->comboBoxScoreMeasurement->itemText(i);
+    }
+
+    CResultsExportDialog dia(this, measurements, m_workspace, false);
+    dia.setWindowTitle("Export fault-localization results");
     dia.exec();
 }

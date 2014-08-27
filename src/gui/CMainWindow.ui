@@ -57,7 +57,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <property name="elideMode">
        <enum>Qt::ElideNone</enum>
@@ -232,7 +232,7 @@
           </widget>
           <widget class="QWidget" name="tests">
            <attribute name="title">
-            <string>Tests</string>
+            <string>Test cases</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_8">
             <item>
@@ -265,7 +265,7 @@
           </widget>
           <widget class="QWidget" name="codeElements">
            <attribute name="title">
-            <string>Code Elements</string>
+            <string>Code elements</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_9">
             <item>
@@ -667,6 +667,9 @@
               </item>
               <item row="0" column="2">
                <widget class="QToolButton" name="toolButtonMetricMeasAdd">
+                <property name="statusTip">
+                 <string>Create new measurement.</string>
+                </property>
                 <property name="text">
                  <string>+</string>
                 </property>
@@ -674,6 +677,9 @@
               </item>
               <item row="0" column="3">
                <widget class="QToolButton" name="toolButtonMetricMeasEd">
+                <property name="statusTip">
+                 <string>Edit current measurement.</string>
+                </property>
                 <property name="text">
                  <string>E</string>
                 </property>
@@ -681,6 +687,9 @@
               </item>
               <item row="0" column="4">
                <widget class="QToolButton" name="toolButtonMetricMeasRem">
+                <property name="statusTip">
+                 <string>Remove current measurement.</string>
+                </property>
                 <property name="text">
                  <string>-</string>
                 </property>
@@ -815,6 +824,9 @@
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
+                <property name="statusTip">
+                 <string>Calculates the selected metrics for the selected groups.</string>
+                </property>
                 <property name="text">
                  <string>Calculate</string>
                 </property>
@@ -922,6 +934,9 @@
               </item>
               <item row="0" column="2">
                <widget class="QToolButton" name="toolButtonScoreMeasAdd">
+                <property name="statusTip">
+                 <string>Create new measurement.</string>
+                </property>
                 <property name="text">
                  <string>+</string>
                 </property>
@@ -929,6 +944,9 @@
               </item>
               <item row="0" column="3">
                <widget class="QToolButton" name="toolButtonScoreMeasEd">
+                <property name="statusTip">
+                 <string>Edit current measurement name.</string>
+                </property>
                 <property name="text">
                  <string>E</string>
                 </property>
@@ -936,6 +954,9 @@
               </item>
               <item row="0" column="4">
                <widget class="QToolButton" name="toolButtonScoreMeasRem">
+                <property name="statusTip">
+                 <string>Remove current measurement.</string>
+                </property>
                 <property name="text">
                  <string>-</string>
                 </property>
@@ -1075,6 +1096,9 @@
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
+                <property name="statusTip">
+                 <string>Calculates fault-localization values for the selected groups.</string>
+                </property>
                 <property name="text">
                  <string>Calculate</string>
                 </property>
@@ -1178,8 +1202,16 @@
      <string>About</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuExport">
+    <property name="title">
+     <string>Export</string>
+    </property>
+    <addaction name="actionMetrics_results"/>
+    <addaction name="actionFault_localization_results"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTestSuite"/>
+   <addaction name="menuExport"/>
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -1221,6 +1253,16 @@
   <action name="actionSaveWorkspaceAs">
    <property name="text">
     <string>Save workspace as...</string>
+   </property>
+  </action>
+  <action name="actionMetrics_results">
+   <property name="text">
+    <string>Metrics results</string>
+   </property>
+  </action>
+  <action name="actionFault_localization_results">
+   <property name="text">
+    <string>Fault-localization results</string>
    </property>
   </action>
  </widget>
