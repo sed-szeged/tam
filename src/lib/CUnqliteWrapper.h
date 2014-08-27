@@ -22,6 +22,8 @@ extern "C" {
  "}"\
  "/* Record to store the string is replaced with the proper json structure */ "\
  "$zRec = %s;"\
+ "if ($coll == 'score')"\
+ "  $zRec = json_encode($zRec);"\
  "$rc = db_store($coll, $zRec);"\
  "$recordId = db_last_record_id($coll);"
 
