@@ -111,8 +111,13 @@ void CMainWindow::fillRevComboBoxes()
     for (int i = 0; i < revs.size(); ++i)
         revList << QString::number(revs[i]);
 
+    disconnect(ui->comboBoxRevMetrics, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_comboBoxRevMetrics_currentIndexChanged(QString)));
     ui->comboBoxRevMetrics->addItems(revList);
+    connect(ui->comboBoxRevMetrics, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_comboBoxRevMetrics_currentIndexChanged(QString)));
+
+    disconnect(ui->comboBoxRevScore, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_comboBoxRevScore_currentIndexChanged(QString)));
     ui->comboBoxRevScore->addItems(revList);
+    connect(ui->comboBoxRevScore, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_comboBoxRevScore_currentIndexChanged(QString)));
 }
 
 void CMainWindow::createNewWorkspace()
@@ -521,11 +526,16 @@ void CMainWindow::loadFinished(QString msg)
     filter->setSourceModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getCodeElements()));
     filter->setFilterKeyColumn(1);
     ui->tableViewCE->setModel(filter);
+
     filter = new QSortFilterProxyModel(this);
     filter->setSourceModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getTestcases()));
     filter->setFilterKeyColumn(1);
     ui->tableViewTests->setModel(filter);
+
     fillRevComboBoxes();
+    updateMetricsConfiguration();
+    updateScoreConfiguration();
+
     calculateStatistics();
 }
 
