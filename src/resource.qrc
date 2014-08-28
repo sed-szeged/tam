@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/Chart.js/Chart.min.js</file>
+        <file>resources/DataTables/js/jquery.js</file>
+        <file>resources/DataTables/js/jquery.dataTables.min.js</file>
+        <file>resources/DataTables/css/jquery.dataTables.min.css</file>
+        <file>resources/DataTables/images/sort_desc_disabled.png</file>
+        <file>resources/DataTables/images/sort_desc.png</file>
+        <file>resources/DataTables/images/sort_both.png</file>
+        <file>resources/DataTables/images/sort_asc_disabled.png</file>
+        <file>resources/DataTables/images/sort_asc.png</file>
+        <file>resources/DataTables/images/forward_enabled_hover.png</file>
+        <file>resources/DataTables/images/forward_enabled.png</file>
+        <file>resources/DataTables/images/forward_disabled.png</file>
+        <file>resources/DataTables/images/back_enabled_hover.png</file>
+        <file>resources/DataTables/images/back_enabled.png</file>
+        <file>resources/DataTables/images/back_disabled.png</file>
+    </qresource>
+</RCC>

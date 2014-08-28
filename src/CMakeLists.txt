@@ -79,9 +79,10 @@ file(GLOB tam_SOURCES ${tam_SOURCE_DIR}/gui/*.cpp)
 file(GLOB tam_FORMS ${tam_SOURCE_DIR}/gui/*.ui)
 
 QT5_WRAP_UI(tam_FORMS_HEADERS ${tam_FORMS})
+QT5_ADD_RESOURCES(tam_RESOURCES ${tam_SOURCE_DIR}/resource.qrc)
 
 aux_source_directory(${tam_SOURCE_DIR}/lib tam_lib)
 
-add_executable(test-suite-analysis-and-manipulation ${tam_SOURCES} ${tam_FORMS_HEADERS} ${tam_lib})
+add_executable(test-suite-analysis-and-manipulation ${tam_SOURCES} ${tam_FORMS_HEADERS} ${tam_RESOURCES} ${tam_lib})
 target_link_libraries(test-suite-analysis-and-manipulation ${binary_dir}/lib/SoDA/${CMAKE_FIND_LIBRARY_PREFIXES}SoDA.so ${binary_dir}/lib/SoDAEngine/${CMAKE_FIND_LIBRARY_PREFIXES}SoDAEngine.so ${Boost_LIBRARIES} ${CMAKE_BINARY_DIR}/ThirdParty/src/Unqlite-build/${CMAKE_FIND_LIBRARY_PREFIXES}Unqlite.so)
 qt5_use_modules(test-suite-analysis-and-manipulation WebKitWidgets Widgets)
