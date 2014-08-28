@@ -395,22 +395,6 @@ void CMainWindow::on_actionExit_triggered()
     qApp->exit();
 }
 
-void CMainWindow::on_actionDumpCoverage_triggered()
-{
-    rapidjson::StringBuffer s;
-    /*for (int i = 0; i < ui->comboBoxScoreMeasurement->model()->rowCount(); ++i) {
-        s.Clear();
-        String name = qobject_cast<QStandardItemModel*>(ui->comboBoxMetricsMeasurement->model())->item(i)->text().toStdString();
-        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
-        m_workspace->getMeasurement(SCORE, name)->Accept(writer);
-        std::cout << name << std::endl << s.GetString() << std::endl;
-    }*/
-    s.Clear();
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer3(s);
-    m_workspace->getMeasurementResults(SCORE, getScoreMeasurement())->Accept(writer3);
-    std::cout << SCORE << std::endl << s.GetString() << std::endl;
-}
-
 void CMainWindow::on_actionNewWorkspace_triggered()
 {
     /*if (!m_workspace->isSaved())

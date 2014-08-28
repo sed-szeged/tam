@@ -56,7 +56,6 @@ private slots:
 
     void on_actionExit_triggered();
     void on_actionNewWorkspace_triggered();
-    void on_actionDumpCoverage_triggered();
     void on_actionLoadWorkspace_triggered();
     void on_actionSaveWorkspace_triggered();
     void on_actionSaveWorkspaceAs_triggered();
