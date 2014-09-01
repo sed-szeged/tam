@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>resources/Chart.js/Chart.min.js</file>
         <file>resources/DataTables/js/jquery.js</file>
         <file>resources/DataTables/js/jquery.dataTables.min.js</file>
         <file>resources/DataTables/css/jquery.dataTables.min.css</file>
@@ -15,5 +14,6 @@
         <file>resources/DataTables/images/back_enabled_hover.png</file>
         <file>resources/DataTables/images/back_enabled.png</file>
         <file>resources/DataTables/images/back_disabled.png</file>
+        <file>resources/CanvasJS/canvasjs.min.js</file>
     </qresource>
 </RCC>
