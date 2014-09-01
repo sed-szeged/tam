@@ -1,4 +1,5 @@
 #include "CShowScores.h"
+#include <iostream>
 
 CShowScores::CShowScores()
 {
@@ -14,34 +15,34 @@ void CShowScores::generateResults(QWebView *view, rapidjson::Document *scores, C
             "<html xmlns=\"http://www.w3.org/1999/xhtml\">"
               "<head>"
                 "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>"
-                "<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>"
-                "<script type=\"text/javascript\">google.load('visualization', '1', {packages:['table']});</script>"
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\"qrc:/resources/DataTables/css/jquery.dataTables.min.css\">"
+                "<script type=\"text/javascript\" charset=\"utf8\" src=\"qrc:/resources/DataTables/js/jquery.js\"></script>"
+                "<script type=\"text/javascript\" charset=\"utf8\" src=\"qrc:/resources/DataTables/js/jquery.dataTables.min.js\"></script>"
                 "<script type=\"text/javascript\">"
-                      "google.setOnLoadCallback(drawTable);"
-                      "function drawTable() {"
+                      "function init() {"
+                        "$('a').on('click', function(){"
+                          "$(this).next().toggle();"
+                        "});"
                         "var data;"
-                        "var table;"
                         "%1"
                       "}"
-                "</script></head><body>"
-                "<h3 style=\"text-align:center;\">Lists of possible failed code elements</h3>"
+                "</script></head><body onload=\"init()\">"
+                "<h2 style=\"text-align:center;\">Lists of possible failed code elements</h2>"
                 "%2"
                 "</body></html>";
 
-    QString table = "data=new google.visualization.DataTable();"
-            "data.addColumn('string','Code Element');"
-            "%1"
-            "data.addRows(["
-              "%2"
-            "]);"
-            "table=new google.visualization.Table(document.getElementById('%3'));"
-            "table.draw(data,{page:'enable',pageSize:20,sortAscending:false,sortColumn:1});";
+    QString tableData = "tableData = [%1];"
+            "$('#%2').DataTable({ data: tableData, order: [ 1, 'desc' ], pageLength: 20 });";
+    QString tableDef = "<table id=\"%1\" class=\"display\">"
+            "<thead><tr><th>Code element</th>"
+            "%2</tr></thead>"
+            "<tbody></tbody></table>";
 
     QString callback;
     QString body;
     for (rapidjson::Value::ConstMemberIterator clusterIt = scores->MemberBegin(); clusterIt != scores->MemberEnd(); ++clusterIt) {
         QString cluster = clusterIt->name.GetString();
-        body.append("<h4 style=\"text-align:center;\">" + cluster + "</h4>");
+        body.append("<h3 style=\"text-align:center;\">" + cluster + "</h3>");
 
         std::map<IndexType, std::map<String, double> > flScore;
         for (rapidjson::Value::ConstMemberIterator flIt = clusterIt->value.MemberBegin(); flIt != clusterIt->value.MemberEnd(); ++flIt) {
@@ -53,8 +54,8 @@ void CShowScores::generateResults(QWebView *view, rapidjson::Document *scores, C
                 continue;
             }
 
-            body.append("<h5>" + flName + "</h5>");
-            body.append("<div id=\"" + cluster + "_" + flIt->name.GetString() + "\"></div>");
+            body.append("<a href=\"#\"><h4>" + flName + "</h4></a>");
+            body.append(tableDef.arg(cluster + "_" + flIt->name.GetString(), "<th>suspiciousness value</th>"));
             QString data;
             for (rapidjson::Value::ConstMemberIterator scoreIt = flIt->value.MemberBegin(); scoreIt != flIt->value.MemberEnd(); ++scoreIt) {
                 if (scoreIt->value.GetDouble() == 0)
@@ -70,7 +71,7 @@ void CShowScores::generateResults(QWebView *view, rapidjson::Document *scores, C
                             QString::number(scoreIt->value.GetDouble()) + "],");
             }
             data.chop(1);
-            callback.append(table.arg("data.addColumn('number','suspiciousness value');", data, cluster + "_" + flIt->name.GetString()));
+            callback.append(tableData.arg(data, cluster + "_" + flIt->name.GetString()));
         }
 
         if (flScore.empty())
@@ -89,7 +90,7 @@ void CShowScores::generateResults(QWebView *view, rapidjson::Document *scores, C
             data.append("['" + codeElementName + "',");
             for (std::map<String, double>::iterator scoreIt = ceIt->second.begin(); scoreIt != ceIt->second.end(); ++scoreIt) {
                 if (first)
-                    column.append("data.addColumn('number','" + QString(scoreIt->first.c_str()) + "');");
+                    column.append("<th>" + QString(scoreIt->first.c_str()) + "</th>");
                 data.append(QString::number(scoreIt->second) + ",");
             }
             data.chop(1);
@@ -97,9 +98,9 @@ void CShowScores::generateResults(QWebView *view, rapidjson::Document *scores, C
             data.append("],");
         }
         data.chop(1);
-        body.append("<h5>Fault localization score</h5>");
-        body.append("<div id=\"" + cluster + "_fl\"></div>");
-        callback.append(table.arg(column, data, cluster + "_fl"));
+        body.append("<h4>Fault localization score</h4>");
+        body.append(tableDef.arg(cluster + "_fl", column));
+        callback.append(tableData.arg(data, cluster + "_fl"));
     }
 
     html = html.arg(callback, body);
