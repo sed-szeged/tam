@@ -11,12 +11,12 @@ struct ChartData
 };
 
 static const ChartData chartData[6] = {
-    { "Code element coverage histogram", "'Number of affected test cases by a code element', 'Occurences'", COV_STATS, "code_coverage_histogram" },
-    { "Test case coverage histogram", "'Number of covered code elements in a test case', 'Occurences'", COV_STATS, "test_coverage_histogram" },
-    { "Results fail histogram", "'Number of failed test cases in a revision', 'Occurences'", RES_STATS, "fail_histogram" },
-    { "Revision fail histogram", "'Revision number', 'Number of failed test cases'", RES_STATS, "revision_fail_histogram"},
-    { "Executed histogram", "'Number of executed test cases', 'Occurences'", RES_STATS, "executed_histogram" },
-    { "Test case info", "'Test case id', 'Executed', 'Fail'", RES_STATS, "test_case_info" }
+    { "Code element coverage histogram", "<th>Number of affected test cases by a code element</th><th>Occurences</th>", COV_STATS, "code_coverage_histogram" },
+    { "Test case coverage histogram", "<th>Number of covered code elements in a test case</th><th>Occurences</th>", COV_STATS, "test_coverage_histogram" },
+    { "Results fail histogram", "<th>Number of failed test cases in a revision</th><th>Occurences</th>", RES_STATS, "fail_histogram" },
+    { "Revision fail histogram", "<th>Revision number</th><th>Number of failed test cases</th>", RES_STATS, "revision_fail_histogram"},
+    { "Executed histogram", "<th>Number of executed test cases</th><th>Occurences</th>", RES_STATS, "executed_histogram" },
+    { "Test case info", "<th>Test case id</th><th>Executed</th><th>Fail</th>", RES_STATS, "test_case_info" }
 };
 
 CShowStatistics::CShowStatistics(CWorkspace *workspace) :
@@ -43,26 +43,32 @@ void CShowStatistics::fillGeneralTab(QWebView *view)
             "Average test cases per code elements: %4</br>"
             "Average code elements per test cases: %5</br>"
             "</div>"
+            "%6"
+            "</body></html>";
 
-            "<div><h3>Results statistics</h3>"
-            "Number of revisions: %6</br>"
-            "Number of test cases: %7</br>"
-            "Number of total failed test cases: %8</br>"
-            "Average failed test cases per revision: %9</br>"
-              "</div></body></html>";
+    QString resultsHtml = "<div><h3>Results statistics</h3>"
+            "Number of revisions: %1</br>"
+            "Number of test cases: %2</br>"
+            "Number of total failed test cases: %3</br>"
+            "Average failed test cases per revision: %4</br></div>";
 
     rapidjson::Document *covData = m_workspace->getData(COV_STATS);
     rapidjson::Document *resData = m_workspace->getData(RES_STATS);
+
+    if (m_workspace->getFileMask() & FILE_RESULTS) {
+        resultsHtml = resultsHtml.arg(QString::number((*resData)["number_of_revisions"].GetInt()),
+                QString::number((*resData)["number_of_test_cases"].GetInt()),
+                QString::number((*resData)["number_of_total_fails"].GetInt()),
+                QString::number((*resData)["average_failed_test_cases_per_revision"].GetDouble()));
+    } else
+        resultsHtml = "";
 
     html = html.arg(QString::number((*covData)["number_of_code_elements"].GetInt()),
             QString::number((*covData)["number_of_test_cases"].GetInt()),
             QString::number((*covData)["density"].GetDouble()),
             QString::number((*covData)["average_test_cases_per_code_elements"].GetDouble()),
             QString::number((*covData)["average_code_elements_per_test_cases"].GetDouble()),
-            QString::number((*resData)["number_of_revisions"].GetInt()),
-            QString::number((*resData)["number_of_test_cases"].GetInt()),
-            QString::number((*resData)["number_of_total_fails"].GetInt()),
-            QString::number((*resData)["average_failed_test_cases_per_revision"].GetDouble()));
+            resultsHtml);
 
     view->settings()->clearMemoryCaches();
     view->setHtml(html);
@@ -75,21 +81,20 @@ void CShowStatistics::generateChartForTab(QWebView *view, int tabindex)
           "<head>"
             "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>"
             "<title>Table</title>"
-            "<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>"
-            "<script type=\"text/javascript\">google.load('visualization', '1.1', {packages: ['table']});</script>"
-            "<script type=\"text/javascript\">"
-              "google.setOnLoadCallback(drawChart);"
-              "function drawChart() {"
-                "var data = google.visualization.arrayToDataTable(["
-                      "[%1],"
-                "%2]);"
-                "var table = new google.visualization.Table(document.getElementById('table'));"
-                "table.draw(data, {page:'enable',pageSize:60,sortAscending:false,sortColumn:1});"
+            "<link rel=\"stylesheet\" type=\"text/css\" href=\"qrc:/resources/DataTables/css/jquery.dataTables.min.css\">"
+            "<script type=\"text/javascript\" charset=\"utf8\" src=\"qrc:/resources/DataTables/js/jquery.js\"></script>"
+            "<script type=\"text/javascript\" charset=\"utf8\" src=\"qrc:/resources/DataTables/js/jquery.dataTables.min.js\"></script>"
+            "<script>"
+              "function init(){"
+                "var tableData = [%1];"
+                "$('#group_table').DataTable({ data: tableData, order: [ 1, 'desc' ] });"
               "}"
-            "</script></head><body>"
-            "<h3 style=\"text-align:center;\">%3</h3>"
-            "<div id=\"table\">"
-              "</div></body></html>";
+            "</script></head><body onLoad=\"init()\">"
+            "<h3 style=\"text-align:center;\">%2</h3>"
+            "<table id=\"group_table\" class=\"display\">"
+            "<thead><tr>%3</tr></thead>"
+            "<tbody></tbody></table>"
+            "</div></body></html>";
 
     rapidjson::Document *data = m_workspace->getData(chartData[tabindex].dataSource.toStdString());
     QString dataStr;
@@ -102,7 +107,7 @@ void CShowStatistics::generateChartForTab(QWebView *view, int tabindex)
     } else
         convertJsonToStringArray(data, chartData[tabindex].dataColumn, dataStr);
 
-    html = html.arg(chartData[tabindex].columnNames, dataStr, chartData[tabindex].title);
+    html = html.arg(dataStr, chartData[tabindex].title, chartData[tabindex].columnNames);
 
     view->settings()->clearMemoryCaches();
     view->setHtml(html);
