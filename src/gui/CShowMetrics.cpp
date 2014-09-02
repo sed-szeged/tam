@@ -1,6 +1,9 @@
 #include <iostream>
 #include "CShowMetrics.h"
 
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/prettywriter.h"
+
 CShowMetrics::CShowMetrics(rapidjson::Document& metrics, ClusterMap& clusters) :
     m_metrics(metrics), m_clusters(clusters)
 {
@@ -16,58 +19,45 @@ void CShowMetrics::generateResults(QWebView *webView)
             "<html xmlns=\"http://www.w3.org/1999/xhtml\">"
               "<head>"
                 "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>"
-                "<style type='text/css'>"
-                    ".left-border { border: 10px solid black; }"
-                    ".right-border { border-right: 2px solid black; }"
-                "</style>"
-                "<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>"
-                "<script type=\"text/javascript\">google.load('visualization', '1.1', {packages: ['corechart']});</script>"
-                "<script type=\"text/javascript\">google.load('visualization', '1', {packages: ['table']});</script>"
+                "<link rel=\"stylesheet\" type=\"text/css\" href=\"qrc:/resources/DataTables/css/jquery.dataTables.min.css\">"
+                "<script type=\"text/javascript\" charset=\"utf8\" src=\"qrc:/resources/DataTables/js/jquery.js\"></script>"
+                "<script type=\"text/javascript\" charset=\"utf8\" src=\"qrc:/resources/DataTables/js/jquery.dataTables.min.js\"></script>"
                 "<script type=\"text/javascript\">"
-                      "google.setOnLoadCallback(drawTable);"
-                      "function drawTable() {"
-                        "var data = new google.visualization.DataTable();"
-                        "data.addColumn('string', '');"
-                        "%1"
-                        "data.addRows(["
-                          "%2"
-                        "]);"
-
-                        "var table = new google.visualization.Table(document.getElementById('summary_table'));"
-                        "var formatter = new google.visualization.NumberFormat({decimalSymbol: '.',fractionDigits: 2});"
-                        "for(i=1; i < data.getNumberOfColumns();++i)"
-                        "  formatter.format(data, i);"
-
-                        "table.draw(data, {allowHtml: true});"
+                      "function init() {"
+                        "var tableData = [%1];"
+                        "$('#summary_table').DataTable({ data: tableData, paging: false, searching: false });"
                       "}"
-                "</script></head><body>"
+                "</script></head><body onload=\"init()\">"
                 "<h3 style=\"text-align:center;\">Summary of base and derived metrics</h3>"
-                "<div id=\"summary_table\"></div>"
+                "<table id=\"summary_table\" class=\"display\">"
+                "<thead><tr><th>Group</th>"
+                "%2</tr></thead>"
+                "<tbody></tbody></table>"
                   "</body></html>";
 
-    QString metrics;
-    QString table;
+    QString tableHeader;
+    QString tableData;
     bool first = true;
     for (rapidjson::Value::MemberIterator itr = m_metrics.MemberBegin(); itr != m_metrics.MemberEnd(); ++itr) {
         QStringList parts = QString(itr->name.GetString()).split(" - ");
-        if (parts.size() == 2 && parts[0] != parts[1])
+        if ((parts.size() == 2 && parts[0] != parts[1]) || !itr->value.IsObject())
             continue;
 
         rapidjson::Value& val = itr->value;
-        table.append("['" + QString(parts[0]) + "',");
+        tableData.append("['" + QString(parts[0]) + "',");
         for (rapidjson::Value::MemberIterator metrIt = val.MemberBegin(); metrIt != val.MemberEnd(); ++metrIt) {
             if (first)
-                metrics.append("data.addColumn('number', '" + QString(metrIt->name.GetString()) + "');");
+                tableHeader.append("<th>" + QString(metrIt->name.GetString()) + "</th>");
 
-            table.append(QString::number(metrIt->value.GetDouble()) + ",");
+            tableData.append(QString::number(metrIt->value.GetDouble(), 'g', 2) + ",");
         }
-        table.chop(1);
-        table.append("],");
+        tableData.chop(1);
+        tableData.append("],");
         first = false;
     }
 
-    table.chop(1);
-    html = html.arg(metrics, table);
+    tableData.chop(1);
+    html = html.arg(tableData, tableHeader);
 
     webView->settings()->clearMemoryCaches();
     webView->setHtml(html);
@@ -79,112 +69,128 @@ void CShowMetrics::generateCharts(QWebView *webView)
         "<html xmlns=\"http://www.w3.org/1999/xhtml\">"
           "<head>"
             "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\"/>"
-            "<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>"
-            "<script type=\"text/javascript\">google.load('visualization', '1.1', {packages: ['controls']});</script>"
+            "<script type=\"text/javascript\" src=\"qrc:/resources/CanvasJS/canvasjs.min.js\"></script>"
             "<script type=\"text/javascript\">"
-                  "google.setOnLoadCallback(drawCovChart);"
-                  "google.setOnLoadCallback(drawSpecChart);"
-                  "google.setOnLoadCallback(drawUniqChart);"
+                  "function init() {"
+                    "drawCovChart();"
+                    "drawSpecChart();"
+                    "drawUniqChart();"
+                  "}"
                   "function drawCovChart() {"
-                    "var data = new google.visualization.DataTable();"
-                    "data.addColumn('string', 'Group');"
-                    "data.addColumn('number', 'cov');"
-                    "data.addColumn('number', 'tpce');"
-                    "data.addColumn('number', 'effcov');"
-                    "data.addColumn('number', 'effpart');"
-                    "data.addRows(["
-                      "%1"
-                    "]);"
-
-                    "var wrapper = new google.visualization.ChartWrapper({"
-                      "'chartType': 'ColumnChart',"
-                      "'containerId': 'covval_chart',"
-                      "'dataTable': data,"
-                      "'options': {"
-                        "title: 'Coverage values and test efficiency',"
-                        "legend: {position: 'bottom'},"
-                      "}"
+                    "var chart = new CanvasJS.Chart(\"covval_chart\",{"
+                      "title:{"
+                        "text: 'Coverage values and test efficiency',"
+                        "fontSize: 16"
+                      "},"
+                      "legend: {"
+                        "cursor: \"pointer\","
+                        "itemclick: function (e) {"
+                          "if (typeof (e.dataSeries.visible) === \"undefined\" || e.dataSeries.visible) {"
+                            "e.dataSeries.visible = false;"
+                          "} else {"
+                            "e.dataSeries.visible = true;"
+                          "}"
+                          "chart.render();"
+                        "}"
+                      "},"
+                      "axisX: {"
+                        "labelAngle: -60"
+                      "},"
+                      "data: [%1]"
                     "});"
-                    // Draw chart
-                    "wrapper.draw();"
+                    "chart.render();"
                   "}"
                   "function drawSpecChart() {"
-                      "var data = new google.visualization.DataTable();"
-                      "data.addColumn('string', 'Group');"
-                      "data.addColumn('number', 'Special tests');"
-                      "data.addColumn('number', 'Not special tests');"
-                      "data.addRows(["
-                        "%2"
-                      "]);"
-
-                      "var wrapper = new google.visualization.ChartWrapper({"
-                        "'chartType': 'ColumnChart',"
-                        "'containerId': 'spec_chart',"
-                        "'dataTable': data,"
-                        "'options': {"
-                          "title: 'Special and not special part of all tests in each group',"
-                          "legend: {position: 'bottom'},"
-                          "isStacked: true,"
-                        "}"
-                      "});"
-                      // Draw chart
-                      "wrapper.draw();"
+                    "var chart = new CanvasJS.Chart(\"spec_chart\",{"
+                      "title:{"
+                        "text: 'Special and not special part of all tests in each group',"
+                        "fontSize: 16"
+                      "},"
+                      "axisX: {"
+                        "labelAngle: -60"
+                      "},"
+                      "data: [%2]"
+                    "});"
+                    "chart.render();"
                   "}"
                   "function drawUniqChart() {"
-                    "var data = new google.visualization.DataTable();"
-                    "data.addColumn('string', 'Group');"
-                    "data.addColumn('number', 'Unique COV');"
-                    "data.addColumn('number', 'Common COV');"
-                    "data.addRows(["
-                      "%3"
-                    "]);"
-
-                    "var wrapper = new google.visualization.ChartWrapper({"
-                      "'chartType': 'ColumnChart',"
-                      "'containerId': 'uniq_chart',"
-                      "'dataTable': data,"
-                      "'options': {"
-                        "title: 'COV metric uniqueness distribution',"
-                        "legend: {position: 'bottom'},"
-                        "isStacked: true,"
-                      "}"
+                    "var chart = new CanvasJS.Chart(\"uniq_chart\",{"
+                      "title:{"
+                        "text: 'COV metric uniqueness distribution',"
+                        "fontSize: 16"
+                      "},"
+                      "axisX: {"
+                        "labelAngle: -60"
+                      "},"
+                      "data: [%3]"
                     "});"
-                    // Draw chart
-                    "wrapper.draw();"
+                    "chart.render();"
                   "}"
-            "</script></head><body>"
-            "<div id=\"covval_chart\" style=\"height:400px;\"></div>"
-            "<div id=\"spec_chart\" style=\"height:400px;\"></div>"
+            "</script></head><body onload=\"init()\">"
+            "<div id=\"covval_chart\" style=\"height:400px\"></div>"
+            "<div id=\"spec_chart\" style=\"height:400px\"></div>"
             "<div id=\"uniq_chart\" style=\"height:400px;\"></div>"
               "</body></html>";
 
-    QString covVal;
-    QString special;
-    QString uniq;
-    for (rapidjson::Value::MemberIterator itr = m_metrics.MemberBegin(); itr != m_metrics.MemberEnd(); ++itr) {
-        QStringList parts = QString(itr->name.GetString()).split(" - ");
-        if (parts.size() == 2 && parts[0] != parts[1])
+    QString dataSet = "{"
+            "type: \"%1\","
+            "showInLegend: true,"
+            "legendText: '%2',"
+            "dataPoints: [%3]"
+          "},";
+
+    QMap<QString, QString> chartData;
+    QMap<QString, QString> specialData;
+    QMap<QString, QString> uniqData;
+    for (rapidjson::Value::MemberIterator groupIt = m_metrics.MemberBegin(); groupIt != m_metrics.MemberEnd(); ++groupIt) {
+        QStringList parts = QString(groupIt->name.GetString()).split(" - ");
+        if ((parts.size() == 2 && parts[0] != parts[1]) || !groupIt->value.IsObject())
             continue;
 
-        rapidjson::Value& val = itr->value;
-        covVal.append("['" + QString(parts[0]) + "'," + QString::number(val["fault-detection"].GetDouble()) + "," + QString::number(val["tpce"].GetDouble()) + "," + QString::number(val["coverage-efficiency"].GetDouble()) + "," + QString::number(val["partition-efficiency"].GetDouble()) + "],");
+        rapidjson::Value& val = groupIt->value;
+        if (val.HasMember("fault-detection"))
+            chartData["fault-detection"].append("{ label: '" + parts[0] + "',y:" + QString::number(val["fault-detection"].GetDouble()) + "},");
+        if (val.HasMember("tpce"))
+            chartData["tpce"].append("{ label: '" + parts[0] + "',y:" + QString::number(val["tpce"].GetDouble()) + "},");
+        if (val.HasMember("coverage-efficiency"))
+            chartData["coverage-efficiency"].append("{ label: '" + parts[0] + "',y:" + QString::number(val["coverage-efficiency"].GetDouble()) + "},");
+        if (val.HasMember("partition-efficiency"))
+            chartData["partition-efficiency"].append("{ label: '" + parts[0] + "',y:" + QString::number(val["partition-efficiency"].GetDouble()) + "},");
 
-        IndexType nrOfTests = m_clusters.at(itr->name.GetString()).getTestCases().size();
-        IndexType specTests = nrOfTests * val["specialization"].GetDouble();
-        if (specTests != nrOfTests)
-            special.append("['" + QString(parts[0]) + "'," + QString::number(specTests) + "," + QString::number(nrOfTests - specTests) + "],");
+        if (val.HasMember("specialization")) {
+            IndexType nrOfTests = m_clusters.at(groupIt->name.GetString()).getTestCases().size();
+            IndexType specTests = nrOfTests * val["specialization"].GetDouble();
+            specialData["Special tests"].append("{label: '" + QString(parts[0]) + "',y:" + QString::number(specTests) + "},");
+            specialData["Not special tests"].append("{label: '" + QString(parts[0]) + "',y:" + QString::number(nrOfTests - specTests) + "},");
+        }
 
-        double uniqCov = val["fault-detection"].GetDouble() * val["uniqueness"].GetDouble();
-        if (uniqCov != val["fault-detection"].GetDouble())
-            uniq.append("['" + QString(parts[0]) + "'," + QString::number(uniqCov) + "," + QString::number((val["fault-detection"].GetDouble() - uniqCov)) + "],");
+        if (val.HasMember("fault-detection") && val.HasMember("uniqueness")) {
+            double uniqCov = val["fault-detection"].GetDouble() * val["uniqueness"].GetDouble();
+            uniqData["Unique COV"].append("{label:'" + QString(parts[0]) + "',y:" + QString::number(uniqCov) + "},");
+            uniqData["Common COV"].append("{label:'" + QString(parts[0]) + "',y:" + QString::number((val["fault-detection"].GetDouble() - uniqCov)) + "},");
+        }
     }
 
-    covVal.chop(1);
+    QString covVal;
+    for (QMap<QString, QString>::iterator it = chartData.begin(); it != chartData.end(); ++it) {
+        it.value().chop(1);
+        covVal.append(dataSet.arg("column", it.key(), it.value()));
+    }
+    QString special;
+    for (QMap<QString, QString>::iterator it = specialData.begin(); it != specialData.end(); ++it) {
+        it.value().chop(1);
+        special.append(dataSet.arg("stackedColumn", it.key(), it.value()));
+    }
+    QString uniq;
+    for (QMap<QString, QString>::iterator it = uniqData.begin(); it != uniqData.end(); ++it) {
+        it.value().chop(1);
+        uniq.append(dataSet.arg("stackedColumn", it.key(), it.value()));
+    }
+
     special.chop(1);
     uniq.chop(1);
-
+    covVal.chop(1);
     html = html.arg(covVal, special, uniq);
-
     webView->settings()->clearMemoryCaches();
     webView->setHtml(html);
 }
