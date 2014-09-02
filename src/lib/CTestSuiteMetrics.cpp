@@ -22,6 +22,7 @@ void CTestSuiteMetrics::calculateMetrics(StringVector metrics, StringVector sele
         m_clusters[*it] = mainWindow->getClusterList()->getClusters()[*it];
     }
 
+    m_results->RemoveAllMembers();
     if (!isRunning())
         start();
 }
