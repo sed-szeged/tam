@@ -16,7 +16,7 @@ public:
     void fillGeneralTab(QWebView *view);
 
 private:
-    void convertJsonToStringArray(rapidjson::Document *data, QString element, QString &str);
+    void convertJsonToStringArray(rapidjson::Document *data, QString element, QString &str, bool chart = false);
 
     CWorkspace *m_workspace;
 };

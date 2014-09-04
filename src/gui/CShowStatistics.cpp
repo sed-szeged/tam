@@ -84,43 +84,59 @@ void CShowStatistics::generateChartForTab(QWebView *view, int tabindex)
             "<link rel=\"stylesheet\" type=\"text/css\" href=\"qrc:/resources/DataTables/css/jquery.dataTables.min.css\">"
             "<script type=\"text/javascript\" charset=\"utf8\" src=\"qrc:/resources/DataTables/js/jquery.js\"></script>"
             "<script type=\"text/javascript\" charset=\"utf8\" src=\"qrc:/resources/DataTables/js/jquery.dataTables.min.js\"></script>"
+            "<script type=\"text/javascript\" src=\"qrc:/resources/CanvasJS/canvasjs.min.js\"></script>"
             "<script>"
               "function init(){"
                 "var tableData = [%1];"
                 "$('#group_table').DataTable({ data: tableData, order: [ 1, 'desc' ] });"
+                "var chart = new CanvasJS.Chart(\"chart\",{"
+                  "zoomEnabled: true,"
+                  "title:{"
+                    "text: '%2',"
+                    "fontSize: 16"
+                  "},"
+                  "data: [{type: \"column\",dataPoints: [%3]}]"
+                "});"
+                "chart.render();"
               "}"
             "</script></head><body onLoad=\"init()\">"
-            "<h3 style=\"text-align:center;\">%2</h3>"
+            "<h3 style=\"text-align:center;\">%4</h3>"
             "<table id=\"group_table\" class=\"display\">"
-            "<thead><tr>%3</tr></thead>"
+            "<thead><tr>%5</tr></thead>"
             "<tbody></tbody></table>"
-            "</div></body></html>";
+            "<div id=\"chart\" style=\"height:500px;\"></div>"
+            "</body></html>";
 
     rapidjson::Document *data = m_workspace->getData(chartData[tabindex].dataSource.toStdString());
     QString dataStr;
+    QString dataChart;
     if (chartData[tabindex].dataColumn == "test_case_info") {
         const rapidjson::Value& val = (*data)["test_case_info"];
         for (rapidjson::Value::ConstMemberIterator itr = val.MemberBegin(); itr != val.MemberEnd(); ++itr) {
             dataStr.append("[" + QString(itr->name.GetString()) + "," + QString::number(itr->value["executed"].GetInt()) + "," +  QString::number(itr->value["fail"].GetInt()) + "],");
         }
         dataStr.chop(1);
-    } else
+    } else {
         convertJsonToStringArray(data, chartData[tabindex].dataColumn, dataStr);
+        convertJsonToStringArray(data, chartData[tabindex].dataColumn, dataChart, true);
+    }
 
-    html = html.arg(dataStr, chartData[tabindex].title, chartData[tabindex].columnNames);
-
+    html = html.arg(dataStr, chartData[tabindex].title, dataChart, chartData[tabindex].title, chartData[tabindex].columnNames);
     view->settings()->clearMemoryCaches();
     view->setHtml(html);
 }
 
-void CShowStatistics::convertJsonToStringArray(rapidjson::Document *data, QString element, QString &str)
+void CShowStatistics::convertJsonToStringArray(rapidjson::Document *data, QString element, QString &str, bool chart)
 {
     const rapidjson::Value& val = (*data)[element.toStdString().c_str()];
     for (rapidjson::Value::ConstMemberIterator itr = val.MemberBegin(); itr != val.MemberEnd(); ++itr) {
         if (QString(itr->name.GetString()).compare("0") == 0)
             continue;
 
-        str.append("[" + QString(itr->name.GetString()) + "," + QString::number(itr->value.GetInt()) + "],");
+        if (chart)
+            str.append("{label:'" + QString(itr->name.GetString()) + "',y:" + QString::number(itr->value.GetInt()) + "},");
+        else
+            str.append("[" + QString(itr->name.GetString()) + "," + QString::number(itr->value.GetInt()) + "],");
     }
     str.chop(1);
 }

@@ -1,4 +1,3 @@
-#include <iostream>
 #include "CShowMetrics.h"
 
 #include "rapidjson/stringbuffer.h"
