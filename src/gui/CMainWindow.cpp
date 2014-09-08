@@ -92,7 +92,7 @@ void CMainWindow::fillWidgets()
         QStandardItem *item = new QStandardItem(tr(scorePlugins[i].c_str()));
         item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
         item->setData(Qt::Unchecked, Qt::CheckStateRole);
-        String desc = m_kernel->getFaultLocalizationTechniquePluginManager().getPlugin(metricPlugins[i])->getDescription();
+        String desc = m_kernel->getFaultLocalizationTechniquePluginManager().getPlugin(scorePlugins[i])->getDescription();
         item->setToolTip(tr(desc.c_str()));
         m_scorePluginModel->appendRow(item);
     }
