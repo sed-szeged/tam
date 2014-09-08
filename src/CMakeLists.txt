@@ -68,6 +68,7 @@ ExternalProject_Add(
 ExternalProject_Get_Property(SoDA source_dir)
 ExternalProject_Get_Property(SoDA binary_dir)
 
+add_definitions("-std=c++0x")
 include_directories(${source_dir}/lib/SoDA/inc)
 include_directories(${source_dir}/lib/SoDAEngine/inc)
 

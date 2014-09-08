@@ -5,18 +5,18 @@
 struct ChartData
 {
     QString title;
-    QString columnNames;
+    QStringList columnNames;
     QString dataSource;
     QString dataColumn;
 };
 
 static const ChartData chartData[6] = {
-    { "Code element coverage histogram", "<th>Number of affected test cases by a code element</th><th>Occurences</th>", COV_STATS, "code_coverage_histogram" },
-    { "Test case coverage histogram", "<th>Number of covered code elements in a test case</th><th>Occurences</th>", COV_STATS, "test_coverage_histogram" },
-    { "Results fail histogram", "<th>Number of failed test cases in a revision</th><th>Occurences</th>", RES_STATS, "fail_histogram" },
-    { "Revision fail histogram", "<th>Revision number</th><th>Number of failed test cases</th>", RES_STATS, "revision_fail_histogram"},
-    { "Executed histogram", "<th>Number of executed test cases</th><th>Occurences</th>", RES_STATS, "executed_histogram" },
-    { "Test case info", "<th>Test case id</th><th>Executed</th><th>Fail</th>", RES_STATS, "test_case_info" }
+    { "Code element coverage histogram", { "Number of affected test cases by a code element", "Occurences" }, COV_STATS, "code_coverage_histogram" },
+    { "Test case coverage histogram", { "Number of covered code elements in a test case", "Occurences" }, COV_STATS, "test_coverage_histogram" },
+    { "Results fail histogram", { "Number of failed test cases in a revision", "Occurences" }, RES_STATS, "fail_histogram" },
+    { "Revision fail histogram", { "Revision number", "Number of failed test cases" }, RES_STATS, "revision_fail_histogram"},
+    { "Executed histogram", { "Number of executed test cases", "Occurences" }, RES_STATS, "executed_histogram" },
+    { "Test case info", { "Test case id", "Executed", "Fail" }, RES_STATS, "test_case_info" }
 };
 
 CShowStatistics::CShowStatistics(CWorkspace *workspace) :
@@ -91,18 +91,27 @@ void CShowStatistics::generateChartForTab(QWebView *view, int tabindex)
                 "$('#group_table').DataTable({ data: tableData, order: [ 1, 'desc' ] });"
                 "var chart = new CanvasJS.Chart(\"chart\",{"
                   "zoomEnabled: true,"
+                  "axisX:{"
+                    "title:'%2',"
+                    "titleFontSize: 16"
+                  "},"
+                  "axisY:{"
+                    "title:'%3',"
+                    "titleFontSize: 16"
+                  "},"
                   "title:{"
-                    "text: '%2',"
+                    "text: '%4',"
                     "fontSize: 16"
                   "},"
-                  "data: [{type: \"column\",dataPoints: [%3]}]"
+                  "data: [{type: \"column\",dataPoints: [%5]}]"
                 "});"
                 "chart.render();"
+                "%6"
               "}"
             "</script></head><body onLoad=\"init()\">"
-            "<h3 style=\"text-align:center;\">%4</h3>"
+            "<h3 style=\"text-align:center;\">%7</h3>"
             "<table id=\"group_table\" class=\"display\">"
-            "<thead><tr>%5</tr></thead>"
+            "<thead><tr>%8</tr></thead>"
             "<tbody></tbody></table>"
             "<div id=\"chart\" style=\"height:500px;\"></div>"
             "</body></html>";
@@ -110,18 +119,28 @@ void CShowStatistics::generateChartForTab(QWebView *view, int tabindex)
     rapidjson::Document *data = m_workspace->getData(chartData[tabindex].dataSource.toStdString());
     QString dataStr;
     QString dataChart;
+    QString tableHeader;
+    QString hideChart;
     if (chartData[tabindex].dataColumn == "test_case_info") {
         const rapidjson::Value& val = (*data)["test_case_info"];
         for (rapidjson::Value::ConstMemberIterator itr = val.MemberBegin(); itr != val.MemberEnd(); ++itr) {
             dataStr.append("[" + QString(itr->name.GetString()) + "," + QString::number(itr->value["executed"].GetInt()) + "," +  QString::number(itr->value["fail"].GetInt()) + "],");
         }
+
+        for (int i = 0; i < 3; ++i)
+            tableHeader.append("<th>" + chartData[tabindex].columnNames[i] + "</th>");
+
+        hideChart.append("$(\"#chart\").hide();");
         dataStr.chop(1);
     } else {
         convertJsonToStringArray(data, chartData[tabindex].dataColumn, dataStr);
         convertJsonToStringArray(data, chartData[tabindex].dataColumn, dataChart, true);
+
+        for (int i = 0; i < 2; ++i)
+            tableHeader.append("<th>" + chartData[tabindex].columnNames[i] + "</th>");
     }
 
-    html = html.arg(dataStr, chartData[tabindex].title, dataChart, chartData[tabindex].title, chartData[tabindex].columnNames);
+    html = html.arg(dataStr, chartData[tabindex].columnNames[0], chartData[tabindex].columnNames[1], chartData[tabindex].title, dataChart, hideChart, chartData[tabindex].title, tableHeader);
     view->settings()->clearMemoryCaches();
     view->setHtml(html);
 }
