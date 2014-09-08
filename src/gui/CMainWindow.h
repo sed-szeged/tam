@@ -146,7 +146,6 @@ private:
     QStandardItemModel *m_scorePluginModel;
 
     CClusterList *m_clusterList;
-    QStringList m_clusterAlgorithms;
 };
 
 #endif // CMAINWINDOW_H

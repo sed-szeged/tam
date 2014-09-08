@@ -63,10 +63,11 @@ void CMainWindow::fillWidgets()
 {
     // fill combobox with cluster algorithms
     StringVector clusterPlugins = m_kernel->getTestSuiteClusterPluginManager().getPluginNames();
-    for (StringVector::const_iterator it = clusterPlugins.begin(); it != clusterPlugins.end(); ++it) {
-        m_clusterAlgorithms << QString((*it).c_str());
+    for (int i = 0; i < clusterPlugins.size(); ++i) {
+        ui->comboBoxClusterPlugins->addItem(tr(clusterPlugins[i].c_str()));
+        String desc = m_kernel->getTestSuiteClusterPluginManager().getPlugin(clusterPlugins[i])->getDescription();
+        ui->comboBoxClusterPlugins->setItemData(i, tr(desc.c_str()), Qt::ToolTipRole);
     }
-    ui->comboBoxClusterPlugins->addItems(m_clusterAlgorithms);
 
     // fill listview with metric algorithm names
     m_metricsPluginModel = new QStandardItemModel();
@@ -76,6 +77,8 @@ void CMainWindow::fillWidgets()
         QStandardItem *item = new QStandardItem(tr(metricPlugins[i].c_str()));
         item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
         item->setData(Qt::Unchecked, Qt::CheckStateRole);
+        String desc = m_kernel->getTestSuiteMetricPluginManager().getPlugin(metricPlugins[i])->getDescription();
+        item->setToolTip(tr(desc.c_str()));
         m_metricsPluginModel->appendRow(item);
     }
     connect(m_metricsPluginModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(metricsPluginStateChanged(QStandardItem*)));
@@ -89,6 +92,8 @@ void CMainWindow::fillWidgets()
         QStandardItem *item = new QStandardItem(tr(scorePlugins[i].c_str()));
         item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
         item->setData(Qt::Unchecked, Qt::CheckStateRole);
+        String desc = m_kernel->getFaultLocalizationTechniquePluginManager().getPlugin(metricPlugins[i])->getDescription();
+        item->setToolTip(tr(desc.c_str()));
         m_scorePluginModel->appendRow(item);
     }
 
