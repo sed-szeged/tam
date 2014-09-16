@@ -32,6 +32,12 @@ bool CClusterEditorDialog::eventFilter(QObject *object, QEvent *event)
         if (ui->lineEditClusterName->text().isEmpty()) {
             QMessageBox::critical(this, "Error", "Missing cluster name.");
             return true;
+        } else if (m_testCases->rowCount() == 0) {
+            QMessageBox::critical(this, "Error", "Please add at least one test case to group.");
+            return true;
+        } else if (m_codeElements->rowCount() == 0) {
+            QMessageBox::critical(this, "Error", "Please add at least one code element to group.");
+            return true;
         }
     }
     return false;
