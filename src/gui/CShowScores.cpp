@@ -23,7 +23,7 @@ void CShowScores::generateResults(QWebView *view, rapidjson::Document *scores, C
                         "$('a').on('click', function(){"
                           "$(this).next().toggle();"
                         "});"
-                        "var data;"
+                        "var tableData;"
                         "%1"
                       "}"
                 "</script></head><body onload=\"init()\">"
@@ -32,7 +32,9 @@ void CShowScores::generateResults(QWebView *view, rapidjson::Document *scores, C
                 "</body></html>";
 
     QString tableData = "tableData = [%1];"
-            "$('#%2').DataTable({ data: tableData, order: [ 1, 'desc' ], pageLength: 20 });";
+            "$('#%2').DataTable({"
+            "\"language\": { \"emptyTable\": \"The suspiciousness value is 0 for every method.\""
+            "}, data: tableData, order: [ 1, 'desc' ], pageLength: 20 });";
     QString tableDef = "<table id=\"%1\" class=\"display\">"
             "<thead><tr><th>Code element</th>"
             "%2</tr></thead>"

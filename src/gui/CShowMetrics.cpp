@@ -72,8 +72,8 @@ void CShowMetrics::generateCharts(QWebView *webView)
             "<script type=\"text/javascript\">"
                   "function init() {"
                     "drawCovChart();"
-                    "drawSpecChart();"
-                    "drawUniqChart();"
+                    //"drawSpecChart();"
+                    //"drawUniqChart();"
                   "}"
                   "function drawCovChart() {"
                     "var chart = new CanvasJS.Chart(\"covval_chart\",{"
@@ -127,8 +127,8 @@ void CShowMetrics::generateCharts(QWebView *webView)
                   "}"
             "</script></head><body onload=\"init()\">"
             "<div id=\"covval_chart\" style=\"height:400px\"></div>"
-            "<div id=\"spec_chart\" style=\"height:400px\"></div>"
-            "<div id=\"uniq_chart\" style=\"height:400px;\"></div>"
+            //"<div id=\"spec_chart\" style=\"height:400px\"></div>"
+            //"<div id=\"uniq_chart\" style=\"height:400px;\"></div>"
               "</body></html>";
 
     QString dataSet = "{"
@@ -147,14 +147,9 @@ void CShowMetrics::generateCharts(QWebView *webView)
             continue;
 
         rapidjson::Value& val = groupIt->value;
-        if (val.HasMember("fault-detection"))
-            chartData["fault-detection"].append("{ label: '" + parts[0] + "',y:" + QString::number(val["fault-detection"].GetDouble()) + "},");
-        if (val.HasMember("tpce"))
-            chartData["tpce"].append("{ label: '" + parts[0] + "',y:" + QString::number(val["tpce"].GetDouble()) + "},");
-        if (val.HasMember("coverage-efficiency"))
-            chartData["coverage-efficiency"].append("{ label: '" + parts[0] + "',y:" + QString::number(val["coverage-efficiency"].GetDouble()) + "},");
-        if (val.HasMember("partition-efficiency"))
-            chartData["partition-efficiency"].append("{ label: '" + parts[0] + "',y:" + QString::number(val["partition-efficiency"].GetDouble()) + "},");
+        for (rapidjson::Value::MemberIterator memberIt = val.MemberBegin(); memberIt != val.MemberEnd(); ++memberIt) {
+            chartData[memberIt->name.GetString()].append("{ label: '" + parts[0] + "',y:" + QString::number(memberIt->value.GetDouble()) + "},");
+        }
 
         if (val.HasMember("specialization")) {
             IndexType nrOfTests = m_clusters.at(groupIt->name.GetString()).getTestCases().size();

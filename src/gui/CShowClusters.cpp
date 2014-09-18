@@ -20,8 +20,7 @@ void CShowClusters::generateCharts(ClusterMap &clusters, QWebView *webView)
             "<script type=\"text/javascript\" src=\"qrc:/resources/CanvasJS/canvasjs.min.js\"></script>"
             "<script type=\"text/javascript\">"
                 "function init() {"
-                  "var chart = new CanvasJS.Chart(\"group_chart\", {"
-                    "exportEnabled:true,"
+                  "var chart = new CanvasJS.Chart(\"test_chart\", {"
                     "title:{"
                       "text: 'Number of test cases in each group',"
                       "fontSize: 16"
@@ -31,14 +30,31 @@ void CShowClusters::generateCharts(ClusterMap &clusters, QWebView *webView)
                     "},"
                     "data: ["
                       "{"
-                       "type: \"line\","
+                       "type: \"column\","
                        "dataPoints: [%1]"
                       "}"
                     "]"
                   "});"
-
                   "chart.render();"
-                  "var tableData = [%2];"
+
+                  "chart = new CanvasJS.Chart(\"ce_chart\", {"
+                    "title:{"
+                      "text: 'Number of code elements in each group',"
+                      "fontSize: 16"
+                    "},"
+                    "axisX: {"
+                      "labelAngle: -60"
+                    "},"
+                    "data: ["
+                      "{"
+                       "type: \"column\","
+                       "dataPoints: [%2]"
+                      "}"
+                    "]"
+                  "});"
+                  "chart.render();"
+
+                  "var tableData = [%3];"
                   "$('#group_table').DataTable({ data: tableData, paging: false, searching: false });"
                 "}"
             "</script></head><body onload=\"init()\">"
@@ -47,10 +63,12 @@ void CShowClusters::generateCharts(ClusterMap &clusters, QWebView *webView)
             "<th>Number of test cases</th>"
             "<th>Number of code elements</th></tr></thead>"
             "<tbody></tbody></table></br>"
-            "<div id=\"group_chart\"></div>"
+            "<div id=\"test_chart\" style=\"height:500px;\"></div>"
+            "<div id=\"ce_chart\" style=\"height:500px;\"></div>"
             "</body></html>";
 
-    QString chartData;
+    QString testData;
+    QString ceData;
     QString tableData;
     for (ClusterMap::iterator it = clusters.begin(); it != clusters.end(); ++it) {
         QStringList parts = QString(it->first.c_str()).split(" - ");
@@ -58,11 +76,13 @@ void CShowClusters::generateCharts(ClusterMap &clusters, QWebView *webView)
             continue;
 
         tableData.append("['" + QString(parts[0]) + "'," + QString::number(it->second.getTestCases().size()) + "," + QString::number(it->second.getCodeElements().size()) + "],");
-        chartData.append("{label:'" + QString(parts[0]) + "',y:" + QString::number(it->second.getTestCases().size()) + "},");
+        testData.append("{label:'" + QString(parts[0]) + "',y:" + QString::number(it->second.getTestCases().size()) + "},");
+        ceData.append("{label:'" + QString(parts[0]) + "',y:" + QString::number(it->second.getCodeElements().size()) + "},");
     }
     tableData.chop(1);
-    chartData.chop(1);
-    html = html.arg(chartData, tableData);
+    testData.chop(1);
+    ceData.chop(1);
+    html = html.arg(testData, ceData, tableData);
 
     webView->settings()->clearMemoryCaches();
     webView->setHtml(html);

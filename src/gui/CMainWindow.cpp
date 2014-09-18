@@ -776,9 +776,6 @@ void CMainWindow::on_tabWidgetMetrics_currentChanged(int index)
         metrics.generateResults(ui->webViewResults);
     else if (tabText == "Charts")
         metrics.generateCharts(ui->webViewCharts);
-    else if (tabText == "Heat map")
-        metrics.generateHeatMap(ui->webViewHeatmap);
-
 }
 
 void CMainWindow::on_tabWidgetScore_currentChanged(int index)
