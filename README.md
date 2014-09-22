@@ -9,7 +9,7 @@ It provides a graphical user interface for most of the algorithms implemented in
 
 * cmake 2.8.0 or higher
 * Boost 1.49 or higher
-* [SoDA](http://github.com/sed-szeged/soda)(develop branch)
+* [SoDA](http://github.com/sed-szeged/soda) (develop branch)
 * Qt 5.3
 
 ### Authors and Contributors
