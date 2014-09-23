@@ -3,7 +3,7 @@ project(tam)
 
 # Set the build type if it isn't already
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Debug)
+  set(CMAKE_BUILD_TYPE Release)
 endif()
 
 # Tell CMake to run moc when necessary:

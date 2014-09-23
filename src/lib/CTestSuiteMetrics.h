@@ -12,7 +12,7 @@ class CMainWindow;
 
 class CTestSuiteMetrics : public QThread
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     CTestSuiteMetrics(QObject *parent = 0);
     ~CTestSuiteMetrics();

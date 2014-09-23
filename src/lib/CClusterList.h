@@ -16,7 +16,6 @@ public:
     CClusterList();
     ~CClusterList();
 
-    void createClusters(String clusterPlugin, CKernel &kernel, CSelectionData &data, rapidjson::Document &params);
     ClusterMap& getClusters() { return *m_clusters; }
     void fromJson(rapidjson::Document &doc);
     void toJson(rapidjson::Document &doc);

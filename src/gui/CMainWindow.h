@@ -2,11 +2,7 @@
 #define CMAINWINDOW_H
 
 #include "engine/CKernel.h"
-#include "lib/CTestSuiteMetrics.h"
 #include "lib/CClusterList.h"
-#include "lib/CTestSuiteLoader.h"
-#include "lib/CStatisticsThread.h"
-#include "lib/CFLScore.h"
 #include "CClusterPluginParameterTableModel.h"
 #include "CTableViewButtonDelegate.h"
 
@@ -48,14 +44,7 @@ private slots:
     void calcStatsFinished(QString msg);
     void calcMetricsFinished(QString msg);
     void calcScoreFinished(QString msg);
-
-    void on_comboBoxRevMetrics_currentIndexChanged(const QString &text);
-    void metricsPluginStateChanged(QStandardItem *item);
-    void metricsClusterStateChanged(QStandardItem *item);
-
-    void on_comboBoxRevScore_currentIndexChanged(const QString &text);
-    void scorePluginStateChanged(QStandardItem *item);
-    void scoreClusterStateChanged(QStandardItem *item);
+    void clusterFinished(QString msg);
 
     void on_actionExit_triggered();
     void on_actionNewWorkspace_triggered();
@@ -65,22 +54,14 @@ private slots:
 
     void on_buttonCalcCluster_clicked();
     void on_comboBoxClusterPlugins_currentIndexChanged(const QString &plugin);
-
     void on_buttonNewCluster_clicked();
     void on_buttonEditCluster_clicked();
     void on_buttonDeleteCluster_clicked();
-
-    void on_buttonCalculateMetrics_clicked();
-    void on_checkBoxMetricsSelectAll_stateChanged(int arg1);
 
     void on_buttonBrowseCov_clicked();
     void on_buttonBrowseRes_clicked();
     void on_buttonBrowseCha_clicked();
     void on_buttonLoad_clicked();
-
-    void on_buttonScoreCalc_clicked();
-    void on_buttonAddFailedCodeElement_clicked();
-    void on_buttonRemoveFailedCodeElement_clicked();
 
     void on_tabWidgetStatistics_currentChanged(int index);
     void on_tabWidgetMain_currentChanged(int index);
@@ -88,30 +69,34 @@ private slots:
     void on_tabWidgetMetrics_currentChanged(int index);
     void on_tabWidgetScore_currentChanged(int index);
 
+    void on_comboBoxRevMetrics_currentIndexChanged(const QString &text);
+    void metricsPluginStateChanged(QStandardItem *item);
+    void metricsClusterStateChanged(QStandardItem *item);
+    void on_buttonCalculateMetrics_clicked();
+    void on_checkBoxMetricsSelectAll_stateChanged(int arg1);
+    void on_comboBoxMetricsMeasurement_currentIndexChanged(int index);
     void on_toolButtonMetricMeasAdd_clicked();
-
     void on_toolButtonMetricMeasRem_clicked();
 
+    void on_comboBoxRevScore_currentIndexChanged(const QString &text);
+    void scorePluginStateChanged(QStandardItem *item);
+    void scoreClusterStateChanged(QStandardItem *item);
+    void on_buttonScoreCalc_clicked();
+    void on_buttonAddFailedCodeElement_clicked();
+    void on_buttonRemoveFailedCodeElement_clicked();
+    void on_comboBoxScoreMeasurement_currentIndexChanged(int index);
     void on_toolButtonScoreMeasAdd_clicked();
-
     void on_toolButtonScoreMeasRem_clicked();
 
-    void on_comboBoxMetricsMeasurement_currentIndexChanged(int index);
-
-    void on_comboBoxScoreMeasurement_currentIndexChanged(int index);
-
     void on_lineEditFilterTests_textEdited(const QString &text);
-
-    void on_lineEditFilterCE_textEdited(const QString &text);
-
     void on_tableViewTests_customContextMenuRequested(const QPoint &pos);
     void actionCoveredCodeElements_triggered();
 
+    void on_lineEditFilterCE_textEdited(const QString &text);
     void on_tableViewCE_customContextMenuRequested(const QPoint &pos);
     void actionCoveredTests_triggered();
 
     void on_actionMetrics_results_triggered();
-
     void on_actionFault_localization_results_triggered();
 
 protected:

@@ -10,13 +10,6 @@ CClusterList::~CClusterList()
     delete m_clusters;
 }
 
-void CClusterList::createClusters(String clusterPlugin, CKernel &kernel, CSelectionData &data, rapidjson::Document &params)
-{
-    ITestSuiteClusterPlugin *clusterAlgorithm = kernel.getTestSuiteClusterPluginManager().getPlugin(clusterPlugin);
-    clusterAlgorithm->init(params);
-    clusterAlgorithm->execute(data, *m_clusters);
-}
-
 void CClusterList::toJson(rapidjson::Document &doc)
 {
     for (ClusterMap::iterator it = m_clusters->begin(); it != m_clusters->end(); ++it) {

@@ -1,27 +1,29 @@
+#include "CMainWindow.h"
+#include "ui_CMainWindow.h"
+
+#include "lib/CTestSuiteCluster.h"
+#include "lib/CTestSuiteMetrics.h"
+#include "lib/CTestSuiteLoader.h"
+#include "lib/CStatisticsThread.h"
+#include "lib/CFLScore.h"
+#include "lib/CWorkspace.h"
+
 #include "CCoveredListDialog.h"
 #include "CClusterEditorAddDialog.h"
 #include "CClusterEditorDialog.h"
 #include "CResultsExportDialog.h"
+#include "CIDManagerTableModel.h"
 
 #include "CShowStatistics.h"
 #include "CShowClusters.h"
 #include "CShowMetrics.h"
 #include "CShowScores.h"
 
-#include "CIDManagerTableModel.h"
-
-#include "CMainWindow.h"
-#include "ui_CMainWindow.h"
-
-#include "lib/CWorkspace.h"
-
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QFileDialog>
-#include <QLayout>
 #include <QStatusBar>
 #include <QCheckBox>
-#include <QWebFrame>
 #include <QSortFilterProxyModel>
 
 CMainWindow::CMainWindow(QWidget *parent) :
@@ -463,7 +465,7 @@ bool CMainWindow::saveWorkspaceAs()
 void CMainWindow::on_buttonBrowseCov_clicked()
 {
     QFileInfo fileInfo;
-    fileInfo.setFile(QFileDialog::getOpenFileName(this, tr("Open coverage file")));
+    fileInfo.setFile(QFileDialog::getOpenFileName(this, tr("Select coverage file"), QFileInfo(m_workspace->getCoveragePath()).filePath()));
     if (!fileInfo.exists())
         return;
 
@@ -474,7 +476,7 @@ void CMainWindow::on_buttonBrowseCov_clicked()
 void CMainWindow::on_buttonBrowseRes_clicked()
 {
     QFileInfo fileInfo;
-    fileInfo.setFile(QFileDialog::getOpenFileName(this, tr("Open results file")));
+    fileInfo.setFile(QFileDialog::getOpenFileName(this, tr("Select results file"), QFileInfo(m_workspace->getResultsPath()).filePath()));
     if (!fileInfo.exists())
         return;
 
@@ -485,7 +487,7 @@ void CMainWindow::on_buttonBrowseRes_clicked()
 void CMainWindow::on_buttonBrowseCha_clicked()
 {
     QFileInfo fileInfo;
-    fileInfo.setFile(QFileDialog::getOpenFileName(this, tr("Open changeset file")));
+    fileInfo.setFile(QFileDialog::getOpenFileName(this, tr("Select changeset file"), QFileInfo(m_workspace->getChangesetPath()).filePath()));
     if (!fileInfo.exists())
         return;
 
@@ -512,11 +514,13 @@ void CMainWindow::loadFinished(QString msg)
     m_workspace->setTestSuiteAvailable(true);
 
     QSortFilterProxyModel *filter = new QSortFilterProxyModel(this);
+    filter->setFilterCaseSensitivity(Qt::CaseInsensitive);
     filter->setSourceModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getCodeElements()));
     filter->setFilterKeyColumn(1);
     ui->tableViewCE->setModel(filter);
 
     filter = new QSortFilterProxyModel(this);
+    filter->setFilterCaseSensitivity(Qt::CaseInsensitive);
     filter->setSourceModel(new CIDManagerTableModel(this, m_workspace->getTestSuite()->getTestcases()));
     filter->setFilterKeyColumn(1);
     ui->tableViewTests->setModel(filter);
@@ -535,7 +539,19 @@ void CMainWindow::on_buttonCalcCluster_clicked()
     params.SetObject();
     m_clusterPluginParameters[clusterPlugin]->getValues(params);
 
-    m_clusterList->createClusters(clusterPlugin, *m_kernel, *m_workspace->getTestSuite(), params);
+    CTestSuiteCluster *clusterThread = new CTestSuiteCluster(this);
+    connect(clusterThread, SIGNAL(updateStatusLabel(QString)), this, SLOT(statusUpdate(QString)));
+    connect(clusterThread, SIGNAL(processFinished(QString)), this, SLOT(clusterFinished(QString)));
+    connect(clusterThread, SIGNAL(finished()), clusterThread, SLOT(deleteLater()));
+    m_statusProgressBar->setMaximum(0);
+    clusterThread->createClusters(clusterPlugin, m_kernel, m_workspace->getTestSuite(), &m_clusterList->getClusters(), params);
+}
+
+void CMainWindow::clusterFinished(QString msg)
+{
+    ui->statusBar->showMessage(msg, 5000);
+    m_statusProgressBar->setMaximum(1);
+    m_statusLabel->clear();
     updateAvailableClusters();
 }
 

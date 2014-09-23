@@ -77,6 +77,7 @@ void CShowMetrics::generateCharts(QWebView *webView)
                   "}"
                   "function drawCovChart() {"
                     "var chart = new CanvasJS.Chart(\"covval_chart\",{"
+                      "zoomEnabled: true,"
                       "title:{"
                         "text: 'Coverage values and test efficiency',"
                         "fontSize: 16"

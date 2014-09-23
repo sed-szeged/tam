@@ -29,6 +29,7 @@ CCoveredListDialog::CCoveredListDialog(QWidget *parent, CSelectionData *data, In
     QStringListModel *model = new QStringListModel(ui->listViewElements);
     model->setStringList(coveredElements);
     m_filter = new QSortFilterProxyModel(ui->listViewElements);
+    m_filter->setFilterCaseSensitivity(Qt::CaseInsensitive);
     m_filter->setSourceModel(model);
     ui->listViewElements->setModel(m_filter);
     ui->listViewElements->setEditTriggers(QAbstractItemView::NoEditTriggers);

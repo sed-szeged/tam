@@ -27,6 +27,7 @@ CClusterEditorAddDialog::CClusterEditorAddDialog(QWidget *parent, CIDManager *ma
     }
     model->setStringList(list);
     m_filter = new QSortFilterProxyModel(ui->listViewElements);
+    m_filter->setFilterCaseSensitivity(Qt::CaseInsensitive);
     m_filter->setSourceModel(model);
     ui->listViewElements->setModel(m_filter);
     ui->listViewElements->setEditTriggers(QAbstractItemView::NoEditTriggers);
