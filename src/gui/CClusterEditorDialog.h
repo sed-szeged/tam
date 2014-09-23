@@ -39,6 +39,10 @@ private slots:
 
     void on_buttonBox_accepted();
 
+    void on_lineEditFilterTests_textEdited(const QString &text);
+
+    void on_lineEditFilterCE_textEdited(const QString &text);
+
 private:
     Ui::CClusterEditorDialog *ui;
     CSelectionData *m_data;

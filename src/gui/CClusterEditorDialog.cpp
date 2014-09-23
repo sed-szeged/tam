@@ -3,6 +3,8 @@
 #include "CMainWindow.h"
 #include "CClusterEditorAddDialog.h"
 #include "ui_CClusterEditorDialog.h"
+
+#include <QSortFilterProxyModel>
 #include <QMessageBox>
 #include <QPushButton>
 
@@ -13,10 +15,18 @@ CClusterEditorDialog::CClusterEditorDialog(QWidget *parent, CSelectionData *data
 {
     ui->setupUi(this);
     ui->buttonBox->button(QDialogButtonBox::Ok)->installEventFilter(this);
+
     m_testCases = new QStandardItemModel(ui->listViewTests);
-    ui->listViewTests->setModel(m_testCases);
+    QSortFilterProxyModel *filter = new QSortFilterProxyModel(ui->listViewTests);
+    filter->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    filter->setSourceModel(m_testCases);
+    ui->listViewTests->setModel(filter);
+
     m_codeElements = new QStandardItemModel(ui->listViewCEs);
-    ui->listViewCEs->setModel(m_codeElements);
+    filter = new QSortFilterProxyModel(ui->listViewCEs);
+    filter->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    filter->setSourceModel(m_codeElements);
+    ui->listViewCEs->setModel(filter);
 
     fillListViews(clusterName);
 }
@@ -43,6 +53,11 @@ bool CClusterEditorDialog::eventFilter(QObject *object, QEvent *event)
     return false;
 }
 
+void CClusterEditorDialog::on_lineEditFilterTests_textEdited(const QString &text)
+{
+    qobject_cast<QSortFilterProxyModel*>(ui->listViewTests->model())->setFilterFixedString(text);
+}
+
 void CClusterEditorDialog::on_toolButtonAddTests_clicked()
 {
     CClusterEditorAddDialog dia(this, m_data->getTestcases(), m_testCases);
@@ -58,6 +73,11 @@ void CClusterEditorDialog::on_toolButtonRemoveTests_clicked()
 
     foreach (const QPersistentModelIndex &i, indexes)
         m_testCases->removeRow(i.row());
+}
+
+void CClusterEditorDialog::on_lineEditFilterCE_textEdited(const QString &text)
+{
+    qobject_cast<QSortFilterProxyModel*>(ui->listViewCEs->model())->setFilterFixedString(text);
 }
 
 void CClusterEditorDialog::on_toolButtonAddCEs_clicked()
