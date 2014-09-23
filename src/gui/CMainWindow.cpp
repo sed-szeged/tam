@@ -16,18 +16,13 @@
 #include "lib/CWorkspace.h"
 
 #include <QMessageBox>
+#include <QInputDialog>
 #include <QFileDialog>
 #include <QLayout>
 #include <QStatusBar>
 #include <QCheckBox>
 #include <QWebFrame>
-#include <QInputDialog>
 #include <QSortFilterProxyModel>
-
-#include <iostream>
-
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
 
 CMainWindow::CMainWindow(QWidget *parent) :
     QMainWindow(parent), ui(new Ui::CMainWindow),
@@ -40,7 +35,9 @@ CMainWindow::CMainWindow(QWidget *parent) :
     ui->buttonScoreCalc->installEventFilter(this);
 
     m_workspace = new CWorkspace(this);
-    m_clusterList = new CClusterList(this);
+    m_clusterList = new CClusterList();
+
+    m_clusterTableViewDelegate = new CTableViewButtonDelegate(ui->tableViewClusterParameter);
 
     createStatusBar();
     fillWidgets();
@@ -107,6 +104,21 @@ void CMainWindow::fillWidgets()
     ui->listViewClusters->setModel(new QStandardItemModel(this));
 
     ui->listViewFailedCodeElements->setModel(new QStandardItemModel(this));
+}
+
+void CMainWindow::updateClusterParameters(QString cluster)
+{
+    std::map<String, String> params = m_kernel->getTestSuiteClusterPluginManager().getPlugin(cluster.toStdString())->getRequiredParameters();
+    if (m_clusterPluginParameters.count(cluster.toStdString()) == 0)
+        m_clusterPluginParameters[cluster.toStdString()] = new CClusterPluginParameterTableModel(this, params);
+
+    if (cluster == "label-test-codeelements")
+        ui->tableViewClusterParameter->setItemDelegateForColumn(2, m_clusterTableViewDelegate);
+    else
+        ui->tableViewClusterParameter->setItemDelegateForColumn(2, 0);
+
+    ui->tableViewClusterParameter->setModel(m_clusterPluginParameters[cluster.toStdString()]);
+    ui->tableViewClusterParameter->resizeColumnsToContents();
 }
 
 void CMainWindow::fillRevComboBoxes()
@@ -228,18 +240,6 @@ void CMainWindow::updateLabels()
 {
     rapidjson::Document &res = *m_workspace->getData(WS);
     QFileInfo fileInfo;
-    fileInfo.setFile(res.HasMember("cluster-code-elements-list") ? res["cluster-code-elements-list"].GetString() : "");
-    if (fileInfo.exists())
-        ui->labelClusterCodeElementList->setText(fileInfo.fileName());
-    else
-        ui->labelClusterCodeElementList->setText("No cluster code element list selected");
-
-    fileInfo.setFile(res.HasMember("cluster-test-list") ? res["cluster-test-list"].GetString() : "");
-    if (fileInfo.exists())
-        ui->labelClusterTestList->setText(fileInfo.fileName());
-    else
-        ui->labelClusterTestList->setText("No cluster test list selected");
-
     fileInfo.setFile(m_workspace->getCoveragePath());
     if (fileInfo.exists())
         ui->labelCov->setText(fileInfo.fileName());
@@ -528,47 +528,14 @@ void CMainWindow::loadFinished(QString msg)
     calculateStatistics();
 }
 
-void CMainWindow::on_buttonClusterTestList_clicked()
-{
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open cluster test list file"),
-                                                    QString(),
-                                                    tr("All Files (*)"));
-    if (fileName.isEmpty())
-        return;
-
-    rapidjson::Document *workspace = m_workspace->getData(WS);
-    rapidjson::Document::MemberIterator memberIt = workspace->FindMember("cluster-test-list");
-    if (memberIt == workspace->MemberEnd()) {
-        rapidjson::Value s;
-        s.SetString(fileName.toStdString().c_str(), fileName.length(), workspace->GetAllocator());
-        workspace->AddMember("cluster-test-list", s, workspace->GetAllocator());
-    } else
-        memberIt->value.SetString(fileName.toStdString().c_str(), fileName.length(), workspace->GetAllocator());
-    ui->labelClusterTestList->setText(QFileInfo(fileName).fileName());
-}
-
-void CMainWindow::on_buttonClusterCEList_clicked()
-{
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open cluster code elements list file"),
-                                                    QString(),
-                                                    tr("All Files (*)"));
-    if (fileName.isEmpty())
-        return;
-
-    rapidjson::Document *workspace = m_workspace->getData(WS);
-    rapidjson::Document::MemberIterator memberIt = workspace->FindMember("cluster-code-elements-list");
-    if (memberIt == workspace->MemberEnd()) {
-        rapidjson::Value s;
-        s.SetString(fileName.toStdString().c_str(), fileName.length(), workspace->GetAllocator());
-        workspace->AddMember("cluster-code-elements-list", s, workspace->GetAllocator());
-    } else
-        memberIt->value.SetString(fileName.toStdString().c_str(), fileName.length(), workspace->GetAllocator());
-    ui->labelClusterCodeElementList->setText(QFileInfo(fileName).fileName());
-}
-
 void CMainWindow::on_buttonCalcCluster_clicked()
 {
-    m_clusterList->createClusters();
+    String clusterPlugin = ui->comboBoxClusterPlugins->currentText().toStdString();
+    rapidjson::Document params;
+    params.SetObject();
+    m_clusterPluginParameters[clusterPlugin]->getValues(params);
+
+    m_clusterList->createClusters(clusterPlugin, *m_kernel, *m_workspace->getTestSuite(), params);
     updateAvailableClusters();
 }
 
@@ -832,21 +799,7 @@ bool CMainWindow::eventFilter(QObject *object, QEvent *event)
 
 void CMainWindow::on_comboBoxClusterPlugins_currentIndexChanged(const QString &plugin)
 {
-    if (plugin != "label-test-codeelements") {
-        ui->buttonClusterCEList->hide();
-        ui->labelClusterCodeElementList->hide();
-        ui->labelClusterCodeElementListTitle->hide();
-        ui->buttonClusterTestList->hide();
-        ui->labelClusterTestList->hide();
-        ui->labelClusterTestListTitle->hide();
-    } else {
-        ui->buttonClusterCEList->show();
-        ui->labelClusterCodeElementList->show();
-        ui->labelClusterCodeElementListTitle->show();
-        ui->buttonClusterTestList->show();
-        ui->labelClusterTestList->show();
-        ui->labelClusterTestListTitle->show();
-    }
+    updateClusterParameters(plugin);
 }
 
 void CMainWindow::on_comboBoxRevMetrics_currentIndexChanged(const QString &text)

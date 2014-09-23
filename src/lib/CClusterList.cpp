@@ -1,10 +1,6 @@
-#include "gui/CMainWindow.h"
-#include "ui_CMainWindow.h"
 #include "CClusterList.h"
-#include "CWorkspace.h"
 
-CClusterList::CClusterList(CMainWindow *mainWindow) :
-    m_mainWindow(mainWindow),
+CClusterList::CClusterList() :
     m_clusters(new ClusterMap())
 {
 }
@@ -14,11 +10,11 @@ CClusterList::~CClusterList()
     delete m_clusters;
 }
 
-void CClusterList::createClusters()
+void CClusterList::createClusters(String clusterPlugin, CKernel &kernel, CSelectionData &data, rapidjson::Document &params)
 {
-    ITestSuiteClusterPlugin *clusterAlgorithm = m_mainWindow->getKernel()->getTestSuiteClusterPluginManager().getPlugin(m_mainWindow->getUi()->comboBoxClusterPlugins->currentText().toStdString());
-    clusterAlgorithm->init(*m_mainWindow->getWorkspace()->getData(WS));
-    clusterAlgorithm->execute(*m_mainWindow->getWorkspace()->getTestSuite(), *m_clusters);
+    ITestSuiteClusterPlugin *clusterAlgorithm = kernel.getTestSuiteClusterPluginManager().getPlugin(clusterPlugin);
+    clusterAlgorithm->init(params);
+    clusterAlgorithm->execute(data, *m_clusters);
 }
 
 void CClusterList::toJson(rapidjson::Document &doc)

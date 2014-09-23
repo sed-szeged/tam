@@ -1,26 +1,27 @@
 #ifndef CCLUSTERLIST_H
 #define CCLUSTERLIST_H
 
+#include "data/CSelectionData.h"
 #include "data/CClusterDefinition.h"
+#include "engine/CKernel.h"
+
+#include <rapidjson/document.h>
+#include <QString>
 
 using namespace soda;
-
-class CMainWindow;
 
 class CClusterList
 {
 public:
-    CClusterList(CMainWindow *mainWindow);
+    CClusterList();
     ~CClusterList();
 
-    void createClusters();
+    void createClusters(String clusterPlugin, CKernel &kernel, CSelectionData &data, rapidjson::Document &params);
     ClusterMap& getClusters() { return *m_clusters; }
     void fromJson(rapidjson::Document &doc);
     void toJson(rapidjson::Document &doc);
 
 private:
-
-    CMainWindow *m_mainWindow;
     ClusterMap *m_clusters;
 };
 

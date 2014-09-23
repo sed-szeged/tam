@@ -7,11 +7,14 @@
 #include "lib/CTestSuiteLoader.h"
 #include "lib/CStatisticsThread.h"
 #include "lib/CFLScore.h"
+#include "CClusterPluginParameterTableModel.h"
+#include "CTableViewButtonDelegate.h"
 
 #include <QMainWindow>
 #include <QProgressBar>
 #include <QLabel>
 #include <QStandardItemModel>
+#include <QMap>
 
 using namespace soda;
 
@@ -60,8 +63,6 @@ private slots:
     void on_actionSaveWorkspace_triggered();
     void on_actionSaveWorkspaceAs_triggered();
 
-    void on_buttonClusterTestList_clicked();
-    void on_buttonClusterCEList_clicked();
     void on_buttonCalcCluster_clicked();
     void on_comboBoxClusterPlugins_currentIndexChanged(const QString &plugin);
 
@@ -123,6 +124,7 @@ private:
     void fillWidgets();
     void fillRevComboBoxes();
     void updateLabels();
+    void updateClusterParameters(QString cluster);
     QString checkMetricsPluginsRequirements();
     bool isRequiredResultsForPlugin(QString plugin);
 
@@ -144,7 +146,8 @@ private:
 
     QStandardItemModel *m_metricsPluginModel;
     QStandardItemModel *m_scorePluginModel;
-
+    QMap<std::string, CClusterPluginParameterTableModel*> m_clusterPluginParameters;
+    CTableViewButtonDelegate *m_clusterTableViewDelegate;
     CClusterList *m_clusterList;
 };
 

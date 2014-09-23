@@ -47,7 +47,7 @@ QVariant CIDManagerTableModel::headerData(int section, Qt::Orientation orientati
         case 0:
             return tr("Id");
         case 1:
-            return tr(" Name");
+            return tr("Name");
         }
     }
     return QVariant();
