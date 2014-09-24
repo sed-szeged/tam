@@ -48,13 +48,15 @@ void CFLScore::run()
             rapidjson::Value flValues(rapidjson::kObjectType);
             for (IndexType k = 0; k < m_failedCodeElements.size(); k++) {
                 IndexType cid = m_failedCodeElements[k];
-                rapidjson::Value::MemberIterator memberIt = clusterVal[flTechniqueName.c_str()].FindMember(static_cast<std::ostringstream*>( &(std::ostringstream() << cid) )->str().c_str());
+                std::ostringstream cidAsString;
+                cidAsString << cid;
+                rapidjson::Value::MemberIterator memberIt = clusterVal[flTechniqueName.c_str()].FindMember(static_cast<std::ostringstream*>( &cidAsString )->str().c_str());
                 if (memberIt == clusterVal[flTechniqueName.c_str()].MemberEnd())
                     continue;
                 double value = memberIt->value.GetDouble();
                 double score = CTestSuiteScore::flScore((*m_clusters)[(*it)], value, technique->getDistribution());
 
-                rapidjson::Value failedCe(static_cast<std::ostringstream*>( &(std::ostringstream() << cid) )->str().c_str(), m_results->GetAllocator());
+                rapidjson::Value failedCe(static_cast<std::ostringstream*>( &cidAsString )->str().c_str(), m_results->GetAllocator());
                 rapidjson::Value flScore(score);
                 flValues.AddMember(failedCe, flScore, m_results->GetAllocator());
             }
