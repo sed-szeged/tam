@@ -500,6 +500,19 @@
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="uncoveredgroup">
+           <attribute name="title">
+            <string>Uncovered code elements</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_17">
+            <item>
+             <widget class="QComboBox" name="comboBoxUncoveredGroup"/>
+            </item>
+            <item>
+             <widget class="QListView" name="listViewUncovered"/>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
        </layout>
