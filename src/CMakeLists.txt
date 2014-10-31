@@ -101,3 +101,16 @@ endif()
 add_executable(test-suite-analysis-and-manipulation ${tam_SOURCES} ${tam_FORMS_HEADERS} ${tam_RESOURCES} ${tam_lib})
 target_link_libraries(test-suite-analysis-and-manipulation ${SoDA_LIB} ${SoDAEngine_LIB} ${Boost_LIBRARIES} ${Unqlite_LIB})
 qt5_use_modules(test-suite-analysis-and-manipulation WebKitWidgets Widgets)
+
+if (WIN32)
+    set(DIRS  ${Boost_LIBRARY_DIR} ${QtLoc} ${CMAKE_BINARY_DIR}/ThirdParty/src/Unqlite-build ${CMAKE_BINARY_DIR}/ThirdParty/src/SoDA-build/lib/SoDA ${CMAKE_BINARY_DIR}/ThirdParty/src/SoDA-build/lib/SoDAEngine)
+    set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/test-suite-analysis-and-manipulation.exe" )
+    get_target_property(QtLoc Qt5::Widgets LOCATION)
+    get_filename_component(QtLoc ${QtLoc} DIRECTORY)
+
+    install(TARGETS test-suite-analysis-and-manipulation DESTINATION bin)
+    install(CODE "
+        include(BundleUtilities)
+        fixup_bundle(\"${APPS}\"   \"\"   \"${DIRS}\")
+        " COMPONENT Runtime)
+endif()
