@@ -19,6 +19,7 @@
 #include "CShowMetrics.h"
 #include "CShowScores.h"
 
+#include <QStringListModel>
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QFileDialog>
@@ -106,6 +107,8 @@ void CMainWindow::fillWidgets()
     ui->listViewClusters->setModel(new QStandardItemModel(this));
 
     ui->listViewFailedCodeElements->setModel(new QStandardItemModel(this));
+    ui->listViewUncovered->setModel(new QStringListModel(ui->listViewUncovered));
+    ui->listViewUncovered->setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
 
 void CMainWindow::updateClusterParameters(QString cluster)
@@ -394,6 +397,7 @@ void CMainWindow::updateAvailableClusters()
         QStandardItem *clusterItem = new QStandardItem(tr(it->first.c_str()));
         clusterItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
         modelClusters->appendRow(clusterItem);
+        ui->comboBoxUncoveredGroup->addItem(tr(it->first.c_str()));
     }
 }
 
@@ -585,6 +589,8 @@ void CMainWindow::on_buttonDeleteCluster_clicked()
     ui->listViewMetricsSelClu->model()->removeRow(item->index().row());
     item = qobject_cast<QStandardItemModel*>(ui->listViewScoreSelClu->model())->findItems(cluster).first();
     ui->listViewScoreSelClu->model()->removeRow(item->index().row());
+    if (int id = ui->comboBoxUncoveredGroup->findText(cluster))
+        ui->comboBoxUncoveredGroup->removeItem(id);
     m_clusterList->getClusters().erase(cluster.toStdString());
 }
 
@@ -1099,4 +1105,38 @@ void CMainWindow::on_actionFault_localization_results_triggered()
     CResultsExportDialog dia(this, measurements, m_workspace, false);
     dia.setWindowTitle("Export fault-localization results");
     dia.exec();
+}
+
+void CMainWindow::on_comboBoxUncoveredGroup_currentIndexChanged(const QString &clusterName)
+{
+    if (clusterName.isEmpty())
+        return;
+
+    CClusterDefinition cluster = m_clusterList->getClusters()[clusterName.toStdString()];
+    std::set<IndexType> coveredElementIds;
+    IndexType nrOfCodeElements = cluster.getCodeElements().size();
+    IndexType nrOfTestcases = cluster.getTestCases().size();
+    coveredElementIds.clear();
+    for (IndexType j = 0; j < nrOfCodeElements; j++) {
+        coveredElementIds.insert(cluster.getCodeElements().at(j));
+    }
+    for (IndexType j = 0; j < nrOfTestcases; j++) {
+        IndexType tcid = cluster.getTestCases().at(j);
+        std::set<IndexType>::iterator it = coveredElementIds.begin();
+        while (it != coveredElementIds.end()) {
+            IndexType cid = *it;
+            if (m_workspace->getTestSuite()->getCoverage()->getBitMatrix().get(tcid, cid)) {
+                coveredElementIds.erase(it++);
+            } else {
+                it++;
+            }
+        }
+    }
+    QStringList list;
+    for (std::set<IndexType>::const_iterator it = coveredElementIds.begin(); it != coveredElementIds.end(); ++it) {
+        list.append(m_workspace->getTestSuite()->getCoverage()->getCodeElements().getValue(*it).c_str());
+    }
+
+    QStringListModel *model = qobject_cast<QStringListModel*>(ui->listViewUncovered->model());
+    model->setStringList(list);
 }

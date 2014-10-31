@@ -99,6 +99,8 @@ private slots:
     void on_actionMetrics_results_triggered();
     void on_actionFault_localization_results_triggered();
 
+    void on_comboBoxUncoveredGroup_currentIndexChanged(const QString &clusterName);
+
 protected:
     bool eventFilter(QObject *object, QEvent *event);
 
