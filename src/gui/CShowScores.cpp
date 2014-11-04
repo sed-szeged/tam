@@ -57,7 +57,7 @@ void CShowScores::generateResults(QWebView *view, rapidjson::Document *scores, C
             }
 
             body.append("<a href=\"#\"><h4>" + flName + "</h4></a>");
-            body.append(tableDef.arg(cluster + "_" + flIt->name.GetString(), "<th>suspiciousness value</th>"));
+            body.append(tableDef.arg(cluster.replace(" ", "") + "_" + flIt->name.GetString(), "<th>suspiciousness value</th>"));
             QString data;
             for (rapidjson::Value::ConstMemberIterator scoreIt = flIt->value.MemberBegin(); scoreIt != flIt->value.MemberEnd(); ++scoreIt) {
                 if (scoreIt->value.GetDouble() == 0)
@@ -73,7 +73,7 @@ void CShowScores::generateResults(QWebView *view, rapidjson::Document *scores, C
                             QString::number(scoreIt->value.GetDouble()) + "],");
             }
             data.chop(1);
-            callback.append(tableData.arg(data, cluster + "_" + flIt->name.GetString()));
+            callback.append(tableData.arg(data, cluster.replace(" ", "") + "_" + flIt->name.GetString()));
         }
 
         if (flScore.empty())
