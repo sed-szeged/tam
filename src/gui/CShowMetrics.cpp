@@ -22,19 +22,29 @@ void CShowMetrics::generateResults(QWebView *webView)
                 "<script type=\"text/javascript\" charset=\"utf8\" src=\"qrc:/resources/DataTables/js/jquery.js\"></script>"
                 "<script type=\"text/javascript\" charset=\"utf8\" src=\"qrc:/resources/DataTables/js/jquery.dataTables.min.js\"></script>"
                 "<script type=\"text/javascript\">"
-                      "function init() {"
+                      "$(document).ready(function() {"
                         "var tableData = [%1];"
-                        "$('#summary_table').DataTable({ data: tableData, paging: false, searching: false });"
-                      "}"
-                "</script></head><body onload=\"init()\">"
+                        "var table = $('#summary_table').DataTable({ data: tableData, paging: false, searching: false });"
+                        "$('a.toggle-vis').on('click', function(e) {"
+                            "e.preventDefault();"
+                        // Get the column API object
+                        "var column = table.column($(this).attr('data-column'));"
+                        // Toggle the visibility
+                        "column.visible(!column.visible());"
+                        "});"
+                      "});"
+                "</script></head><body>"
                 "<h3 style=\"text-align:center;\">Summary of base and derived metrics</h3>"
+                "<div>%2</div>"
                 "<table id=\"summary_table\" class=\"display\">"
                 "<thead><tr><th>Group</th>"
-                "%2</tr></thead>"
+                "%3</tr></thead>"
                 "<tbody></tbody></table>"
                   "</body></html>";
 
     QString tableHeader;
+    QString tableToggle;
+    tableToggle.append("Toggle column: ");
     QString tableData;
     bool first = true;
     for (rapidjson::Value::MemberIterator itr = m_metrics.MemberBegin(); itr != m_metrics.MemberEnd(); ++itr) {
@@ -44,9 +54,13 @@ void CShowMetrics::generateResults(QWebView *webView)
 
         rapidjson::Value& val = itr->value;
         tableData.append("['" + QString(parts[0]) + "',");
+        int i = 1;
         for (rapidjson::Value::MemberIterator metrIt = val.MemberBegin(); metrIt != val.MemberEnd(); ++metrIt) {
-            if (first)
+            if (first) {
                 tableHeader.append("<th>" + QString(metrIt->name.GetString()) + "</th>");
+                tableToggle.append("<a href=\"#\" class=\"toggle-vis\" data-column=\"" + QString::number(i) + QString("\">") + QString(metrIt->name.GetString()) + "</a> - ");
+                ++i;
+            }
 
             tableData.append(QString::number(metrIt->value.GetDouble(), 'g', 2) + ",");
         }
@@ -55,8 +69,9 @@ void CShowMetrics::generateResults(QWebView *webView)
         first = false;
     }
 
+    tableToggle.chop(2);
     tableData.chop(1);
-    html = html.arg(tableData, tableHeader);
+    html = html.arg(tableData, tableToggle, tableHeader);
 
     webView->settings()->clearMemoryCaches();
     webView->setHtml(html);
