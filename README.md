@@ -1,6 +1,6 @@
 TAM (Test-suite Analysis and Manipulation)
 ========
-TAM (Test-suite Analysis and Manipulation) is a GUI application, written in Qt, that is created for researchers and developers to help investigating and manipulating test suites or creating assesment reposrts. It is built on top of the [SoDA](http://github.com/sed-szeged/soda) library.
+TAM (Test-suite Analysis and Manipulation) is a GUI application, written in Qt, that is created for researchers and developers to help investigating and manipulating test suites or creating assesment reports. It is built on top of the [SoDA](http://github.com/sed-szeged/soda) library.
 It provides a graphical user interface for most of the algorithms implemented in the library.
 
 ### What's next?
@@ -23,7 +23,7 @@ Send us your improvement ideas or help us to implement these features. Open an i
 
 ### Authors and Contributors
 
-SoDA is created and maintained by the [Department of Software Engineering](http://www.sed.hu), [University of Szeged](http://www.u-szeged.hu). 
+TAM is created and maintained by the [Department of Software Engineering](http://www.sed.hu), [University of Szeged](http://www.u-szeged.hu). 
 
 #### Contribution
 If you would like to contribute to the project, create an issue at our GitHub page or send a pull request. Every contribution is welcome!
