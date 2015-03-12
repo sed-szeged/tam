@@ -29,19 +29,49 @@
 
 using namespace soda;
 
+/**
+ * @brief The CShowMetrics class visualises the results of metrics on different charts.
+ */
 class CShowMetrics
 {
 public:
+
+    /**
+     * @brief Creates a new object.
+     * @param metrics Metric results.
+     * @param clusters Container of clusters.
+     */
     CShowMetrics(rapidjson::Document& metrics, ClusterMap& clusters);
     ~CShowMetrics();
 
+    /**
+     * @brief Visualises the results in a table.
+     * @param webView Selected QWebView instance.
+     */
     void generateResults(QWebView *webView);
+
+    /**
+     * @brief Visualises the results on different charts.
+     * @param webView Selected QWebView instance.
+     */
     void generateCharts(QWebView *webView);
+
+    /**
+     * @brief NIY: Not implemented yet.
+     * @param webView Selected QWebView instance.
+     */
     void generateHeatMap(QWebView *webView);
 
 private:
 
+    /**
+     * @brief Metric results.
+     */
     rapidjson::Document& m_metrics;
+
+    /**
+     * @brief Available clusters.
+     */
     ClusterMap& m_clusters;
 };
 

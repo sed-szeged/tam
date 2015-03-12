@@ -23,15 +23,6 @@
 #include "wrapper/CWorkspace.h"
 #include "util/CSelectionStatistics.h"
 
-CStatisticsThread::CStatisticsThread(QObject *parent) : QThread(parent)
-{
-}
-
-CStatisticsThread::~CStatisticsThread()
-{
-    wait();
-}
-
 void CStatisticsThread::calcStatistics(CWorkspace *workspace)
 {
     m_testSuite = workspace->getTestSuite();

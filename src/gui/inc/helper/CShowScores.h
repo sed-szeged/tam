@@ -28,12 +28,24 @@
 
 using namespace soda;
 
+/**
+ * @brief The CShowScores class implements methods for visualising the results of the fault localization techniques.
+ */
 class CShowScores
 {
 public:
+    /**
+     * @brief Creates a new object.
+     */
     CShowScores();
     ~CShowScores();
 
+    /**
+     * @brief Visualises the given results.
+     * @param view Current QWebView.
+     * @param scores Results of computed fault localization techniques
+     * @param selection Current test-suite for resolving code element ids.
+     */
     void generateResults(QWebView *view, rapidjson::Document *scores, CSelectionData *selection);
 };
 

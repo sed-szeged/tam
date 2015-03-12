@@ -26,10 +26,6 @@ CTestSuiteCluster::CTestSuiteCluster(QObject *parent) : QThread(parent)
     m_params.SetObject();
 }
 
-CTestSuiteCluster::~CTestSuiteCluster()
-{
-}
-
 void CTestSuiteCluster::createClusters(String clusterPlugin, CKernel *kernel, CSelectionData *data, ClusterMap *clusters, rapidjson::Document &params)
 {
     m_clusterPluginName = clusterPlugin;

@@ -22,14 +22,6 @@
 #include "runnable/CTestSuiteLoader.h"
 #include "wrapper/CWorkspace.h"
 
-CTestSuiteLoader::CTestSuiteLoader(QObject *parent) : QThread(parent)
-{
-}
-
-CTestSuiteLoader::~CTestSuiteLoader()
-{
-}
-
 void CTestSuiteLoader::load(CWorkspace *workspace)
 {
     m_covPath = workspace->getCoveragePath().toStdString();

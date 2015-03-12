@@ -32,21 +32,45 @@ namespace Ui {
 class CCoveredListDialog;
 }
 
+/**
+ * @brief The CCoveredListDialog class implements a dialog which lists
+ * the covered test cases by a selected code element or the covered code elements by a selected test case.
+ */
 class CCoveredListDialog : public QDialog
 {
     Q_OBJECT
 
 public:
+
+    /**
+     * @brief Creates a new object and initialises the dialog.
+     * @param parent Parent object.
+     * @param data Current test-suite.
+     * @param id Selected item id.
+     * @param isTest True if the id is belongs to a test case.
+     */
     explicit CCoveredListDialog(QWidget *parent, CSelectionData *data, IndexType id, bool isTest);
     ~CCoveredListDialog();
 
 private slots:
+
+    /**
+     * @brief Slot which is called upon clicking the close button.
+     */
     void on_buttonClose_clicked();
 
+    /**
+     * @brief Slot which is called upon keypress on the connected lineEdit.
+     * @param text Content of the lineEdit.
+     */
     void on_lineEditFilter_textEdited(const QString &text);
 
 private:
     Ui::CCoveredListDialog *ui;
+
+    /**
+     * @brief Helper model for filtering the content of the list.
+     */
     QSortFilterProxyModel *m_filter;
 };
 

@@ -24,12 +24,37 @@
 
 #include <QItemDelegate>
 
+/**
+ * @brief The CTableViewButtonDelegate class implements a special button item which contains a textbox
+ * and a button which opens a file browser. Mostly overrides the functions of the base class.
+ */
 class CTableViewButtonDelegate : public QItemDelegate
 {
     Q_OBJECT
 public:
+
+    /**
+     * @brief Creates a new object.
+     * @param parent
+     */
     CTableViewButtonDelegate(QObject *parent = 0);
+
+    /**
+     * @brief Reimplemented from QItemDelegate::paint().
+     * @param painter
+     * @param option
+     * @param index
+     */
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+
+    /**
+     * @brief Reimplemented from QItemDeleage::editorEvent().
+     * @param event
+     * @param model
+     * @param option
+     * @param index
+     * @return
+     */
     bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index);
 };
 

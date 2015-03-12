@@ -31,17 +31,42 @@
 
 using namespace soda;
 
+/**
+ * @brief The CClusterList class wraps the ClusterMap type with a few methods.
+ */
 class CClusterList
 {
 public:
+
+    /**
+     * @brief Initializes a CClusterList object.
+     */
     CClusterList();
     ~CClusterList();
 
+    /**
+     * @brief Returns a reference to the current clusters.
+     * @return Reference to the current clusters.
+     */
     ClusterMap& getClusters() { return *m_clusters; }
+
+    /**
+     * @brief Stores the given json object in m_clusters
+     * @param doc Given json object which contains clusters.
+     */
     void fromJson(rapidjson::Document &doc);
+
+    /**
+     * @brief Converts the current clusters to json format.
+     * @param doc Given json object where the current clusters will be stored.
+     */
     void toJson(rapidjson::Document &doc);
 
 private:
+
+    /**
+     * @brief Stores cluster groups.
+     */
     ClusterMap *m_clusters;
 };
 

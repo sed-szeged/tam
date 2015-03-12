@@ -31,28 +31,92 @@ using namespace soda;
 
 class CMainWindow;
 
+/**
+ * @brief The CFLScore class implements the computation of faulty code elements on separate thread.
+ */
 class CFLScore : public QThread
 {
     Q_OBJECT
 public:
-    CFLScore(QObject *parent = 0);
+
+    /**
+     * @brief Creates a new object.
+     * @param parent
+     */
+    CFLScore(QObject *parent = 0) : QThread(parent) { }
+    ~CFLScore() { }
+
+    /**
+     * @brief Initialises the thread with the neccessery parameters.
+     * @param revision Revision number.
+     * @param faultLocalizationTechniques Selected fault localization techniques.
+     * @param selectedClusters Selected clusters.
+     * @param failedCodeElements Selected failed code element ids.
+     * @param mainWindow Main window.
+     */
     void calculateScore(RevNumType revision, StringVector faultLocalizationTechniques, StringVector selectedClusters, IntVector failedCodeElements, CMainWindow *mainWindow);
+
 protected:
+
+    /**
+     * @brief Starts the computation.
+     */
     void run();
 
 signals:
+
+    /**
+     * @brief Signal which updates the status label on the main window.
+     * @param label Label to be set on the status label.
+     */
     void updateStatusLabel(QString label);
+
+    /**
+     * @brief Signal that informs the main window that the computation is finished.
+     * @param msg Message to the main window.
+     */
     void processFinished(QString msg);
 
 private:
 
+    /**
+     * @brief Selected revision number.
+     */
     RevNumType m_revision;
+
+    /**
+     * @brief Selected failed code elements.
+     */
     IntVector m_failedCodeElements;
+
+    /**
+     * @brief Selected fault localization techniques.
+     */
     StringVector m_faultLocalizationTechniques;
+
+    /**
+     * @brief List of selected clusters.
+     */
     StringVector m_selectedClusters;
+
+    /**
+     * @brief Current test-suite.
+     */
     CSelectionData *m_testSuite;
+
+    /**
+     * @brief Container of the results.
+     */
     rapidjson::Document *m_results;
+
+    /**
+     * @brief Plugin manager.
+     */
     CKernel *m_kernel;
+
+    /**
+     * @brief Container of available clusters.
+     */
     ClusterMap *m_clusters;
 };
 

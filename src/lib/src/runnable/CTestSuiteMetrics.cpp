@@ -23,14 +23,6 @@
 #include "wrapper/CWorkspace.h"
 #include "runnable/CTestSuiteMetrics.h"
 
-CTestSuiteMetrics::CTestSuiteMetrics(QObject *parent) : QThread(parent)
-{
-}
-
-CTestSuiteMetrics::~CTestSuiteMetrics()
-{
-}
-
 void CTestSuiteMetrics::calculateMetrics(StringVector metrics, StringVector selectedClusters, RevNumType revision, CMainWindow *mainWindow)
 {
     m_metricNames = metrics;

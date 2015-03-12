@@ -27,11 +27,24 @@
 
 using namespace soda;
 
+/**
+ * @brief The CShowClusters class visualises the generated clusters on charts and a table.
+ */
 class CShowClusters
 {
 public:
+
+    /**
+     * @brief Creates a new object.
+     */
     CShowClusters();
     ~CShowClusters();
+
+    /**
+     * @brief Visualises the given clusters.
+     * @param clusters Conainer of clusters.
+     * @param webView Selected QWebView instance.
+     */
     void generateCharts(ClusterMap &clusters, QWebView *webView);
 };
 

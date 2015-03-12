@@ -26,10 +26,6 @@
 
 #include <QString>
 
-CFLScore::CFLScore(QObject *parent) : QThread(parent)
-{
-}
-
 void CFLScore::calculateScore(RevNumType revision, StringVector faultLocalizationTechniques, StringVector selectedClusters, IntVector failedCodeElements, CMainWindow *mainWindow)
 {
     m_kernel = mainWindow->getKernel();

@@ -27,20 +27,68 @@
 
 using namespace soda;
 
+/**
+ * @brief The CIDManagerTableModel class implements a model which lists code elements and test cases.
+ */
 class CIDManagerTableModel : public QAbstractTableModel
 {
     Q_OBJECT
-    IIDManager *m_data;
-    StringVector m_names;
-    IntVector m_ids;
 public:
+    /**
+     * @brief Creates a new object.
+     * @param parent
+     * @param idManager Container of code elements or test cases.
+     */
     explicit CIDManagerTableModel(QObject *parent, IIDManager *idManager);
     enum {ID = 0, NAME, MAX_COLS};
 
+    /**
+     * @brief Returns the number of rows.
+     * @param parent
+     * @return  Number of rows.
+     */
     int rowCount(const QModelIndex &parent) const;
+
+    /**
+     * @brief Returns the number of columns.
+     * @param parent
+     * @return Number of columns.
+     */
     int columnCount(const QModelIndex &parent) const;
+
+    /**
+     * @brief Returns the stored data in the given index.
+     * @param index
+     * @param role
+     * @return Data at the given index.
+     */
     QVariant data(const QModelIndex &index, int role) const;
+
+    /**
+     * @brief Returns the header label for the requested section.
+     * @param section
+     * @param orientation
+     * @param role
+     * @return Header label.
+     */
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+
+private:
+
+    /**
+     * @brief Instance of IDManager.
+     */
+    IIDManager *m_data;
+
+    /**
+     * @brief List of names for speeding up indexing.
+     */
+    StringVector m_names;
+
+    /**
+     * @brief List of ids for speeding up indexing.
+     */
+    IntVector m_ids;
 };
 
 #endif // CTESTSTABLEMODEL_H
