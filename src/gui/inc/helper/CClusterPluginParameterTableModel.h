@@ -27,7 +27,7 @@
 #include <rapidjson/document.h>
 
 /**
- * @brief The CClusterPluginParameterTableModel class
+ * @brief The CClusterPluginParameterTableModel class manages the required parameters for cluster plugins.
  */
 class CClusterPluginParameterTableModel : public QAbstractTableModel
 {
