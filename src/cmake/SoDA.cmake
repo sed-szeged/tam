@@ -2,6 +2,7 @@
 ExternalProject_Add(
     SoDA
     SVN_REPOSITORY https://github.com/sed-szeged/soda/trunk/src
+    SVN_REVISION -r 457
     TIMEOUT 10
     # Force separate output paths for debug and release builds to allow easy
     # identification of correct lib in subsequent TARGET_LINK_LIBRARIES commands
